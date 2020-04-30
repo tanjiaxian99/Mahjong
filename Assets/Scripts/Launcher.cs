@@ -24,6 +24,12 @@ public class Launcher : MonoBehaviourPunCallbacks {
     [SerializeField]
     private GameObject progressLabel;
 
+    /// <summary>
+    /// Only true when the player connects to the server for the first time. Prevents calling OnConnectedToMaster()
+    /// automatically when leaving a room.
+    /// </summary>
+    bool firstConnection;
+
     #endregion
 
     #region MonoBehaviour Callbacks
@@ -46,7 +52,13 @@ public class Launcher : MonoBehaviourPunCallbacks {
 
     public override void OnConnectedToMaster() {
         Debug.Log("Mahjong/Launcher: OnConnectedToMaster() was called by PUN");
-        PhotonNetwork.JoinRandomRoom();
+
+        // Automatically connect to a random room when firstConnection is true, which is when the player
+        // connects to the Photon server for the first time.
+        if (firstConnection) {
+            PhotonNetwork.JoinRandomRoom();
+            firstConnection = false;
+        }
     }
 
 
@@ -55,6 +67,12 @@ public class Launcher : MonoBehaviourPunCallbacks {
     /// </summary>
     public override void OnJoinedRoom() {
         Debug.Log("Mahjong/Launcher: OnJoinedRoom() called by PUN. The client is in a room.");
+        // Let the first player load the room. Every other player will sync with the loaded level 
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 1) {
+            Debug.Log("We load the GameRoom");
+            // Load the Room Level.
+            PhotonNetwork.LoadLevel("GameRoom");
+        }
     }
 
 
@@ -74,6 +92,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
         // Turn off 'connecting...' progressLabel
         progressLabel.SetActive(false);
         controlPanel.SetActive(true);
+
+        // Restart the firstConnection
+        firstConnection = false;
     }
 
     #endregion
@@ -92,7 +113,7 @@ public class Launcher : MonoBehaviourPunCallbacks {
         if (PhotonNetwork.IsConnected) {
             PhotonNetwork.JoinRandomRoom();
         } else {
-            PhotonNetwork.ConnectUsingSettings();
+            firstConnection = PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
         }
     }
