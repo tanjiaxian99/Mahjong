@@ -29,4 +29,3 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     #endregion
 }
-}
