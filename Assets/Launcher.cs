@@ -12,6 +12,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
     /// </summary>
     string gameVersion = "1";
 
+    // #Future Adjust to accommodate spectators
+    [SerializeField]
+    private byte maxPlayersPerRoom = 4;
     #endregion
 
     #region MonoBehaviour Callbacks
@@ -32,6 +35,26 @@ public class Launcher : MonoBehaviourPunCallbacks {
 
     public override void OnConnectedToMaster() {
         Debug.Log("Mahjong/Launcher: OnConnectedToMaster() was called by PUN");
+        PhotonNetwork.JoinRandomRoom();
+    }
+
+
+    /// <summary>
+    /// Called by PUN when JoinRandomRoom succeeds
+    /// </summary>
+    public override void OnJoinedRoom() {
+        Debug.Log("Mahjong/Launcher: OnJoinedRoom() called by PUN. The client is in a room.");
+    }
+
+
+    /// <summary>
+    /// Called by PUN when JoinRandomRoom fails
+    /// </summary>
+    public override void OnJoinRandomFailed(short returnCode, string message) {
+        Debug.Log("Mahjong/Launcher: OnJoinRandomFailed() was called by PUN. No random room available. \nCall PhotonNetwork.CreateRoom");
+        // Create a new room with no name
+        PhotonNetwork.CreateRoom(null, new RoomOptions {
+            MaxPlayers = maxPlayersPerRoom});
     }
 
 
