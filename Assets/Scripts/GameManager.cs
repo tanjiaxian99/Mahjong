@@ -18,22 +18,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     #endregion
 
-
-    #region Private Methods
-
-    /// <summary>
-    /// The Master Client will load the GameRoom and subsequent players will join
-    /// </summary>
-    void LoadArena() {
-        if (!PhotonNetwork.IsMasterClient) {
-            Debug.LogError("PhotonNetwork : Trying to Load a level but we are not the Master Client");
-        }
-        Debug.LogFormat("PhotonNetwork : Loading GameRoom");
-        PhotonNetwork.LoadLevel("GameRoom");
-    }
-
-    #endregion
-
     #region Public Methods
 
 

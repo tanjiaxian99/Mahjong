@@ -55,6 +55,12 @@ public class Launcher : MonoBehaviourPunCallbacks {
     /// </summary>
     public override void OnJoinedRoom() {
         Debug.Log("Mahjong/Launcher: OnJoinedRoom() called by PUN. The client is in a room.");
+        // Let the first player load the room. Every other player will sync with the loaded level 
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 1) {
+            Debug.Log("We load the GameRoom");
+            // Load the Room Level.
+            PhotonNetwork.LoadLevel("GameRoom");
+        }
     }
 
 
