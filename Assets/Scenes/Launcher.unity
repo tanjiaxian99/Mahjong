@@ -312,6 +312,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxPlayersPerRoom: 4
+  controlPanel: {fileID: 1766920304}
+  progressLabel: {fileID: 595439089}
 --- !u!4 &1089412701
 Transform:
   m_ObjectHideFlags: 0
