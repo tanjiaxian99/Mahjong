@@ -1,18 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+using Photon.Pun;
+using Photon.Realtime;
+public class GameManager : MonoBehaviourPunCallbacks {
+    #region Photon Callbacks
+
+    /// <summary>
+    /// When the player leaves the room, call the Launcher scene
+    /// </summary>
+    public override void OnLeftRoom() {
+        SceneManager.LoadScene(0);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+
+    #endregion
+
+
+    #region Public Methods
+
+
+    public void LeaveRoom() {
+        PhotonNetwork.LeaveRoom();
     }
+
+
+    #endregion
+}
 }
