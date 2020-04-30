@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
-public class Launcher : MonoBehaviour {
+public class Launcher : MonoBehaviourPunCallbacks {
     #region Private Fields
 
     /// <summary>
@@ -13,7 +14,7 @@ public class Launcher : MonoBehaviour {
 
     #endregion
 
-    #region MonoBehaviour CallBacks
+    #region MonoBehaviour Callbacks
 
     void Awake() {
         // All clients in the same room will automatically load the same level as Master Client
@@ -23,6 +24,19 @@ public class Launcher : MonoBehaviour {
 
     void Start() {
         Connect();
+    }
+
+    #endregion
+
+    #region MonoBehaviourPunCallbacks Callbacks
+
+    public override void OnConnectedToMaster() {
+        Debug.Log("Mahjong/Launcher: OnConnectedToMaster() was called by PUN");
+    }
+
+
+    public override void OnDisconnected(DisconnectCause cause) {
+        Debug.LogWarningFormat("Mahjong/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
     }
 
     #endregion
