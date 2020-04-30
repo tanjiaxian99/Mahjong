@@ -15,6 +15,15 @@ public class Launcher : MonoBehaviourPunCallbacks {
     // #Future Adjust to accommodate spectators
     [SerializeField]
     private byte maxPlayersPerRoom = 4;
+
+    [Tooltip("The Control Panel that allows the player to enter a name and click play")]
+    [SerializeField]
+    private GameObject controlPanel;
+
+    [Tooltip("The UI Label to inform the player that the connection is in progress")]
+    [SerializeField]
+    private GameObject progressLabel;
+
     #endregion
 
     #region MonoBehaviour Callbacks
@@ -26,6 +35,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
 
 
     void Start() {
+        // Show name inputField and 'Play' button
+        progressLabel.SetActive(false);
+        controlPanel.SetActive(true);
     }
 
     #endregion
@@ -59,6 +71,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
 
     public override void OnDisconnected(DisconnectCause cause) {
         Debug.LogWarningFormat("Mahjong/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
+        // Turn off 'connecting...' progressLabel
+        progressLabel.SetActive(false);
+        controlPanel.SetActive(true);
     }
 
     #endregion
@@ -66,10 +81,14 @@ public class Launcher : MonoBehaviourPunCallbacks {
     #region Public Methods
 
     /// <summary>
-    /// Start the connection process
+    /// Start the connection process upon clicking the 'Play' Button
     /// If connected, join a random room. Else, connect to server
     /// </summary>
     public void Connect() {
+        // Show 'connecting... progressLabel'
+        progressLabel.SetActive(true);
+        controlPanel.SetActive(false);
+
         if (PhotonNetwork.IsConnected) {
             PhotonNetwork.JoinRandomRoom();
         } else {
