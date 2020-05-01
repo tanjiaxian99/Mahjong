@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 405816842061345336}
   - component: {fileID: 2302294406595586567}
   - component: {fileID: 5088626587880419655}
-  - component: {fileID: 3547083271901314109}
+  - component: {fileID: 8659606841668409289}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 9c3900fd8d2d4744cad2f94aeeba974a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4de396911bdeaa4db43783efc876aaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3547083271901314109
+--- !u!114 &8659606841668409289
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -122,7 +122,7 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 3
+  Synchronization: 0
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: 0}

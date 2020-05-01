@@ -23,9 +23,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
             Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
         } else {
             Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManager.GetActiveScene().name);
-            // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
-            PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 1f, -5.5f), Quaternion.identity, 0);
-            assignPlayerWind();
+            PlayerManager.Wind playerWind = AssignPlayerWind();
+            MoveToWindSeat(playerWind);
         }
     }
 
@@ -46,7 +45,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     #region Private Methods
 
     // Assign a random player wind to the local player without clashing with the winds of other players
-    private void assignPlayerWind() {
+    private PlayerManager.Wind AssignPlayerWind() {
         // Retrieve winds of other players
         Player[] playerList = PhotonNetwork.PlayerListOthers;
         List<PlayerManager.Wind> winds = new List<PlayerManager.Wind>();
@@ -79,16 +78,40 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
 
         // Add local player's wind to customProperties
-        Hashtable customProperties = new Hashtable();
-        customProperties.Add("playerWind", playerWind);
-        PhotonNetwork.SetPlayerCustomProperties(customProperties);
-        Debug.Log(playerWind);
+        Hashtable hash = new Hashtable();
+        hash.Add("playerWind", playerWind);
+        PhotonNetwork.SetPlayerCustomProperties(hash);
+
+        Debug.LogFormat("The local player has been assigned the {0} wind", playerWind);
+        return playerWind;
+    }
+
+
+    // Instantiate player at the wind seat based on playerWind
+    private void MoveToWindSeat(PlayerManager.Wind playerWind) {
+        // Determine location of spawnpoint
+        Vector3 playerPos;
+        switch (playerWind) {
+            case PlayerManager.Wind.EAST:
+                playerPos = new Vector3(5.5f, 1, 0);
+                break;
+            case PlayerManager.Wind.SOUTH:
+                playerPos = new Vector3(0, 1, -5.5f);
+                break;
+            case PlayerManager.Wind.WEST:
+                playerPos = new Vector3(-5.5f, 1, 0);
+                break;
+            default:
+                playerPos = new Vector3(0, 1, 5.5f);
+                break;
+        }
+        // Spawn a character for the local player. It gets synced by using PhotonNetwork.Instantiate
+        PhotonNetwork.Instantiate(this.playerPrefab.name, playerPos, Quaternion.identity, 0);
     }
 
     #endregion
 
     #region Public Methods
-
 
     public void LeaveRoom() {
         PhotonNetwork.LeaveRoom();
