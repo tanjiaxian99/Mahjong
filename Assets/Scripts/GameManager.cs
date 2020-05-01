@@ -53,9 +53,10 @@ public class GameManager : MonoBehaviourPunCallbacks {
             winds.Add((PlayerManager.Wind)player.CustomProperties["playerWind"]);
         }
         
-        // Ensure local player doesn't have the same wind as another player
         var rand = new System.Random();
         PlayerManager.Wind playerWind;
+
+        // Assign the local player a different wind from current players
         while (true) {
             switch (rand.Next(4)) {
                 case 0:
@@ -89,22 +90,30 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     // Instantiate player at the wind seat based on playerWind
     private void MoveToWindSeat(PlayerManager.Wind playerWind) {
-        // Determine location of spawnpoint
         Vector3 playerPos;
+        Quaternion cameraRotation;
+
+        // Determine seat location based on playerWind and rotate main camera accordingly.
         switch (playerWind) {
             case PlayerManager.Wind.EAST:
                 playerPos = new Vector3(5.5f, 1, 0);
+                cameraRotation = Quaternion.Euler(90f, 0f, 90f);
                 break;
             case PlayerManager.Wind.SOUTH:
                 playerPos = new Vector3(0, 1, -5.5f);
+                cameraRotation = Quaternion.Euler(90f, 0f, 0f);
                 break;
             case PlayerManager.Wind.WEST:
                 playerPos = new Vector3(-5.5f, 1, 0);
+                cameraRotation = Quaternion.Euler(90f, 0f, 270f);
                 break;
             default:
                 playerPos = new Vector3(0, 1, 5.5f);
+                cameraRotation = Quaternion.Euler(90f, 0f, 180f);
                 break;
         }
+        Camera.main.transform.rotation = cameraRotation;
+
         // Spawn a character for the local player. It gets synced by using PhotonNetwork.Instantiate
         PhotonNetwork.Instantiate(this.playerPrefab.name, playerPos, Quaternion.identity, 0);
     }
