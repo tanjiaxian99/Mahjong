@@ -9,7 +9,10 @@ public class GameManager : MonoBehaviourPunCallbacks {
     #region Private Fields
 
     [Tooltip("The prefab to use for representing the player")]
-    public GameObject playerPrefab;
+    [SerializeField]
+    private GameObject playerPrefab;
+
+    private List<PlayerManager.Wind> playerWinds;
 
     #endregion
 
@@ -19,7 +22,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         if (playerPrefab == null) {
             Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
         } else {
-            Debug.LogFormat("We are Instantiating LocalPlayer from {0}", Application.loadedLevelName);
+            Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManager.GetActiveScene().name);
             // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
             PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 1f, -5.5f), Quaternion.identity, 0);
         }
@@ -36,6 +39,29 @@ public class GameManager : MonoBehaviourPunCallbacks {
         SceneManager.LoadScene(0);
     }
 
+
+    #endregion
+
+    #region Private Methods
+
+    // Assign a random player wind to each new player
+    //private void playerWindStart() {
+    //    var rand = new System.Random();
+    //    switch (rand.Next(4)) {
+    //        case 0:
+    //            playerWind = Wind.EAST;
+    //            break;
+    //        case 1:
+    //            playerWind = Wind.SOUTH;
+    //            break;
+    //        case 2:
+    //            playerWind = Wind.WEST;
+    //            break;
+    //        case 3:
+    //            playerWind = Wind.NORTH;
+    //            break;
+    //    }
+    //}
 
     #endregion
 
