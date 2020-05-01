@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         hash.Add("playerWind", playerWind);
         PhotonNetwork.SetPlayerCustomProperties(hash);
 
-        Debug.LogFormat("The local player has been assigned the {0} wind", playerWind);
+        Debug.LogErrorFormat("The local player has been assigned the {0} wind", playerWind);
         return playerWind;
     }
 
