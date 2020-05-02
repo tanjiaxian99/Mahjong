@@ -33,12 +33,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
     }
 
-    void Update() {
-        Debug.LogFormat("The height is: {0}", 2f * Camera.main.orthographicSize);
-        Debug.LogFormat("The width is: {0}", 2f * Camera.main.orthographicSize * Camera.main.aspect);
-
-    }
-
     #endregion
 
     #region MonoBehaviourPunCallbacks Callbacks
@@ -107,19 +101,19 @@ public class GameManager : MonoBehaviourPunCallbacks {
         // Determine seat location based on playerWind and rotate main camera accordingly.
         switch (playerWind) {
             case PlayerManager.Wind.EAST:
-                playerPos = new Vector3(5.5f, 1, 0);
+                playerPos = new Vector3(15f, 1, 0);
                 cameraRotation = Quaternion.Euler(90f, 0f, 90f);
                 break;
             case PlayerManager.Wind.SOUTH:
-                playerPos = new Vector3(0, 1, -5.5f);
+                playerPos = new Vector3(0, 1, -15f);
                 cameraRotation = Quaternion.Euler(90f, 0f, 0f);
                 break;
             case PlayerManager.Wind.WEST:
-                playerPos = new Vector3(-5.5f, 1, 0);
+                playerPos = new Vector3(-15f, 1, 0);
                 cameraRotation = Quaternion.Euler(90f, 0f, 270f);
                 break;
             default:
-                playerPos = new Vector3(0, 1, 5.5f);
+                playerPos = new Vector3(0, 1, 15f);
                 cameraRotation = Quaternion.Euler(90f, 0f, 180f);
                 break;
         }
