@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviourPunCallbacks {
     [SerializeField]
     private GameObject playerPrefab;
 
+    [Tooltip("The GameObject used to represent a physical Mahjong table")]
+    [SerializeField]
+    private GameObject gameTable;
+
     #endregion
 
     #region MonoBehavior Callbacks
@@ -25,7 +29,14 @@ public class GameManager : MonoBehaviourPunCallbacks {
             Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManager.GetActiveScene().name);
             PlayerManager.Wind playerWind = AssignPlayerWind();
             MoveToWindSeat(playerWind);
+            StretchGameTable(playerWind);
         }
+    }
+
+    void Update() {
+        Debug.LogFormat("The height is: {0}", 2f * Camera.main.orthographicSize);
+        Debug.LogFormat("The width is: {0}", 2f * Camera.main.orthographicSize * Camera.main.aspect);
+
     }
 
     #endregion
@@ -116,6 +127,21 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         // Spawn a character for the local player. It gets synced by using PhotonNetwork.Instantiate
         PhotonNetwork.Instantiate(this.playerPrefab.name, playerPos, Quaternion.identity, 0);
+    }
+
+
+    // Stretch the GameTable to fill up the screen, depending on the player's seat
+    private void StretchGameTable(PlayerManager.Wind playerWind) {
+        Camera camera = Camera.main;
+        float height = 2f * camera.orthographicSize;
+        float width = height * camera.aspect;
+
+        // Scale the GameTable along the x-z axes
+        if (playerWind == PlayerManager.Wind.NORTH || playerWind == PlayerManager.Wind.SOUTH) {
+            gameTable.transform.localScale = new Vector3(width, 1, height);
+        } else {
+            gameTable.transform.localScale = new Vector3(height, 1, width);
+        }
     }
 
     #endregion

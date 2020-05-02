@@ -1158,6 +1158,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 311240183391819340, guid: eed4940a3d7774344a2e54efba0b74a1,
         type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: gameTable
+      value: 
+      objectReference: {fileID: 1286068716}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 015276895ad00c942b8b856802f75876, type: 3}
 --- !u!114 &863154032465345303 stripped
