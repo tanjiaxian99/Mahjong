@@ -42,7 +42,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvAssignWind = 3;
 
     /// <summary>
-    /// The Player Instantiation event message byte. Used internally for instantiatig the local player and player instances.
+    /// The Player Instantiation event message byte. Used internally for instantiating the local player and 
+    /// stretching the GameTable to fill the screen.
     /// </summary>
     public const byte EvPlayerInstantiate = 4;
 
@@ -390,6 +391,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Scale the GameTable along z direction
         gameTable.transform.localScale = new Vector3(width, 1, height);
     }
+
     
     #endregion
 }
