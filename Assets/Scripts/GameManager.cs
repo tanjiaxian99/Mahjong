@@ -8,10 +8,12 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using Photon.Pun.UtilityScripts;
+using ExitGames.Client.Photon;
+
 using Random = System.Random;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
+public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
 
     [Tooltip("The prefab to use for representing the player")]
@@ -31,6 +33,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     private PunTurnManager turnManager;
 
     #endregion
+
+    #region OnEvent Fields
+
+    /// <summary>
+    /// The Wind Assignment event message byte. Used internally for saving data in Player Custom Properties
+    /// </summary>
+    public const byte EvAssignWind = 1;
+
+    /// <summary>
+    /// The Wind Assignment event message byte. Used internally for saving data in Player Custom Properties
+    /// </summary>
+    //public static readonly byte Ev
+
+    /// <summary>
+    /// Wind of the player
+    /// </summary>
+    public static readonly string AssignWindPropKey = "pW";
+
+    #endregion
+
 
     #region MonoBehavior Callbacks
 
@@ -52,13 +74,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
 
     #region MonoBehaviourPunCallbacks Callbacks
 
+    // Register the OnEvent callback handler
+    public override void OnEnable() {
+        base.OnEnable();
+        PhotonNetwork.AddCallbackTarget(this);
+    }
+
+
+    // Remove the OnEvent callback handler
+    public override void OnDisable() {
+        base.OnDisable();
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
+
+
     /// <summary>
     /// Called by the local player upon joining a room
     /// </summary>
     public override void OnJoinedRoom() {
-        // Determine the wind of the local player
-        PlayerManager.Wind playerWind = AssignPlayerWind();
-
         // Move the player to his seat based on his wind
         MoveToWindSeat(playerWind);
 
@@ -115,7 +148,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     
     #endregion
 
-    #region IPunTurnManagerCallbacks
+    #region IPunTurnManagerCallbacks Callbacks
 
     public void OnTurnBegins(int turn) {
         throw new System.NotImplementedException();
@@ -135,6 +168,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
 
     public void OnTurnTimeEnds(int turn) {
         throw new System.NotImplementedException();
+    }
+
+    #endregion Callbacks Callbacks
+
+    #region IOnEventCallback Callbacks
+
+    public void OnEvent(EventData photonEvent) {
+        byte eventCode = photonEvent.Code;
+
+        switch(eventCode) {
+            case EvAssignWind:
+                PlayerManager.Wind wind = (PlayerManager.Wind)photonEvent.CustomData;
+
+                Hashtable ht = new Hashtable();
+                ht.Add(AssignWindPropKey, wind);
+                PhotonNetwork.SetPlayerCustomProperties(ht);
+                break;
+        }
     }
 
     #endregion
@@ -170,7 +221,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
             int randomIndex = rand.Next(winds.Count());
             playerWind = winds[randomIndex];
             winds.Remove(winds[randomIndex]);
-            // TODO: Raise Event for specific player
+
+            PhotonNetwork.RaiseEvent(EvAssignWind, playerWind, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             // TODO: Each player has to store their own winds after receiving event
         }
 
@@ -315,5 +367,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
             gameTable.transform.localScale = new Vector3(height, 1, width);
         }
     }
+    
     #endregion
 }
