@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,8 +26,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     private int numberOfPlayersToStart = 4;
 
     private PunTurnManager turnManager;
-
-
 
     #endregion
 
@@ -103,8 +103,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         // Implement disconnectedPanel UI
         Debug.Log("Local player has disconnected due to cause {0}", cause);
     }
-
-
+    
     #endregion
 
     #region IPunTurnManagerCallbacks
@@ -134,12 +133,68 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     #region Gameplay Methods
 
     /// <summary>
-    /// Master Client will start the turn
+    /// Called by the Master Client to start a new Turn
     /// </summary>
     public void StartTurn() {
-        //
+        
         if (PhotonNetwork.IsMasterClient) {
             this.turnManager.BeginTurn();
+        }
+    }
+
+    /// <summary>
+    /// Called at the start of every game (when PunTurnManager.Turn == 0)
+    /// </summary>
+    public void InitializeGame() {
+        this.GenerateTiles();
+
+               
+
+    }
+
+    /// <summary>
+    /// Create 4 copies of each tile, giving 148 tiles
+    /// </summary>
+    public void GenerateTiles() {
+        List<Tile> tiles = new List<Tile>();
+
+        // Create 4 copies of each tile
+        for (int k = 0; k < 4; k++) {
+
+            foreach (Tile.Suit suit in Enum.GetValues(typeof(Tile.Suit))) {
+
+                switch (suit) {
+                    // Generate the tiles for Character, Dot and Bamboo suits
+                    case Tile.Suit.Character:
+                    case Tile.Suit.Dot:
+                    case Tile.Suit.Bamboo:
+                        foreach (Tile.Rank rank in Enum.GetValues(typeof(Tile.Rank))) {
+                            tiles.Add(new Tile(suit, rank));
+                        }
+                        break;
+
+                    // Generate the tiles for Wind, Season, Flower and Animal suits
+                    case Tile.Suit.Wind:
+                    case Tile.Suit.Season:
+                    case Tile.Suit.Flower:
+                    case Tile.Suit.Animal:
+                        foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(4)) {
+                            tiles.Add(new Tile(suit, rank));
+                        }
+                        break;
+
+                    // Generate the tiles for Dragon suit
+                    case Tile.Suit.Dragon:
+                        foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(3)) {
+                            tiles.Add(new Tile(suit, rank));
+                        }
+                        break;
+                }
+            }
+        }
+
+        if (tiles.Count != 148) {
+            Debug.LogError("The number of tiles created isn't 148");
         }
     }
 
