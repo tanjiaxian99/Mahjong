@@ -49,7 +49,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Wind of the player
     /// </summary>
-    public static readonly string AssignWindPropKey = "pW";
+    public static readonly string AssignWindPropKey = "pw";
+
+    /// <summary>
+    /// List of tiles in the walls
+    /// </summary>
+    public static readonly string WallTileListPropKey = "wt";
+
+    /// <summary>
+    /// List of tiles in the discard pool
+    /// </summary>
+    public static readonly string DiscardTileListPropKey = "dt";
 
     #endregion
 
@@ -181,9 +191,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvAssignWind:
                 PlayerManager.Wind wind = (PlayerManager.Wind)photonEvent.CustomData;
 
+                // Update local player's custom properties
                 Hashtable ht = new Hashtable();
                 ht.Add(AssignWindPropKey, wind);
                 PhotonNetwork.SetPlayerCustomProperties(ht);
+
+                // Update local player's playerManager
+                playerManager.PlayerWind = wind;
                 break;
         }
     }
@@ -212,7 +226,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Called by MasterClient to assign a wind to each player
     /// </summary>
-    private void AssignPlayerWind() {
+    public void AssignPlayerWind() {
         Random rand = new Random();
         List<PlayerManager.Wind> winds = ((PlayerManager.Wind[])Enum.GetValues(typeof(PlayerManager.Wind))).ToList();
         PlayerManager.Wind playerWind;
@@ -223,12 +237,29 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             winds.Remove(winds[randomIndex]);
 
             PhotonNetwork.RaiseEvent(EvAssignWind, playerWind, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-            // TODO: Each player has to store their own winds after receiving event
         }
 
         Debug.LogFormat("The 4 winds have been assigned to each player");
     }
 
+    /// <summary>
+    /// Update the room's custom properties with the play order.
+    /// Play order starts from East Wind and ends at South.
+    /// </summary>
+    public void DeterminePlayOrder() {
+        Player[] playOrder = new Player[4];
+
+        foreach (Player player in PhotonNetwork.PlayerList) {
+            // PlayerManager.Wind is order from East to South. Retrieving the wind of the player and converting it to an int
+            // will give the proper play order
+            int index = (int)player.CustomProperties[AssignWindPropKey];
+            playOrder[index] = player;
+        }
+
+        Hashtable ht = new Hashtable();
+        ht.Add(WallTileListPropKey, playOrder);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
 
     /// <summary>
     /// Create 4 copies of each tile, giving 148 tiles
@@ -276,9 +307,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         // Add to Room Custom Properties
-        Hashtable tilesHT = new Hashtable();
-        tilesHT.Add("tiles", tiles);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(tilesHT);
+        Hashtable ht = new Hashtable();
+        ht.Add("tiles", tiles);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
     /// <summary>
