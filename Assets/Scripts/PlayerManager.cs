@@ -14,14 +14,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
         WEST,
         NORTH
     }
-    private Wind playerWind { get; set; }
+
+    public Wind PlayerWind { get; set; }
+
+    public List<Tile> hand { get; set; } = new List<Tile>() ;
 
     #endregion
 
     #region MonoBehaviour Callbacks
 
     void Awake() {
-
     }
     #endregion
 

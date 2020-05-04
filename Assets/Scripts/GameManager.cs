@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using Photon.Pun.UtilityScripts;
+using Random = System.Random;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
@@ -16,6 +17,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     [Tooltip("The prefab to use for representing the player")]
     [SerializeField]
     private GameObject playerPrefab;
+
+    private PlayerManager playerManager;
 
     [Tooltip("The GameObject used to represent a physical Mahjong table")]
     [SerializeField]
@@ -36,7 +39,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
             Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
         } else {
             Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManager.GetActiveScene().name);
-
+            
             // PunTurnManager settings
             turnManager = this.gameObject.AddComponent<PunTurnManager>();
             turnManager.TurnManagerListener = this;
@@ -62,9 +65,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         // Change the width of the gameTable based on the player's seat
         StretchGameTable(playerWind);
 
+        // Initialize PlayerManager for local player
+        playerManager = playerPrefab.GetComponent<PlayerManager>();
+
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             // Players that disconnect and reconnect won't start the game at turn 0
             if (this.turnManager.Turn == 0) {
+                this.InitializeGame();
                 this.StartTurn();
             }
 
@@ -79,6 +86,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             if (this.turnManager.Turn == 0) {
+                this.InitializeGame();
                 this.StartTurn();
             }
         }
@@ -101,7 +109,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
 
     public override void OnDisconnected(DisconnectCause cause) {
         // Implement disconnectedPanel UI
-        Debug.Log("Local player has disconnected due to cause {0}", cause);
+        Debug.LogFormat("Local player has disconnected due to cause {0}", cause);
     }
     
     #endregion
@@ -133,7 +141,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     #region Gameplay Methods
 
     /// <summary>
-    /// Called by the Master Client to start a new Turn
+    /// Called by the MasterClient to start a new Turn
     /// </summary>
     public void StartTurn() {
         
@@ -143,13 +151,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     }
 
     /// <summary>
-    /// Called at the start of every game (when PunTurnManager.Turn == 0)
+    /// Called at the start of every game (when PunTurnManager.Turn == 0) by MasterClient
     /// </summary>
     public void InitializeGame() {
-        this.GenerateTiles();
-
-               
-
+        if (PhotonNetwork.IsMasterClient) {
+            this.GenerateTiles();
+            this.DistributeTiles();
+        }
     }
 
     /// <summary>
@@ -196,6 +204,40 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         if (tiles.Count != 148) {
             Debug.LogError("The number of tiles created isn't 148");
         }
+
+        // Add to Room Custom Properties
+        Hashtable tilesHT = new Hashtable();
+        tilesHT.Add("tiles", tiles);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(tilesHT);
+    }
+
+    /// <summary>
+    /// Distribute tiles to each player depending on the wind seat. The player with the East Wind receives 14 tiles
+    /// while the rest receives 13
+    /// </summary>
+    public void DistributeTiles() {
+        Random rand = new Random();
+        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties["tiles"];
+
+        foreach (Player player in PhotonNetwork.PlayerList) {
+            List<Tile> playerTiles = new List<Tile>();
+
+            for (int i = 0; i < 13; i++) {
+                // Choose a tile randomly from the complete tiles list and add it to the player's tiles
+                playerTiles.Add(tiles[rand.Next(tiles.Count())]);
+            }
+
+            // Give the player one more tile if he is the East Wind
+            if ((PlayerManager.Wind)player.CustomProperties["playerWind"] == PlayerManager.Wind.EAST) {
+                playerTiles.Add(tiles[rand.Next(tiles.Count())]);
+            }
+            // RaiseEvent
+        }
+
+        // Reinsert updated tiles list into Room Custom Properties
+        Hashtable tilesHT = new Hashtable();
+        tilesHT.Add("tiles", tiles);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(tilesHT);
     }
 
     #endregion
@@ -206,7 +248,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         PhotonNetwork.LeaveRoom();
     }
 
-
+    // TODO: Assign after there are 4 players
     // Assign a random player wind to the local player without clashing with the winds of other players
     private PlayerManager.Wind AssignPlayerWind() {
         // Retrieve winds of other players
