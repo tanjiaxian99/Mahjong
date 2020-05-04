@@ -37,15 +37,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     #region OnEvent Fields
 
     /// <summary>
-    /// The Wind Assignment event message byte. Used internally for saving data in Player Custom Properties
+    /// The Wind Assignment event message byte. Used internally for saving data in local player's custom properties.
     /// </summary>
     public const byte EvAssignWind = 3;
 
     /// <summary>
-    /// The Player Instantiation event message byte. Used internally for instantiating the local player and 
+    /// The Instantiate Player event message byte. Used internally for instantiating the local player and 
     /// stretching the GameTable to fill the screen.
     /// </summary>
-    public const byte EvPlayerInstantiate = 4;
+    public const byte EvInstantiatePlayer = 4;
+
+    /// <summary>
+    /// The Distribute Tiles event message byte. Used internally for saving data in local player's PlayerManager.
+    /// </summary>
+    public const byte EvDistributeTiles = 5;
+
+    /// <summary>
+    /// The Instantiate Tiles event message byte. Used internally for instantiating the tiles in the local player's hand.
+    /// </summary>
+    public const byte EvInstantiateTiles = 6;
 
     /// <summary>
     /// Wind of the player
@@ -196,9 +206,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerManager.PlayerWind = wind;
                 break;
 
-            case EvPlayerInstantiate:
+            case EvInstantiatePlayer:
                 this.InstantiateLocalPlayer();
                 this.StretchGameTable();
+                break;
+
+            case EvDistributeTiles:
+                // Update local player's playerManager
+                playerManager.hand = (List<Tile>)photonEvent.CustomData;
+                break;
+
+            case EvInstantiateTiles:
+                this.InstantiateLocalTiles();
                 break;
         }
     }
@@ -224,6 +243,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiatePlayers();
         this.GenerateTiles();
         this.DistributeTiles();
+        this.InstantiateTiles();
     }
 
 
@@ -268,10 +288,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Raise an event telling all players to instantiate their player prefab
+    /// Raise an event telling all players to instantiate their player prefab and stretch their GameTable
     /// </summary>
     public void InstantiatePlayers() {
-        PhotonNetwork.RaiseEvent(EvPlayerInstantiate, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
+        PhotonNetwork.RaiseEvent(EvInstantiatePlayer, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
     }
 
 
@@ -350,18 +370,28 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 }
             }
 
-            // TODO: RaiseEvent
+            PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
         }
 
         // Reinsert updated tiles list into Room Custom Properties
         Hashtable ht = new Hashtable();
         ht.Add(WallTileListPropKey, tiles);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        Debug.Log("The tiles from the wall have been distributed");
+    }
+
+
+    /// <summary>
+    /// Raise an event telling all players to instantiate the tiles in their hand.
+    /// </summary>
+    public void InstantiateTiles() {
+        PhotonNetwork.RaiseEvent(EvInstantiateTiles, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
     }
 
     #endregion
 
-    #region Public Methods
+    #region Local Player Methods
 
     public void LeaveRoom() {
         PhotonNetwork.LeaveRoom();
@@ -392,6 +422,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         gameTable.transform.localScale = new Vector3(width, 1, height);
     }
 
-    
+
+    /// <summary>
+    /// After the local player receives the tiles, instantiate the tiles.
+    /// </summary>
+    public void InstantiateLocalTiles() {
+        if (playerManager.hand == null) {
+            Debug.Log("The player's hand is empty.");
+            return;
+        }
+
+
+    }
+
     #endregion
 }
