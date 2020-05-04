@@ -70,7 +70,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             // Players that disconnect and reconnect won't start the game at turn 0
-            if (this.turnManager.Turn == 0) {
+            // Game is initialized by MasterClient
+            if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
                 this.InitializeGame();
                 this.StartTurn();
             }
@@ -85,7 +86,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         Debug.Log("A new player has arrived");
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
-            if (this.turnManager.Turn == 0) {
+            if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
                 this.InitializeGame();
                 this.StartTurn();
             }
@@ -144,21 +145,38 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     /// Called by the MasterClient to start a new Turn
     /// </summary>
     public void StartTurn() {
-        
-        if (PhotonNetwork.IsMasterClient) {
-            this.turnManager.BeginTurn();
-        }
+        this.turnManager.BeginTurn();
     }
 
     /// <summary>
     /// Called at the start of every game (when PunTurnManager.Turn == 0) by MasterClient
     /// </summary>
     public void InitializeGame() {
-        if (PhotonNetwork.IsMasterClient) {
-            this.GenerateTiles();
-            this.DistributeTiles();
-        }
+        this.AssignPlayerWind();
+        this.GenerateTiles();
+        this.DistributeTiles();
     }
+
+
+    /// <summary>
+    /// Called by MasterClient to assign a wind to each player
+    /// </summary>
+    private void AssignPlayerWind() {
+        Random rand = new Random();
+        List<PlayerManager.Wind> winds = ((PlayerManager.Wind[])Enum.GetValues(typeof(PlayerManager.Wind))).ToList();
+        PlayerManager.Wind playerWind;
+
+        foreach (Player player in PhotonNetwork.PlayerList) {
+            int randomIndex = rand.Next(winds.Count());
+            playerWind = winds[randomIndex];
+            winds.Remove(winds[randomIndex]);
+            // TODO: Raise Event for specific player
+            // TODO: Each player has to store their own winds after receiving event
+        }
+
+        Debug.LogFormat("The 4 winds have been assigned to each player");
+    }
+
 
     /// <summary>
     /// Create 4 copies of each tile, giving 148 tiles
@@ -222,16 +240,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         foreach (Player player in PhotonNetwork.PlayerList) {
             List<Tile> playerTiles = new List<Tile>();
 
-            for (int i = 0; i < 13; i++) {
+            int i = 0;
+            while (i < 14)  {
                 // Choose a tile randomly from the complete tiles list and add it to the player's tiles
-                playerTiles.Add(tiles[rand.Next(tiles.Count())]);
+                int randomIndex = rand.Next(tiles.Count());
+                playerTiles.Add(tiles[randomIndex]);
+                tiles.Remove(tiles[randomIndex]);
+
+                // Don't give the 14th tile if the player is not the East Wind
+                if (!((PlayerManager.Wind)player.CustomProperties["playerWind"] == PlayerManager.Wind.EAST)) {
+                    break;
+                }
             }
 
-            // Give the player one more tile if he is the East Wind
-            if ((PlayerManager.Wind)player.CustomProperties["playerWind"] == PlayerManager.Wind.EAST) {
-                playerTiles.Add(tiles[rand.Next(tiles.Count())]);
-            }
-            // RaiseEvent
+            // TODO: RaiseEvent
         }
 
         // Reinsert updated tiles list into Room Custom Properties
@@ -246,50 +268,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
 
     public void LeaveRoom() {
         PhotonNetwork.LeaveRoom();
-    }
-
-    // TODO: Assign after there are 4 players
-    // Assign a random player wind to the local player without clashing with the winds of other players
-    private PlayerManager.Wind AssignPlayerWind() {
-        // Retrieve winds of other players
-        Player[] playerList = PhotonNetwork.PlayerListOthers;
-        List<PlayerManager.Wind> winds = new List<PlayerManager.Wind>();
-        foreach (Player player in playerList) {
-            winds.Add((PlayerManager.Wind)player.CustomProperties["playerWind"]);
-        }
-
-        var rand = new System.Random();
-        PlayerManager.Wind playerWind;
-
-        // Assign the local player a different wind from current players
-        while (true) {
-            switch (rand.Next(4)) {
-                case 0:
-                    playerWind = PlayerManager.Wind.EAST;
-                    break;
-                case 1:
-                    playerWind = PlayerManager.Wind.SOUTH;
-                    break;
-                case 2:
-                    playerWind = PlayerManager.Wind.WEST;
-                    break;
-                default:
-                    playerWind = PlayerManager.Wind.NORTH;
-                    break;
-            }
-
-            if (!winds.Contains(playerWind)) {
-                break;
-            }
-        }
-
-        // Add local player's wind to customProperties
-        Hashtable hash = new Hashtable();
-        hash.Add("playerWind", playerWind);
-        PhotonNetwork.SetPlayerCustomProperties(hash);
-
-        Debug.LogErrorFormat("The local player has been assigned the {0} wind", playerWind);
-        return playerWind;
     }
 
 
