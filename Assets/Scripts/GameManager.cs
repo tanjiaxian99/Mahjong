@@ -39,17 +39,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// The Wind Assignment event message byte. Used internally for saving data in Player Custom Properties
     /// </summary>
-    public const byte EvAssignWind = 1;
+    public const byte EvAssignWind = 3;
 
     /// <summary>
-    /// The Wind Assignment event message byte. Used internally for saving data in Player Custom Properties
+    /// The Player Instantiation event message byte. Used internally for instantiatig the local player and player instances.
     /// </summary>
-    //public static readonly byte Ev
+    public const byte EvPlayerInstantiate = 4;
 
     /// <summary>
     /// Wind of the player
     /// </summary>
-    public static readonly string AssignWindPropKey = "pw";
+    public static readonly string PlayerWindPropKey = "pw";
 
     /// <summary>
     /// List of tiles in the walls
@@ -76,7 +76,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             turnManager = this.gameObject.AddComponent<PunTurnManager>();
             turnManager.TurnManagerListener = this;
             this.turnManager.TurnDuration = 1000f;
-
         }
     }
 
@@ -102,11 +101,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player upon joining a room
     /// </summary>
     public override void OnJoinedRoom() {
-        // Move the player to his seat based on his wind
-        MoveToWindSeat(playerWind);
 
-        // Change the width of the gameTable based on the player's seat
-        StretchGameTable(playerWind);
 
         // Initialize PlayerManager for local player
         playerManager = playerPrefab.GetComponent<PlayerManager>();
@@ -193,11 +188,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 // Update local player's custom properties
                 Hashtable ht = new Hashtable();
-                ht.Add(AssignWindPropKey, wind);
+                ht.Add(PlayerWindPropKey, wind);
                 PhotonNetwork.SetPlayerCustomProperties(ht);
 
                 // Update local player's playerManager
                 playerManager.PlayerWind = wind;
+                break;
+
+            case EvPlayerInstantiate:
+                this.InstantiateLocalPlayer();
+                this.StretchGameTable();
                 break;
         }
     }
@@ -213,11 +213,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.turnManager.BeginTurn();
     }
 
+
     /// <summary>
     /// Called at the start of every game (when PunTurnManager.Turn == 0) by MasterClient
     /// </summary>
     public void InitializeGame() {
         this.AssignPlayerWind();
+        this.DeterminePlayOrder();
+        this.InstantiatePlayers();
         this.GenerateTiles();
         this.DistributeTiles();
     }
@@ -242,6 +245,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Debug.LogFormat("The 4 winds have been assigned to each player");
     }
 
+
     /// <summary>
     /// Update the room's custom properties with the play order.
     /// Play order starts from East Wind and ends at South.
@@ -252,7 +256,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         foreach (Player player in PhotonNetwork.PlayerList) {
             // PlayerManager.Wind is order from East to South. Retrieving the wind of the player and converting it to an int
             // will give the proper play order
-            int index = (int)player.CustomProperties[AssignWindPropKey];
+            int index = (int)player.CustomProperties[PlayerWindPropKey];
             playOrder[index] = player;
         }
 
@@ -260,6 +264,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht.Add(WallTileListPropKey, playOrder);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
+
+
+    /// <summary>
+    /// Raise an event telling all players to instantiate their player prefab
+    /// </summary>
+    public void InstantiatePlayers() {
+        PhotonNetwork.RaiseEvent(EvPlayerInstantiate, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
+    }
+
 
     /// <summary>
     /// Create 4 copies of each tile, giving 148 tiles
@@ -308,7 +321,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Add to Room Custom Properties
         Hashtable ht = new Hashtable();
-        ht.Add("tiles", tiles);
+        ht.Add(WallTileListPropKey, tiles);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
@@ -318,7 +331,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void DistributeTiles() {
         Random rand = new Random();
-        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties["tiles"];
+        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
         foreach (Player player in PhotonNetwork.PlayerList) {
             List<Tile> playerTiles = new List<Tile>();
@@ -331,7 +344,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 tiles.Remove(tiles[randomIndex]);
 
                 // Don't give the 14th tile if the player is not the East Wind
-                if (!((PlayerManager.Wind)player.CustomProperties["playerWind"] == PlayerManager.Wind.EAST)) {
+                if (!((PlayerManager.Wind)player.CustomProperties[PlayerWindPropKey] == PlayerManager.Wind.EAST)) {
                     break;
                 }
             }
@@ -340,9 +353,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         // Reinsert updated tiles list into Room Custom Properties
-        Hashtable tilesHT = new Hashtable();
-        tilesHT.Add("tiles", tiles);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(tilesHT);
+        Hashtable ht = new Hashtable();
+        ht.Add(WallTileListPropKey, tiles);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
     #endregion
@@ -354,49 +367,28 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
 
-    // Instantiate player at the wind seat based on playerWind
-    private void MoveToWindSeat(PlayerManager.Wind playerWind) {
-        Vector3 playerPos;
-        Quaternion cameraRotation;
+    /// <summary>
+    /// Instantiate the local player in the local client.
+    /// </summary>
+    public void InstantiateLocalPlayer() {
+        // The local player is always seated at the bottom of the screen
+        Camera.main.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
 
-        // Determine seat location based on playerWind and rotate main camera accordingly.
-        switch (playerWind) {
-            case PlayerManager.Wind.EAST:
-                playerPos = new Vector3(15f, 1, 0);
-                cameraRotation = Quaternion.Euler(90f, 0f, 90f);
-                break;
-            case PlayerManager.Wind.SOUTH:
-                playerPos = new Vector3(0, 1, -15f);
-                cameraRotation = Quaternion.Euler(90f, 0f, 0f);
-                break;
-            case PlayerManager.Wind.WEST:
-                playerPos = new Vector3(-15f, 1, 0);
-                cameraRotation = Quaternion.Euler(90f, 0f, 270f);
-                break;
-            default:
-                playerPos = new Vector3(0, 1, 15f);
-                cameraRotation = Quaternion.Euler(90f, 0f, 180f);
-                break;
-        }
-        Camera.main.transform.rotation = cameraRotation;
-
-        // Spawn a character for the local player. It gets synced by using PhotonNetwork.Instantiate
-        PhotonNetwork.Instantiate(this.playerPrefab.name, playerPos, Quaternion.identity, 0);
+        // Spawn a character for the local player. 
+        Instantiate(this.playerPrefab, new Vector3(0, 1, -15f), Quaternion.identity);
     }
 
 
-    // Stretch the GameTable to fill up the screen, depending on the player's seat
-    private void StretchGameTable(PlayerManager.Wind playerWind) {
+    /// <summary>
+    /// Stretch the GameTable to fill up the screen
+    /// </summary>
+    public void StretchGameTable() {
         Camera camera = Camera.main;
         float height = 2f * camera.orthographicSize;
         float width = height * camera.aspect;
 
-        // Scale the GameTable along the x-z axes
-        if (playerWind == PlayerManager.Wind.NORTH || playerWind == PlayerManager.Wind.SOUTH) {
-            gameTable.transform.localScale = new Vector3(width, 1, height);
-        } else {
-            gameTable.transform.localScale = new Vector3(height, 1, width);
-        }
+        // Scale the GameTable along z direction
+        gameTable.transform.localScale = new Vector3(width, 1, height);
     }
     
     #endregion
