@@ -23,9 +23,7 @@ namespace Photon.Pun.Demo.Asteroids
 
         private PhotonView photonView;
 
-#pragma warning disable 0109
         private new Rigidbody rigidbody;
-#pragma warning restore 0109
 
         #region UNITY
 
