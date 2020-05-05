@@ -624,6 +624,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Spawn a character for the local player. 
         Instantiate(this.playerPrefab, new Vector3(0, 1, -15f), Quaternion.identity);
+        
     }
 
 
@@ -650,9 +651,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         foreach (Tile tile in playerManager.hand) {
-            string tileName = tile.suit + "" + tile.rank;
+            string tileName = tile.suit + "_" + tile.rank;
 
-            Instantiate((GameObject)tileName, new Vector3(0f, 0f, 0f), Quaternion.Euler(270f, 180f, 0f));
+            Instantiate(tilesDict[tileName], new Vector3(0f, 0f, 0f), Quaternion.Euler(270f, 180f, 0f));
         }
 
     }
