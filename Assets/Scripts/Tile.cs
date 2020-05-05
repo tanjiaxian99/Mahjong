@@ -9,8 +9,8 @@ using UnityEngine;
 /// Animal: Cat, Rat, Rooster, Centipede.
 /// </summary>
 public class Tile {
-    private Suit suit { get; set; }
-    private Rank rank { get; set; }
+    public Suit suit { get; set; }
+    public Rank rank { get; set; }
 
     public enum Suit {
         Character,

@@ -26,11 +26,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     [SerializeField]
     private GameObject gameTable;
 
+    [Tooltip("Height of the Mahjong table in the local client")]
+    [SerializeField]
+    private float tableHeight;
+
+    [Tooltip("Width of the Mahjong table in the local client")]
+    [SerializeField]
+    private float tableWidth;
+
     [Tooltip("Debugging: The number of players required to start a game")]
     [SerializeField]
     private int numberOfPlayersToStart = 4;
 
     private PunTurnManager turnManager;
+
+    /// <summary>
+    /// HashTable where the keys are the string names of tiles and values are the tiles' prefab
+    /// </summary>
+    private Dictionary<string, GameObject> tilesDict = new Dictionary<string, GameObject>();
 
     #endregion
 
@@ -227,6 +240,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             turnManager = this.gameObject.AddComponent<PunTurnManager>();
             turnManager.TurnManagerListener = this;
             this.turnManager.TurnDuration = 1000f;
+
+            // Set up a HashTable for tiles
+            this.InstantiateTilesDict();
+
         }
     }
 
@@ -539,6 +556,66 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
+    /// Fill up the tilesDict with the tile prebabs and their string representations
+    /// </summary>
+    public void InstantiateTilesDict() {
+        tilesDict.Add("Character_One", Character_One);
+        tilesDict.Add("Character_Two", Character_Two);
+        tilesDict.Add("Character_Three", Character_Three);
+        tilesDict.Add("Character_Four", Character_Four);
+        tilesDict.Add("Character_Five", Character_Five);
+        tilesDict.Add("Character_Six", Character_Six);
+        tilesDict.Add("Character_Seven", Character_Seven);
+        tilesDict.Add("Character_Eight", Character_Eight);
+        tilesDict.Add("Character_Nine", Character_Nine);
+
+        tilesDict.Add("Dot_One", Dot_One);
+        tilesDict.Add("Dot_Two", Dot_Two);
+        tilesDict.Add("Dot_Three", Dot_Three);
+        tilesDict.Add("Dot_Four", Dot_Four);
+        tilesDict.Add("Dot_Five", Dot_Five);
+        tilesDict.Add("Dot_Six", Dot_Six);
+        tilesDict.Add("Dot_Seven", Dot_Seven);
+        tilesDict.Add("Dot_Eight", Dot_Eight);
+        tilesDict.Add("Dot_Nine", Dot_Nine);
+
+        tilesDict.Add("Bamboo_One", Bamboo_One);
+        tilesDict.Add("Bamboo_Two", Bamboo_Two);
+        tilesDict.Add("Bamboo_Three", Bamboo_Three);
+        tilesDict.Add("Bamboo_Four", Bamboo_Four);
+        tilesDict.Add("Bamboo_Five", Bamboo_Five);
+        tilesDict.Add("Bamboo_Six", Bamboo_Six);
+        tilesDict.Add("Bamboo_Seven", Bamboo_Seven);
+        tilesDict.Add("Bamboo_Eight", Bamboo_Eight);
+        tilesDict.Add("Bamboo_Nine", Bamboo_Nine);
+
+        tilesDict.Add("Wind_One", Wind_One);
+        tilesDict.Add("Wind_Two", Wind_Two);
+        tilesDict.Add("Wind_Three", Wind_Three);
+        tilesDict.Add("Wind_Four", Wind_Four);
+
+        tilesDict.Add("Dragon_One", Dragon_One);
+        tilesDict.Add("Dragon_Two", Dragon_Two);
+        tilesDict.Add("Dragon_Three", Dragon_Three);
+
+        tilesDict.Add("Season_One", Season_One);
+        tilesDict.Add("Season_Two", Season_Two);
+        tilesDict.Add("Season_Three", Season_Three);
+        tilesDict.Add("Season_Four", Season_Four);
+
+        tilesDict.Add("Flower_One", Flower_One);
+        tilesDict.Add("Flower_Two", Flower_Two);
+        tilesDict.Add("Flower_Three", Flower_Three);
+        tilesDict.Add("Flower_Four", Flower_Four);
+
+        tilesDict.Add("Animal_One", Animal_One);
+        tilesDict.Add("Animal_Two", Animal_Two);
+        tilesDict.Add("Animal_Three", Animal_Three);
+        tilesDict.Add("Animal_Four", Animal_Four);
+    }
+
+
+    /// <summary>
     /// Instantiate the local player in the local client.
     /// </summary>
     public void InstantiateLocalPlayer() {
@@ -555,11 +632,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void StretchGameTable() {
         Camera camera = Camera.main;
-        float height = 2f * camera.orthographicSize;
-        float width = height * camera.aspect;
+        tableHeight = 2f * camera.orthographicSize;
+        tableWidth = tableHeight * camera.aspect;
 
         // Scale the GameTable along z direction
-        gameTable.transform.localScale = new Vector3(width, 1, height);
+        gameTable.transform.localScale = new Vector3(tableWidth, 1, tableHeight);
     }
 
 
@@ -572,6 +649,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             return;
         }
 
+        foreach (Tile tile in playerManager.hand) {
+            string tileName = tile.suit + "" + tile.rank;
+
+            Instantiate((GameObject)tileName, new Vector3(0f, 0f, 0f), Quaternion.Euler(270f, 180f, 0f));
+        }
 
     }
 
