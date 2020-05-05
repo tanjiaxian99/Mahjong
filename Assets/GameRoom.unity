@@ -1070,6 +1070,282 @@ PrefabInstance:
       propertyPath: gameTable
       value: 
       objectReference: {fileID: 1286068716}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Character_One
+      value: 
+      objectReference: {fileID: 2022342652468663596, guid: 1c4d417bfc4fafd4ba59d29e32def632,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Character_Two
+      value: 
+      objectReference: {fileID: 3598562508962473438, guid: 4bc6a18eec946c44bb43422d9ed5e7ec,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Character_Three
+      value: 
+      objectReference: {fileID: 7065365570855484875, guid: 02282fd780b153e42811a0ef2a8c2df5,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Character_Four
+      value: 
+      objectReference: {fileID: 1196508672798801843, guid: c23cecc83fcf44d4f9ca8fbd48bff22d,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Character_Six
+      value: 
+      objectReference: {fileID: 1547447137235735628, guid: 1c261a75e5d0b6845a59f721bc017498,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Character_Five
+      value: 
+      objectReference: {fileID: 7457014407535904502, guid: 7e32e0880c6776f449c2a098d11263f4,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Character_Seven
+      value: 
+      objectReference: {fileID: 2854319414459431889, guid: e6d5e26f316e3b8488cd0fc956911393,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Character_Eight
+      value: 
+      objectReference: {fileID: 8084176849661706741, guid: 3716c9610ecd35f4dbe31b99f1cffda6,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Character_Nine
+      value: 
+      objectReference: {fileID: 5040648517235066408, guid: 3a629c19d99071440a3b943b68590c45,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dot_One
+      value: 
+      objectReference: {fileID: 3740231899746932683, guid: 026ffa66e731b1e4497a53541b9e2df3,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dot_Two
+      value: 
+      objectReference: {fileID: 7250971237989449437, guid: 9e0bca55fc27e59499e6f545976d78aa,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dot_Three
+      value: 
+      objectReference: {fileID: 335323900172384379, guid: b7983d7a000936a42aed0d0b63929de0,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dot_Four
+      value: 
+      objectReference: {fileID: 2350949673264642103, guid: bed15070e30f38b4fbe2b9fdac4ce835,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dot_Five
+      value: 
+      objectReference: {fileID: 1789693067005210208, guid: c1c2eca8e93ed594fa3e0127bfedf108,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dot_Six
+      value: 
+      objectReference: {fileID: 3480760456565899500, guid: 25324099d58dc6944bcb57cd8642552e,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dot_Seven
+      value: 
+      objectReference: {fileID: 3159198470452033620, guid: c39bdebd6a594464ebd1c0df9a10c78a,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dot_Eight
+      value: 
+      objectReference: {fileID: 392860475782974797, guid: 29f4c50c3f0ffaf46a1457a9e91a6e28,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dot_Nine
+      value: 
+      objectReference: {fileID: 3968882163644866776, guid: 641717e35f97d564fbfa619b9806cd40,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Bamboo_One
+      value: 
+      objectReference: {fileID: 5220166236254838385, guid: 1e0c57b97f988444c85e0ece6048b5d2,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Bamboo_Two
+      value: 
+      objectReference: {fileID: 8752702342277976661, guid: 061c98812a28c7846935e9bdbbdfe2da,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Bamboo_Three
+      value: 
+      objectReference: {fileID: 7052637809221759015, guid: a098307809e2b5841b8f23ac10018f12,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Bamboo_Four
+      value: 
+      objectReference: {fileID: 5869842271936665649, guid: 0feaf3daa94ffba49a0bf8bb9fadb82c,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Bamboo_Five
+      value: 
+      objectReference: {fileID: 3789233785472706879, guid: 8e0d87e3f7098d34485d3d52eafd9fba,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Bamboo_Six
+      value: 
+      objectReference: {fileID: 9154334736484732821, guid: bda2f9cc869edae4fb6e9b0813ba61a7,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Bamboo_Seven
+      value: 
+      objectReference: {fileID: 5701879162348875508, guid: 8e192b9b930a206428d3f745e3038317,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Bamboo_Eight
+      value: 
+      objectReference: {fileID: 2119360855751209741, guid: 435abf683fa850244a38226e49a7ade2,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Bamboo_Nine
+      value: 
+      objectReference: {fileID: 9166255416215632887, guid: 70cabb809152aaf448836f2fc45e4ea8,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Wind_One
+      value: 
+      objectReference: {fileID: 2848230156750837031, guid: d80c82fffb82daa4d800576d783cf9e5,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Wind_Two
+      value: 
+      objectReference: {fileID: 2495823525007374984, guid: ff68265f36aab54419b80e8a7c583f2a,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Wind_Three
+      value: 
+      objectReference: {fileID: 6772967380437110408, guid: 5c6777193d6ea41449d78b4d435bcbd8,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Wind_Four
+      value: 
+      objectReference: {fileID: 6700942672057634222, guid: 5fb4b9a0aa4c3194089c0efee6aa0f3e,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dragon_One
+      value: 
+      objectReference: {fileID: 5339147961757046852, guid: 2df3755b4dd25f04fae99d5cf3157243,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dragon_Three
+      value: 
+      objectReference: {fileID: 4512128869100695658, guid: dcf69d280b8f059488b26035d77a83ee,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Season_Three
+      value: 
+      objectReference: {fileID: 3220816295789797936, guid: adc820d4a91e3f54495c7207312ebf98,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Dragon_Two
+      value: 
+      objectReference: {fileID: 8535270896862966829, guid: 43148467aaa7ebe4bb9d3fd1815d4e62,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Season_One
+      value: 
+      objectReference: {fileID: 2422341921081735408, guid: 46917b72b88a6be45a97482f0d3b13e2,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Season_Two
+      value: 
+      objectReference: {fileID: 6016031276742516991, guid: f66e9b87d31d41845bdee6f04f2b8797,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Season_Four
+      value: 
+      objectReference: {fileID: 8193522456717828824, guid: 1915ea1f2c565cc45a5bab403046456a,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Flower_Four
+      value: 
+      objectReference: {fileID: 4245697192126773267, guid: 0baea46801cdf9c489bd06a0e32ad730,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Flower_Three
+      value: 
+      objectReference: {fileID: 5688284296596327896, guid: 7bbf8cc95ec01eb49b471b713c28a189,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Flower_Two
+      value: 
+      objectReference: {fileID: 6863329948389024738, guid: 056a7c33bccefd24e9ed08e58abc964c,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Flower_One
+      value: 
+      objectReference: {fileID: 5283246803341828824, guid: bbf16cf53c86cb545806e6532374fae5,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Animal_One
+      value: 
+      objectReference: {fileID: 6978397176853820478, guid: 7ee771a0d0f61b64990bb87a4219d4ce,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Animal_Three
+      value: 
+      objectReference: {fileID: 9156618089253883417, guid: ca1abe85cc7bd1245b7102068cb48ee8,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Animal_Two
+      value: 
+      objectReference: {fileID: 4564180262425136016, guid: 0c71e8d992bbee943a3b7c2043eec3e8,
+        type: 3}
+    - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
+        type: 3}
+      propertyPath: Animal_Four
+      value: 
+      objectReference: {fileID: 3677805149413772991, guid: 2c277d73ff7a1d643abe5ce5d6185eb8,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 015276895ad00c942b8b856802f75876, type: 3}
 --- !u!114 &863154032465345303 stripped

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
 /// Class for all tiles. Rank sequence is as follows:
-/// Character, Dot, Bamboo, Season and Flower: the number on the tile.
-/// Wind: East, South, West, North.
-/// Dragon: Red, White, Green.
+/// Character, Dot, Bamboo, Season and Flower: the number on the tile;
+/// Wind: East, North, West, South;
+/// Dragon: Red, White, Green;
 /// Animal: Cat, Rat, Rooster, Centipede.
 /// </summary>
 public class Tile {

@@ -74,6 +74,146 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #endregion
 
+    #region Tiles Prefabs
+    [SerializeField]
+    private GameObject Character_One;
+
+    [SerializeField]
+    private GameObject Character_Two;
+
+    [SerializeField]
+    private GameObject Character_Three;
+
+    [SerializeField]
+    private GameObject Character_Four;
+
+    [SerializeField]
+    private GameObject Character_Five;
+
+    [SerializeField]
+    private GameObject Character_Six;
+
+    [SerializeField]
+    private GameObject Character_Seven;
+
+    [SerializeField]
+    private GameObject Character_Eight;
+
+    [SerializeField]
+    private GameObject Character_Nine;
+
+    [SerializeField]
+    private GameObject Dot_One;
+
+    [SerializeField]
+    private GameObject Dot_Two;
+
+    [SerializeField]
+    private GameObject Dot_Three;
+
+    [SerializeField]
+    private GameObject Dot_Four;
+
+    [SerializeField]
+    private GameObject Dot_Five;
+
+    [SerializeField]
+    private GameObject Dot_Six;
+
+    [SerializeField]
+    private GameObject Dot_Seven;
+
+    [SerializeField]
+    private GameObject Dot_Eight;
+
+    [SerializeField]
+    private GameObject Dot_Nine;
+
+    [SerializeField]
+    private GameObject Bamboo_One;
+
+    [SerializeField]
+    private GameObject Bamboo_Two;
+
+    [SerializeField]
+    private GameObject Bamboo_Three;
+
+    [SerializeField]
+    private GameObject Bamboo_Four;
+
+    [SerializeField]
+    private GameObject Bamboo_Five;
+
+    [SerializeField]
+    private GameObject Bamboo_Six;
+
+    [SerializeField]
+    private GameObject Bamboo_Seven;
+
+    [SerializeField]
+    private GameObject Bamboo_Eight;
+
+    [SerializeField]
+    private GameObject Bamboo_Nine;
+
+    [SerializeField]
+    private GameObject Wind_One;
+
+    [SerializeField]
+    private GameObject Wind_Two;
+
+    [SerializeField]
+    private GameObject Wind_Three;
+
+    [SerializeField]
+    private GameObject Wind_Four;
+
+    [SerializeField]
+    private GameObject Dragon_One;
+
+    [SerializeField]
+    private GameObject Dragon_Two;
+
+    [SerializeField]
+    private GameObject Dragon_Three;
+
+    [SerializeField]
+    private GameObject Season_One;
+
+    [SerializeField]
+    private GameObject Season_Two;
+
+    [SerializeField]
+    private GameObject Season_Three;
+
+    [SerializeField]
+    private GameObject Season_Four;
+
+    [SerializeField]
+    private GameObject Flower_One;
+
+    [SerializeField]
+    private GameObject Flower_Two;
+
+    [SerializeField]
+    private GameObject Flower_Three;
+
+    [SerializeField]
+    private GameObject Flower_Four;
+
+    [SerializeField]
+    private GameObject Animal_One;
+
+    [SerializeField]
+    private GameObject Animal_Two;
+
+    [SerializeField]
+    private GameObject Animal_Three;
+
+    [SerializeField]
+    private GameObject Animal_Four;
+
+    #endregion
 
     #region MonoBehavior Callbacks
 
