@@ -466,43 +466,51 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void GenerateTiles() {
         List<Tile> tiles = new List<Tile>();
 
-        // Create 4 copies of each tile
-        for (int k = 0; k < 4; k++) {
+        foreach (Tile.Suit suit in Enum.GetValues(typeof(Tile.Suit))) {
 
-            foreach (Tile.Suit suit in Enum.GetValues(typeof(Tile.Suit))) {
-
-                switch (suit) {
-                    // Generate the tiles for Character, Dot and Bamboo suits
-                    case Tile.Suit.Character:
-                    case Tile.Suit.Dot:
-                    case Tile.Suit.Bamboo:
-                        foreach (Tile.Rank rank in Enum.GetValues(typeof(Tile.Rank))) {
+            switch (suit) {
+                // Generate the tiles for Character, Dot and Bamboo suits
+                case Tile.Suit.Character:
+                case Tile.Suit.Dot:
+                case Tile.Suit.Bamboo:
+                    foreach (Tile.Rank rank in Enum.GetValues(typeof(Tile.Rank))) {
+                        for (int i = 0; i < 4; i++) {
                             tiles.Add(new Tile(suit, rank));
                         }
-                        break;
+                    }
+                    break;
 
-                    // Generate the tiles for Wind, Season, Flower and Animal suits
-                    case Tile.Suit.Wind:
-                    case Tile.Suit.Season:
-                    case Tile.Suit.Flower:
-                    case Tile.Suit.Animal:
-                        foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(4)) {
+                // Generate the tiles for Wind suit
+                case Tile.Suit.Wind:
+                    foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(4)) {
+                        for (int i = 0; i < 4; i++) {
                             tiles.Add(new Tile(suit, rank));
                         }
-                        break;
+                    }
+                    break;
 
-                    // Generate the tiles for Dragon suit
-                    case Tile.Suit.Dragon:
-                        foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(3)) {
+                // Generate the tiles for Dragon suit
+                case Tile.Suit.Dragon:
+                    foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(3)) {
+                        for (int i = 0; i < 4; i++) {
                             tiles.Add(new Tile(suit, rank));
                         }
-                        break;
-                }
+                    }
+                    break;
+
+                // Generate the tiles for Season, Flower and Animal suits. Only generates 1 tile for each rank.
+                case Tile.Suit.Season:
+                case Tile.Suit.Flower:
+                case Tile.Suit.Animal:
+                    foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(4)) {
+                        tiles.Add(new Tile(suit, rank));
+                    }
+                    break;
             }
         }
 
         if (tiles.Count != 148) {
-            Debug.LogError("The number of tiles created isn't 148");
+            Debug.LogErrorFormat("{0} tiles have been created instead of 148", tiles.Count);
         }
 
         // Add to Room Custom Properties
