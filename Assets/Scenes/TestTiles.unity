@@ -413,7 +413,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 773339871}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.02, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_Children: []
   m_Father: {fileID: 0}
@@ -462,4 +462,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ef5e638b9bee964bba556cd4901fb53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gm: {fileID: -927199367670048503, guid: dd6f49c1f0b4d464fa2b5397c3efed1a, type: 3}
+  tile: {fileID: -927199367670048503, guid: dd6f49c1f0b4d464fa2b5397c3efed1a, type: 3}
+  gameTable: {fileID: 773339871}
+  scaleFactor: 1

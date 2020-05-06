@@ -16,7 +16,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
 
-    [Tooltip("The prefab to use for representing the player")]
+    [Tooltip("The prefab used for representing the player")]
     [SerializeField]
     private GameObject playerPrefab;
 
@@ -37,6 +37,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     [Tooltip("Debugging: The number of players required to start a game")]
     [SerializeField]
     private int numberOfPlayersToStart = 4;
+
+    [Tooltip("The factor by which to scale the tiles such that they fill different screen sizes proportionately")]
+    private float scaleFactor = 1f;
 
     private PunTurnManager turnManager;
 
@@ -648,13 +651,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Debug.Log("The player's hand is empty.");
             return;
         }
+        
+        // Separation between pivot of tiles
+        float xSep = 0.83f;
+        float xPos = -xSep * 6;
 
         foreach (Tile tile in playerManager.hand) {
             string tileName = tile.suit + "" + tile.rank;
 
-            Instantiate(tilesDict[tileName], new Vector3(0f, 0f, 0f), Quaternion.Euler(270f, 180f, 0f));
+            Instantiate(tilesDict[tileName], new Vector3(xPos, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
+            xPos += xSep;
         }
-
     }
 
     #endregion
