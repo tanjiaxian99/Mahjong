@@ -6,12 +6,6 @@ Kd 1 1 1
 d 1
 illum 0.0
 
-newmtl color_16711680
-Ka 0 0 0 
-Kd 1 0 0
-d 1
-illum 0.0
-
 newmtl color_43520
 Ka 0 0 0 
 Kd 0 0.6666666666666666 0
@@ -21,6 +15,12 @@ illum 0.0
 newmtl color_4792320
 Ka 0 0 0 
 Kd 0.28627450980392155 0.12549019607843137 0
+d 1
+illum 0.0
+
+newmtl color_16711680
+Ka 0 0 0 
+Kd 1 0 0
 d 1
 illum 0.0
 
