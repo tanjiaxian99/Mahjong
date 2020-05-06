@@ -652,7 +652,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         foreach (Tile tile in playerManager.hand) {
             string tileName = tile.suit + "" + tile.rank;
 
-            Instantiate((GameObject)tileName, new Vector3(0f, 0f, 0f), Quaternion.Euler(270f, 180f, 0f));
+            Instantiate(tilesDict[tileName], new Vector3(0f, 0f, 0f), Quaternion.Euler(270f, 180f, 0f));
         }
 
     }
