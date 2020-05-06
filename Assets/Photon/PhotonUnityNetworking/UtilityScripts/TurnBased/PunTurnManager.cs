@@ -266,7 +266,7 @@ namespace Photon.Pun.UtilityScripts
         public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
         {
 
-            //   Debug.Log("OnRoomPropertiesUpdate: "+propertiesThatChanged.ToStringFull());
+            //Debug.Log("OnRoomPropertiesUpdate: " + propertiesThatChanged.ToStringFull());
 
             if (propertiesThatChanged.ContainsKey("Turn"))
             {

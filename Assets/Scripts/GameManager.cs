@@ -79,6 +79,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public static readonly string PlayerWindPropKey = "pw";
 
     /// <summary>
+    /// Wind of the player
+    /// </summary>
+    public static readonly string PlayOrderPropkey = "po";
+
+    /// <summary>
     /// List of tiles in the walls
     /// </summary>
     public static readonly string WallTileListPropKey = "wt";
@@ -280,7 +285,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Game is initialized by MasterClient
             if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
                 StartCoroutine("InitializeGame");
-                this.StartTurn();
             }
 
         } else {
@@ -295,7 +299,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
                 StartCoroutine("InitializeGame");
-                this.StartTurn();
             }
         }
     }
@@ -403,6 +406,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.GenerateTiles();
         this.DistributeTiles();
         this.InstantiateTiles();
+        this.StartTurn();
         yield return null;
     }
 
@@ -416,7 +420,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind playerWind;
 
         foreach (Player player in PhotonNetwork.PlayerList) {
-            int randomIndex = rand.Next(winds.Count());
+            //int randomIndex = rand.Next(winds.Count());
+            int randomIndex = (int)PlayerManager.Wind.EAST;
             playerWind = winds[randomIndex];
             winds.Remove(winds[randomIndex]);
 
@@ -432,7 +437,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Play order starts from East Wind and ends at South.
     /// </summary>
     public void DeterminePlayOrder() {
-        Player[] playOrder = new Player[4];
+        // TODO: An array containing the nicknames might be sufficient.
+        Player[] playOrder = new Player[numberOfPlayersToStart];
 
         foreach (Player player in PhotonNetwork.PlayerList) {
             // PlayerManager.Wind is order from East to South. Retrieving the wind of the player and converting it to an int
@@ -440,13 +446,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             int index = (int)player.CustomProperties[PlayerWindPropKey];
             playOrder[index] = player;
         }
-        Debug.Log("called");
 
         Hashtable ht = new Hashtable();
-        ht.Add(WallTileListPropKey, playOrder);
+        ht.Add(PlayOrderPropkey, playOrder);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
-
 
     /// <summary>
     /// Raise an event telling all players to instantiate their player prefab and stretch their GameTable
