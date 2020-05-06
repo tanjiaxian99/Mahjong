@@ -7,7 +7,8 @@ public class InstantiateTile : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        Instantiate(gm, new Vector3(0f, 2f, 0f), Quaternion.Euler(270f, 180f, 0f));
+        GameObject tile = Instantiate(gm, new Vector3(0f, 2f, 0f), Quaternion.Euler(270f, 180f, 0f));
+        tile.transform.localScale = 
     }
 
     // Update is called once per frame
