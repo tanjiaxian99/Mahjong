@@ -247,7 +247,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Set up a HashTable for tiles
             this.InstantiateTilesDict();
             this.OnJoinedRoom();
-
         }
     }
 
@@ -280,7 +279,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Players that disconnect and reconnect won't start the game at turn 0
             // Game is initialized by MasterClient
             if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
-                this.InitializeGame();
+                StartCoroutine("InitializeGame");
                 this.StartTurn();
             }
 
@@ -295,7 +294,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
-                this.InitializeGame();
+                StartCoroutine("InitializeGame");
                 this.StartTurn();
             }
         }
@@ -396,13 +395,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Called at the start of every game (when PunTurnManager.Turn == 0) by MasterClient
     /// </summary>
-    public void InitializeGame() {
+    IEnumerator InitializeGame() {
         this.AssignPlayerWind();
+        yield return new WaitForSeconds(1f);
         this.DeterminePlayOrder();
         this.InstantiatePlayers();
         this.GenerateTiles();
         this.DistributeTiles();
         this.InstantiateTiles();
+        yield return null;
     }
 
 
@@ -439,6 +440,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             int index = (int)player.CustomProperties[PlayerWindPropKey];
             playOrder[index] = player;
         }
+        Debug.Log("called");
 
         Hashtable ht = new Hashtable();
         ht.Add(WallTileListPropKey, playOrder);
