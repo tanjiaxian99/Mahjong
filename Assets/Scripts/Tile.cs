@@ -75,4 +75,8 @@ public class Tile {
         this.suit = suit;
         this.rank = rank;
     }
+
+    public override string ToString() {
+        return suit + " " + rank;
+    }
 }

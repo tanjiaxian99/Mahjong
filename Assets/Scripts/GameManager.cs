@@ -246,6 +246,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             // Set up a HashTable for tiles
             this.InstantiateTilesDict();
+            this.OnJoinedRoom();
 
         }
     }
@@ -272,8 +273,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player upon joining a room
     /// </summary>
     public override void OnJoinedRoom() {
-
-
         // Initialize PlayerManager for local player
         playerManager = playerPrefab.GetComponent<PlayerManager>();
 
@@ -662,6 +661,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Instantiate(tilesDict[tileName], new Vector3(xPos, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
             xPos += xSep;
         }
+
+        Debug.Log(playerManager.hand);
     }
 
     #endregion
