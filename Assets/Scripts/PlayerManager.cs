@@ -23,6 +23,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public List<Tile> showTiles { get; set; } = new List<Tile>();
 
+    public bool myTurn = false;
+
     #endregion
 
     #region MonoBehaviour Callbacks

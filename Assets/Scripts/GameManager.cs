@@ -83,6 +83,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvConvertBonusTiles = 7;
 
     /// <summary>
+    /// The Player Turn event message byte. Used internally to track if it is the local player's turn.
+    /// </summary>
+    public const byte EvPlayerTurn = 8;
+
+    /// <summary>
     /// Wind of the player
     /// </summary>
     public static readonly string PlayerWindPropKey = "pw";
@@ -339,66 +344,34 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #region IPunTurnManagerCallbacks Callbacks
 
+    // We only need 1 turn?
     public void OnTurnBegins(int turn) {
-        throw new System.NotImplementedException();
+        Debug.LogFormat("Turn {0} has begun", turn);
+
+        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
+        PhotonNetwork.RaiseEvent(EvPlayerTurn, true, new RaiseEventOptions() { TargetActors = new int[] { playOrder[0].ActorNumber } }, SendOptions.SendReliable);
     }
 
     public void OnTurnCompleted(int turn) {
         throw new System.NotImplementedException();
     }
 
+    // What the local client does when a remote player performs a move
     public void OnPlayerMove(Player player, int turn, object move) {
         throw new System.NotImplementedException();
     }
 
+    // What the local client does when a remote player finishes a move
     public void OnPlayerFinished(Player player, int turn, object move) {
         throw new System.NotImplementedException();
     }
 
+    // TODO: Does time refers to time of a single player's turn?
     public void OnTurnTimeEnds(int turn) {
         throw new System.NotImplementedException();
     }
 
     #endregion Callbacks Callbacks
-
-    #region IOnEventCallback Callbacks
-
-    public void OnEvent(EventData photonEvent) {
-        byte eventCode = photonEvent.Code;
-
-        switch(eventCode) {
-            case EvAssignWind:
-                PlayerManager.Wind wind = (PlayerManager.Wind)photonEvent.CustomData;
-
-                // Update local player's custom properties
-                Hashtable ht = new Hashtable();
-                ht.Add(PlayerWindPropKey, wind);
-                PhotonNetwork.SetPlayerCustomProperties(ht);
-
-                // Update local player's playerManager
-                playerManager.PlayerWind = wind;
-                break;
-
-            case EvInstantiatePlayer:
-                this.InstantiateLocalPlayer();
-                this.StretchGameTable();
-                break;
-
-            case EvDistributeTiles:
-                // Update local player's playerManager
-                playerManager.hand = (List<Tile>)photonEvent.CustomData;
-                break;
-
-            case EvInstantiateTiles:
-                this.InstantiateLocalTiles();
-                break;
-            case EvConvertBonusTiles:
-                this.ConvertLocalBonusTiles();
-                break;
-        }
-    }
-
-    #endregion
 
     #region Gameplay Methods
 
@@ -591,6 +564,45 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             yield return new WaitForSeconds(1f);
         }
         yield return null;
+    }
+
+    #endregion
+
+    #region IOnEventCallback Callbacks
+
+    public void OnEvent(EventData photonEvent) {
+        byte eventCode = photonEvent.Code;
+
+        switch (eventCode) {
+            case EvAssignWind:
+                PlayerManager.Wind wind = (PlayerManager.Wind)photonEvent.CustomData;
+
+                // Update local player's custom properties
+                Hashtable ht = new Hashtable();
+                ht.Add(PlayerWindPropKey, wind);
+                PhotonNetwork.SetPlayerCustomProperties(ht);
+
+                // Update local player's playerManager
+                playerManager.PlayerWind = wind;
+                break;
+
+            case EvInstantiatePlayer:
+                this.InstantiateLocalPlayer();
+                this.StretchGameTable();
+                break;
+
+            case EvDistributeTiles:
+                // Update local player's playerManager
+                playerManager.hand = (List<Tile>)photonEvent.CustomData;
+                break;
+
+            case EvInstantiateTiles:
+                this.InstantiateLocalTiles();
+                break;
+            case EvConvertBonusTiles:
+                this.ConvertLocalBonusTiles();
+                break;
+        }
     }
 
     #endregion
