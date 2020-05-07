@@ -670,7 +670,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Debug.Log("The player's hand is empty.");
             return;
         }
-        
+
+        // Sort tiles by Suit, then by rank
+        playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
+        //playerManager.hand.Sort((x, y));
+
         // Separation between pivot of tiles
         float xSep = 0.83f;
         float xPos = -xSep * 6;
