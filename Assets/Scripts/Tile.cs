@@ -88,6 +88,10 @@ public class Tile {
         this.rank = rank;
     }
 
+    public bool IsBonus() {
+        return suit == Suit.Season || suit == Suit.Flower || suit == Suit.Animal;
+    }
+
     public override string ToString() {
         return suit + " " + rank;
     }

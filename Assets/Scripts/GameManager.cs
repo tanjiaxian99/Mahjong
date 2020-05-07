@@ -74,6 +74,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvInstantiateTiles = 6;
 
     /// <summary>
+    /// The Convert Flower Tiles event message byte. Used internally for converting bonus tiles (Season, Flower and Animal suits) 
+    /// to normal tiles in the local player's hand.
+    /// </summary>
+    public const byte EvConvertFlowerTiles = 7;
+
+    /// <summary>
     /// Wind of the player
     /// </summary>
     public static readonly string PlayerWindPropKey = "pw";
@@ -383,6 +389,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvInstantiateTiles:
                 this.InstantiateLocalTiles();
                 break;
+            case EvConvertFlowerTiles:
+                this.ConvertLocalFlowerTiles();
+                break;
         }
     }
 
@@ -409,6 +418,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.GenerateTiles();
         yield return new WaitForSeconds(1f);
         this.DistributeTiles();
+        StartCoroutine("ConvertFlowerTiles");
         this.InstantiateTiles();
         this.StartTurn();
         yield return null;
@@ -568,6 +578,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.RaiseEvent(EvInstantiateTiles, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
     }
 
+
+    /// <summary>
+    /// Convert Season, Flower and Animal suit tiles to other tiles. Done in playOrder sequence.
+    /// </summary>
+    IEnumerable ConvertFlowerTiles() {
+        foreach (Player player in (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey]) {
+            PhotonNetwork.RaiseEvent(EvConvertFlowerTiles, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+            yield return new WaitForSeconds(1f);
+        }
+        yield return null;
+    }
+
     #endregion
 
     #region Local Player Methods
@@ -663,7 +685,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// After the local player receives the tiles, instantiate the tiles.
+    /// After the local player receives the tiles, instantiate the tiles, including bonus tiles.
     /// </summary>
     public void InstantiateLocalTiles() {
         if (playerManager.hand == null) {
@@ -684,6 +706,45 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Instantiate(tilesDict[tileName], new Vector3(xPos, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
             xPos += xSep;
         }
+
+        // Instantiate bonus tiles
+
+    }
+
+    /// <summary>
+    /// Convert the bonus (Season, Flower and Animal) tiles into normal tiles. Repeat until there are no bonus tiles
+    /// </summary>
+    public void ConvertLocalFlowerTiles() {
+        //// Create a temporary list to store the player's hand. This is to avoid removing tiles from the player's hand while in a loop.
+        //List<Tile> temp = new List<Tile>(playerManager.hand);
+
+        foreach (Tile tile in playerManager.hand) {
+            if (tile.IsBonus()) {
+                playerManager.bonusTiles.Add(tile);
+
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Draw a new tile. No distinction made between front end or back end of Wall Tiles.
+    /// </summary>
+    public Tile DrawTile() {
+        Random rand = new Random();
+        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
+        Tile tile;
+
+        int randomIndex = rand.Next(tiles.Count());
+        tile = tiles[randomIndex];
+        tiles.Remove(tiles[randomIndex]);
+
+        // Reinsert updated tiles list into Room Custom Properties
+        Hashtable ht = new Hashtable();
+        ht.Add(WallTileListPropKey, tiles);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        return tile;
     }
 
     #endregion

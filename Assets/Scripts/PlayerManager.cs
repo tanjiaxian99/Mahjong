@@ -19,6 +19,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public List<Tile> hand { get; set; } = new List<Tile>() ;
 
+    public List<Tile> bonusTiles { get; set; } = new List<Tile>();
+
     #endregion
 
     #region MonoBehaviour Callbacks
