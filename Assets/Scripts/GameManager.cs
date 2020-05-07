@@ -521,7 +521,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Hashtable ht = new Hashtable();
         ht.Add(WallTileListPropKey, tiles);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-
     }
 
 
@@ -532,6 +531,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void DistributeTiles() {
         Random rand = new Random();
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
+        foreach (Tile tile in tiles) {
+        }
 
         foreach (Player player in PhotonNetwork.PlayerList) {
             List<Tile> playerTiles = new List<Tile>();
@@ -680,8 +681,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Instantiate(tilesDict[tileName], new Vector3(xPos, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
             xPos += xSep;
         }
-
-        Debug.Log(playerManager.hand);
     }
 
     #endregion
@@ -693,8 +692,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public static object DeserializeTilesList(byte[] data) {
         List<Tile> tilesList = new List<Tile>();
-        Tile tile = new Tile(0, 0);
+        
         foreach (byte tileByte in data) {
+            Tile tile = new Tile(0, 0);
             tile.Id = tileByte;
             tilesList.Add(tile);
         }
