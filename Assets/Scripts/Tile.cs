@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Class for all tiles. Rank sequence is as follows:
 /// Character, Dot, Bamboo, Season and Flower: the number on the tile;
-/// Wind: East, North, West, South;
+/// Wind: East, South, West, North;
 /// Dragon: Red, White, Green;
 /// Animal: Cat, Rat, Rooster, Centipede.
 /// </summary>

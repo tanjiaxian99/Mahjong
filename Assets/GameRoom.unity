@@ -1242,7 +1242,7 @@ PrefabInstance:
         type: 3}
       propertyPath: Wind_Two
       value: 
-      objectReference: {fileID: -927199367670048503, guid: 03a454d9c70f269439a0e6ca153f1343,
+      objectReference: {fileID: -927199367670048503, guid: 944cb0ec7dcf9c942a253cf5d711fb43,
         type: 3}
     - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
         type: 3}
@@ -1254,7 +1254,7 @@ PrefabInstance:
         type: 3}
       propertyPath: Wind_Four
       value: 
-      objectReference: {fileID: -927199367670048503, guid: 944cb0ec7dcf9c942a253cf5d711fb43,
+      objectReference: {fileID: -927199367670048503, guid: 03a454d9c70f269439a0e6ca153f1343,
         type: 3}
     - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
         type: 3}
