@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// The Convert Flower Tiles event message byte. Used internally for converting bonus tiles (Season, Flower and Animal suits) 
     /// to normal tiles in the local player's hand.
     /// </summary>
-    public const byte EvConvertFlowerTiles = 7;
+    public const byte EvConvertBonusTiles = 7;
 
     /// <summary>
     /// Wind of the player
@@ -389,8 +389,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvInstantiateTiles:
                 this.InstantiateLocalTiles();
                 break;
-            case EvConvertFlowerTiles:
-                this.ConvertLocalFlowerTiles();
+            case EvConvertBonusTiles:
+                this.ConvertLocalBonusTiles();
                 break;
         }
     }
@@ -418,7 +418,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.GenerateTiles();
         yield return new WaitForSeconds(1f);
         this.DistributeTiles();
-        StartCoroutine("ConvertFlowerTiles");
+        StartCoroutine("ConvertBonusTiles");
         this.InstantiateTiles();
         this.StartTurn();
         yield return null;
@@ -582,9 +582,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Convert Season, Flower and Animal suit tiles to other tiles. Done in playOrder sequence.
     /// </summary>
-    IEnumerable ConvertFlowerTiles() {
+    IEnumerable ConvertBonusTiles() {
         foreach (Player player in (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey]) {
-            PhotonNetwork.RaiseEvent(EvConvertFlowerTiles, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent(EvConvertBonusTiles, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             yield return new WaitForSeconds(1f);
         }
         yield return null;
@@ -712,17 +712,27 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
     /// <summary>
-    /// Convert the bonus (Season, Flower and Animal) tiles into normal tiles. Repeat until there are no bonus tiles
+    /// Convert the bonus (Season, Flower and Animal) tiles into normal tiles. Repeat until there are no bonus tiles.
     /// </summary>
-    public void ConvertLocalFlowerTiles() {
-        //// Create a temporary list to store the player's hand. This is to avoid removing tiles from the player's hand while in a loop.
-        //List<Tile> temp = new List<Tile>(playerManager.hand);
+    public void ConvertLocalBonusTiles() {
+        while (true) {
+            bool haveBonusTile = false;
 
-        foreach (Tile tile in playerManager.hand) {
-            if (tile.IsBonus()) {
-                playerManager.bonusTiles.Add(tile);
-
+            for (int i = 0; i < playerManager.hand.Count; i++) {
+                if (playerManager.hand[i].IsBonus()) {
+                    // Add tile to bonus tiles list, which are instantiated separately
+                    playerManager.bonusTiles.Add(playerManager.hand[i]);
+                    playerManager.hand[i] = this.DrawTile();
+                    haveBonusTile = true;
+                }
             }
+
+            if (!haveBonusTile) {
+                break;
+            }
+        }
+        foreach (Tile tile in playerManager.bonusTiles) {
+            Debug.Log(tile);
         }
     }
 
