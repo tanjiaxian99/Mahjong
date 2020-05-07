@@ -252,6 +252,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Set up a HashTable for tiles
             this.InstantiateTilesDict();
             this.OnJoinedRoom();
+
+            bool register = PhotonPeer.RegisterType(typeof(Tile), 255, SerializeTile, DeserializeTile);
+            Debug.Log(register);
+
         }
     }
 
@@ -515,9 +519,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Add to Room Custom Properties
         Hashtable ht = new Hashtable();
-        ht.Add(WallTileListPropKey, tiles);
+        ht.Add(WallTileListPropKey, new Tile(0, 0));
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        // Create a custom type for serializing List<Tile> 
+        // https://answers.unity.com/questions/430090/photon-pun-type-serialization-error-on-rpc.html
+        // Or, only send the suit and rank of a tile.
     }
+
+
+    public static object DeserializeTile(byte[] data) {
+        var result = new Tile(0, 0);
+        result.Id = data[0];
+        return result;
+    }
+
+    public static byte[] SerializeTile(object customType) {
+        var c = (Tile)customType;
+        return new byte[] { c.Id };
+    }
+
 
     /// <summary>
     /// Distribute tiles to each player depending on the wind seat. The player with the East Wind receives 14 tiles

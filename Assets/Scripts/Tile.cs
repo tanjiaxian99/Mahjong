@@ -35,6 +35,15 @@ public class Tile {
         Nine,
     }
 
+    public byte Id {
+        get {
+            return (byte) ((int)suit * 10 + (int)rank);
+        } set {
+            suit = (Suit) (value / 10);
+            rank = (Rank) (value % 10);
+        }
+    }
+
     // Raises error if rank does not belong in suit
     public Tile(Suit suit, Rank rank) {
         if (suit < Suit.Character || suit > Suit.Animal) {
