@@ -536,15 +536,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         foreach (Player player in PhotonNetwork.PlayerList) {
             List<Tile> playerTiles = new List<Tile>();
 
-            int i = 0;
-            while (i < 14)  {
+            for (int i = 0; i < 14; i++) {
                 // Choose a tile randomly from the complete tiles list and add it to the player's tiles
                 int randomIndex = rand.Next(tiles.Count());
                 playerTiles.Add(tiles[randomIndex]);
                 tiles.Remove(tiles[randomIndex]);
 
                 // Don't give the 14th tile if the player is not the East Wind
-                if (!((PlayerManager.Wind)player.CustomProperties[PlayerWindPropKey] == PlayerManager.Wind.EAST)) {
+                if (i == 13 && !((PlayerManager.Wind)player.CustomProperties[PlayerWindPropKey] == PlayerManager.Wind.EAST)) {
                     break;
                 }
             }
