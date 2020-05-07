@@ -12,6 +12,7 @@ using ExitGames.Client.Photon;
 
 using Random = System.Random;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using UnityEditorInternal;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
@@ -270,6 +271,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Register customType List<Tile>
             bool register = PhotonPeer.RegisterType(typeof(List<Tile>), 255, SerializeTilesList, DeserializeTilesList);
         }
+    }
+
+    void Update() {
+        this.LocalPlayerMoves();
     }
 
     #endregion
@@ -602,6 +607,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvConvertBonusTiles:
                 this.ConvertLocalBonusTiles();
                 break;
+            case EvPlayerTurn:
+                playerManager.myTurn = true;
+                break;
         }
     }
 
@@ -724,11 +732,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 xPosHand += 0.30f;
             }
 
-            Instantiate(tilesDict[tileName], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
+            GameObject tileGameObject = Instantiate(tilesDict[tileName], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
+
+            // Tag the child GameObjects of the tile. Tagging allows the GameObject to be quickly identified when we RayCast
+            foreach (Transform child in tileGameObject.transform) {
+                child.tag = "Hand";
+            }
+
             xPosHand += xSepHand;
-        }
-        for (int i = 0; i < 4; i++) {
-            playerManager.bonusTiles.Add(new Tile(0, 0));
         }
         
         // TODO: place bonus tiles in the middle of the screen
@@ -785,6 +796,34 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
         return tile;
+    }
+
+
+    public void LocalPlayerMoves() {
+        // Only execute the move if it is the local player's turn
+        if (!playerManager.myTurn) {
+            return;
+        }
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        // Only detect the GameObject hit by the RayCast when the left mouse button is clicked
+        if (!Input.GetMouseButtonDown(0)) {
+            return;
+        }
+
+        if (Physics.Raycast(ray, out hit)) {
+            GameObject hitObject = hit.transform.gameObject;
+
+            // If the GameObject hit is a tile from the player's hand, remove that tile.
+            if (hitObject.tag == "Hand") {
+                Debug.Log(hitObject.transform.parent.name);
+                //playerManager.hand.Remove(hitObject);
+                //Destroy(hitObject);
+            }
+        }
+        
     }
 
     #endregion
