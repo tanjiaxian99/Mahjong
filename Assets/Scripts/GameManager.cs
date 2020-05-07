@@ -582,7 +582,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Convert Season, Flower and Animal suit tiles to other tiles. Done in playOrder sequence.
     /// </summary>
-    IEnumerable ConvertBonusTiles() {
+    IEnumerator ConvertBonusTiles() {
         foreach (Player player in (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey]) {
             PhotonNetwork.RaiseEvent(EvConvertBonusTiles, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             yield return new WaitForSeconds(1f);
@@ -730,9 +730,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             if (!haveBonusTile) {
                 break;
             }
-        }
-        foreach (Tile tile in playerManager.bonusTiles) {
-            Debug.Log(tile);
         }
     }
 
