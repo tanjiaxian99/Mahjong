@@ -675,7 +675,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         float xPos = -xSep * 6;
 
         foreach (Tile tile in playerManager.hand) {
-            string tileName = tile.suit + "" + tile.rank;
+            string tileName = tile.suit + "_" + tile.rank;
 
             Instantiate(tilesDict[tileName], new Vector3(xPos, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
             xPos += xSep;
