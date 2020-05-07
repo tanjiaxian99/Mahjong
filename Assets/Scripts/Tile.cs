@@ -35,6 +35,9 @@ public class Tile {
         Nine,
     }
 
+    /// <summary>
+    /// The Id of each tile is a 2-digit number: the first digit represents the suit while the second represents the rank.
+    /// </summary>
     public byte Id {
         get {
             return (byte) ((int)suit * 10 + (int)rank);

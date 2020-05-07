@@ -253,9 +253,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             this.InstantiateTilesDict();
             this.OnJoinedRoom();
 
-            bool register = PhotonPeer.RegisterType(typeof(Tile), 255, SerializeTile, DeserializeTile);
-            Debug.Log(register);
-
+            // Register customType List<Tile>
+            bool register = PhotonPeer.RegisterType(typeof(List<Tile>), 255, SerializeTilesList, DeserializeTilesList);
         }
     }
 
@@ -408,6 +407,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.DeterminePlayOrder();
         this.InstantiatePlayers();
         this.GenerateTiles();
+        yield return new WaitForSeconds(1f);
         this.DistributeTiles();
         this.InstantiateTiles();
         this.StartTurn();
@@ -519,23 +519,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Add to Room Custom Properties
         Hashtable ht = new Hashtable();
-        ht.Add(WallTileListPropKey, new Tile(0, 0));
+        ht.Add(WallTileListPropKey, tiles);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-        // Create a custom type for serializing List<Tile> 
-        // https://answers.unity.com/questions/430090/photon-pun-type-serialization-error-on-rpc.html
-        // Or, only send the suit and rank of a tile.
-    }
 
-
-    public static object DeserializeTile(byte[] data) {
-        var result = new Tile(0, 0);
-        result.Id = data[0];
-        return result;
-    }
-
-    public static byte[] SerializeTile(object customType) {
-        var c = (Tile)customType;
-        return new byte[] { c.Id };
     }
 
 
@@ -697,6 +683,38 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         Debug.Log(playerManager.hand);
+    }
+
+    #endregion
+
+    #region Custom Types
+
+    /// <summary>
+    /// Deserialize the byteStream into a List<Tile>
+    /// </summary>
+    public static object DeserializeTilesList(byte[] data) {
+        List<Tile> tilesList = new List<Tile>();
+        Tile tile = new Tile(0, 0);
+        foreach (byte tileByte in data) {
+            tile.Id = tileByte;
+            tilesList.Add(tile);
+        }
+
+        return tilesList;
+    }
+
+
+    /// <summary>
+    /// Serialize List<Tile> into a byteStream
+    /// </summary>
+    public static byte[] SerializeTilesList(object customType) {
+        var tilesList = (List<Tile>)customType;
+        byte[] byteArray = new byte[tilesList.Count];
+
+        for (int i = 0; i < tilesList.Count; i++) {
+            byteArray[i] = tilesList[i].Id;
+        }
+        return byteArray;
     }
 
     #endregion
