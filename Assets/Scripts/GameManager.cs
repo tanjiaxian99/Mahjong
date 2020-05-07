@@ -48,6 +48,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     private Dictionary<string, GameObject> tilesDict = new Dictionary<string, GameObject>();
 
+    private float xPosBonus;
+
+
     #endregion
 
     #region OnEvent Fields
@@ -697,18 +700,36 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
 
         // Separation between pivot of tiles
-        float xSep = 0.83f;
-        float xPos = -xSep * 6;
+        float xSepHand = 0.83f;
+        float xPosHand = -xSepHand * 6;
 
-        foreach (Tile tile in playerManager.hand) {
-            string tileName = tile.suit + "_" + tile.rank;
+        // Instantiate hand tiles
+        for (int i = 0; i < playerManager.hand.Count; i++) {
+            string tileName = playerManager.hand[i].ToString();
 
-            Instantiate(tilesDict[tileName], new Vector3(xPos, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
-            xPos += xSep;
+            // Instantiate the 14th tile further away from the other 13
+            if (i == 13) {
+                xPosHand += 0.30f;
+            }
+
+            Instantiate(tilesDict[tileName], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
+            xPosHand += xSepHand;
         }
-
+        for (int i = 0; i < 4; i++) {
+            playerManager.bonusTiles.Add(new Tile(0, 0));
+        }
+        
+        // TODO: place bonus tiles in the middle of the screen
         // Instantiate bonus tiles
+        xPosBonus = -tableWidth / 2f + 0.27f;
+        float xSepBonus = 0.83f * 0.5f;
+        foreach (Tile tile in playerManager.bonusTiles) {
+            string tileName = tile.ToString();
+            GameObject newTile = Instantiate(tilesDict[tileName], new Vector3(xPosBonus, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
+            xPosBonus += xSepBonus;
+        }
     }
 
     /// <summary>

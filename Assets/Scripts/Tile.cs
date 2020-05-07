@@ -93,6 +93,6 @@ public class Tile {
     }
 
     public override string ToString() {
-        return suit + " " + rank;
+        return suit + "_" + rank;
     }
 }
