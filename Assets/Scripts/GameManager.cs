@@ -813,11 +813,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 if (playerManager.hand.Contains(tile)) {
                     playerManager.hand.Remove(tile);
-                    playerManager.myTurn = false;
+                    //playerManager.myTurn = false;
 
                     this.InstantiateLocalHand();
-                    this.DiscardTile(tile);
-                    // discard tile animation
+                    this.DiscardTile(tile, hitObject.transform.position.x);
                     // sendmove so other players can see the discard tile
                     // tell the next player it is his turn
                 }
@@ -931,11 +930,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         tileGameObject.tag = "Hand";
     }
 
+
     /// <summary>
     /// Update the Room's Custom Properties with the discarded tile and tosses the tile to the middle of the GameTable.
     /// </summary>
     // TODO: detect changes in CustomProperties which contains the word discardtilepropkey
-    public void DiscardTile(Tile tile) {
+    public void DiscardTile(Tile tile, float xPos) {
         // Add the discarded tile to the DiscardTileList
         List<Tile> discardTiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
         Hashtable ht = new Hashtable();
@@ -943,12 +943,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht.Add(DiscardTileListPropKey, discardTiles);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
-        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(0, 0.85f, -3f), Quaternion.Euler(270f, 180f, 0f));
+        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.85f, -2.6f), Quaternion.Euler(270f, 180f, 0f));
         foreach (Transform child in tileGameObject.transform) {
             child.GetComponent<MeshCollider>().convex = true;
         }
+
+        float xForce;
+        float zForce;
+        float tanAlpha = 2.6f / xPos;
+        //xForce = 64 / (1 + Math.Pow(tanAlpha, 2));
+
         Rigidbody rb = tileGameObject.AddComponent<Rigidbody>();
-        rb.AddForce(new Vector3(0, 0, 10), ForceMode.Impulse);
+        rb.AddForce(new Vector3(xForce, 0f, 8f), ForceMode.Impulse);
 
     }
     #endregion
