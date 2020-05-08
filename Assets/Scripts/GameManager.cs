@@ -740,15 +740,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             bool haveBonusTile = false;
 
             for (int i = 0; i < playerManager.hand.Count; i++) {
-                Debug.LogFormat("Tile before conversion: {0}", playerManager.hand[i]);
                 if (playerManager.hand[i].IsBonus()) {
                     // Add tile to bonus tiles list, which are instantiated separately
                     playerManager.bonusTiles.Add(playerManager.hand[i]);
                     playerManager.hand[i] = this.DrawTile();
                     haveBonusTile = true;
                 }
-                Debug.LogFormat("Tile after conversion: {0}", playerManager.hand[i]);
-                Debug.LogFormat("Bonus tile tally at: {0}", playerManager.bonusTiles.Count);
             }
 
             if (!haveBonusTile) {

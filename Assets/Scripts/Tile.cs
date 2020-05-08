@@ -124,15 +124,17 @@ public class Tile : IEquatable<Tile> {
     /// <summary>
     /// If 2 tiles have the same suit and rank, they are equal, regardless of reference.
     /// </summary>
-    public bool Equals(Tile other) {
-        if (other == null) {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other)) {
-            return true;
-        }
-
-        return this.suit == other.suit && this.rank == other.rank;
+    public bool Equals(Tile tile) {
+        return suit == tile.suit &&
+               rank == tile.rank;
     }
+    
+    public override int GetHashCode() {
+        int hashCode = 39855015;
+        hashCode = hashCode * -1521134295 + suit.GetHashCode();
+        hashCode = hashCode * -1521134295 + rank.GetHashCode();
+        return hashCode;
+    }
+
+    
 }
