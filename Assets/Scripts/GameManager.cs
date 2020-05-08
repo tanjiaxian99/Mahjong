@@ -792,7 +792,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             GameObject hitObject = hit.transform.gameObject;
 
             // If the GameObject hit is a child object of a tile from the player's hand, remove that tile.
-            if (hitObject.tag == "Hand") {
+            if (hitObject.transform.parent.tag == "Hand") {
 
                 // hitObject.transform.name will only give the name of the child object. E.g. group_0_16777215
                 string tileName = hitObject.transform.parent.name;
@@ -802,12 +802,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Tile tile = new Tile(tileName);
 
                 if (playerManager.hand.Contains(tile)) {
+                    //Destroy(hitObject.transform.parent.gameObject);
                     playerManager.hand.Remove(tile);
-                    Destroy(hitObject.transform.parent.gameObject);
                     playerManager.myTurn = false;
+                    this.InstantiateLocalHand();
+
                     // add tile to discard
                     // discard tile animation
-                    this.InstantiateLocalHand();
                     // sendmove so other players can see the discard tile
                     // tell the next player it is his turn
                 }
@@ -842,7 +843,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // taggedHand represents the tiles currently on the GameTable. It represents the hand one move prior to the current hand.
         GameObject[] taggedHand = GameObject.FindGameObjectsWithTag("Hand");
 
-
         // Initial instantiation of tiles
         if (taggedHand.Length == 0) {
             xPosHand = -((handSize - 1) / 2f) * xSepHand;
@@ -859,16 +859,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.InstantiateSingleTile(playerManager.hand[i], xPosHand);
                 xPosHand += xSepHand;
             }
+
             return;
         }
-
 
         // When the player draws a tile, there will be one more tile in the player's hand than on the GameTable. Instantiate the drawn tile.
         // handSize is either 2, 5, 8, 11 or 14.
         if (taggedHand.Length + 1 == handSize) {
+            Debug.Log("called 2");
             xPosHand = (handSize / 2f) * xSepHand + xOffset;
             Tile tile = playerManager.hand[handSize - 1];
             this.InstantiateSingleTile(tile, xPosHand);
+
             return;
         }
 
@@ -877,6 +879,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Destroy all tiles, sort the player's hand, and instantiate the new tiles.
         // handSize is either 1, 4, 7, 10 or 13.
         if (taggedHand.Length - 1 == handSize) {
+            Debug.Log("called 3");
             xPosHand = -((handSize - 1) / 2f) * xSepHand;
 
             // Destroy tiles on the GameTable
@@ -891,6 +894,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.InstantiateSingleTile(tile, xPosHand);
                 xPosHand += xSepHand;
             }
+
             return;
         }
 
@@ -915,11 +919,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.InstantiateSingleTile(playerManager.hand[i], xPosHand);
                 xPosHand += xSepHand;
             }
-
             return;
         }
 
-        Debug.LogErrorFormat("The player's hand size has an invalid hand size of {0}", handSize);
+        Debug.LogErrorFormat("Size of hand: {0}. Number of tiles on GameTable: {1}", handSize, taggedHand.Length);
     }
 
 
@@ -929,10 +932,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InstantiateSingleTile(Tile tile, float xPosHand) {
         GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
 
-        // Tag the child GameObjects of the tile
-        foreach (Transform child in tileGameObject.transform) {
-            child.tag = "Hand";
-        }
+        // Tag the parent GameObject of the tile
+        tileGameObject.tag = "Hand";
+        //foreach (Transform child in tileGameObject.transform) {
+        //    child.tag = "Hand";
+        //}
     }
 
     #endregion
