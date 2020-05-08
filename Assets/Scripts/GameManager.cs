@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// HashTable where the keys are the string names of tiles and values are the tiles' prefab
     /// </summary>
+    // TODO: Might be better to have Dictionary<Tile, GameObject>
     private Dictionary<string, GameObject> tilesDict = new Dictionary<string, GameObject>();
 
     private float xPosBonus;
@@ -825,16 +826,50 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Tile tile = new Tile(tileName);
 
                 if (playerManager.hand.Contains(tile)) {
-                    Debug.Log("contains");
-                    //playerManager.hand.Remove(tile);
-                    //Destroy(hitObject.transform.parent);
-                    //playerManager.myTurn = false;
-                    // sendmove
-                    //Debug.Log(playerManager.hand.Count);
+                    playerManager.hand.Remove(tile);
+                    Destroy(hitObject.transform.parent.gameObject);
+                    playerManager.myTurn = false;
+                    // add tile to discard
+                    // discard tile animation
+                    this.SortTiles();
+                    // sendmove so other players can see the discard tile
+                    // tell the next player it is his turn
                 }
             }
         }
-        
+    }
+    // TODO: Create a dictionary with discarded tile, force applied, and player. In the event that a player disconnects and reconnects,
+    // he can reconstruct the scene.
+
+    // TODO: detect changes in CustomProperties which contains the word discardtilepropkey
+    public void DiscardTile(Tile tile) {
+        // Add the discarded tile to the DiscardTileList
+        List<Tile> discardTiles = (List<Tile>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
+        Hashtable ht = new Hashtable();
+        discardTiles.Add(tile);
+        ht.Add(DiscardTileListPropKey, tile);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
+    public void SortTiles() {
+        // Destroy current hand first
+        GameObject[] taggedHand = GameObject.FindGameObjectsWithTag("Hand");
+        foreach (GameObject tagged in taggedHand) {
+            Destroy(tagged);
+        }
+
+        // Sort hand by Rank, then by suit
+        playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
+
+        // Separation between pivot of tiles
+        float xSepHand = 0.83f;
+        float xPosHand = -xSepHand * 6;
+
+        foreach (Tile tile in playerManager.hand) {
+            string tileName = tile.ToString();
+            Instantiate(tilesDict[tileName], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
+            xPosHand += xSepHand;
+        }
     }
 
     #endregion
