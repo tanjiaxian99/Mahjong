@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
@@ -47,8 +48,32 @@ public class Tile {
         }
     }
 
-    // Raises error if rank does not belong in suit
+
+    /// <summary>
+    /// Default constructor. Calls Initialize, which is shared with the secondary constructor.
+    /// </summary>
     public Tile(Suit suit, Rank rank) {
+        this.Initialize(suit, rank);
+    }
+
+
+    /// <summary>
+    /// Secondary constructor. Calls Initialize, which is shared with the default constructor.
+    /// </summary>
+    public Tile(string name) {
+        string[] part = name.Split('_');
+        Enum.TryParse(part[0], out Suit suit);
+        Enum.TryParse(part[1], out Rank rank);
+        this.Initialize(suit, rank);
+    }
+
+
+    /// <summary>
+    /// Initialize a new Tile object. Called by both constructors.
+    /// </summary>
+    /// <param name="suit"></param>
+    /// <param name="rank"></param>
+    public void Initialize(Suit suit, Rank rank) {
         if (suit < Suit.Character || suit > Suit.Animal) {
             Debug.LogError("The tile has an invalid suit");
             return;

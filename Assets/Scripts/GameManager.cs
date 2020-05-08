@@ -816,9 +816,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (Physics.Raycast(ray, out hit)) {
             GameObject hitObject = hit.transform.gameObject;
 
-            // If the GameObject hit is a tile from the player's hand, remove that tile.
+            // If the GameObject hit is a child object of a tile from the player's hand, remove that tile.
             if (hitObject.tag == "Hand") {
-                Debug.Log(hitObject.transform.parent.name);
+                // Retrieve the name of the tile. hitObject.transform.name will only give the name of the child object. E.g. group_0_16777215
+                string tileName = hitObject.transform.parent.name;
+                // Remove the phrase '(Clone)' from the back of the name
+                tileName = tileName.Substring(0, tileName.Length - 7);
+                Debug.Log(tileName);
+
                 //playerManager.hand.Remove(hitObject);
                 //Destroy(hitObject);
             }
