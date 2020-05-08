@@ -824,20 +824,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
         }
     }
-    // TODO: Create a dictionary with discarded tile, force applied, and player. In the event that a player disconnects and reconnects,
+    // TODO: Create a dictionary with discarded tile and current location. In the event that a player disconnects and reconnects,
     // he can reconstruct the scene.
-
-    // TODO: detect changes in CustomProperties which contains the word discardtilepropkey
-    public void DiscardTile(Tile tile) {
-        // Add the discarded tile to the DiscardTileList
-        List<Tile> discardTiles = (List<Tile>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
-        Hashtable ht = new Hashtable();
-        discardTiles.Add(tile);
-        ht.Add(DiscardTileListPropKey, discardTiles);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-
-        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(0, 1f, -3f), Quaternion.Euler(270f, 180f, 0f));
-    }
 
     /// <summary>
     /// Called whenever there is an update to the player's hand.
@@ -939,10 +927,30 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Helper method for InstantiateLocalHand to instantiate a single tile and tagging the children GameObjects
     /// </summary>
     public void InstantiateSingleTile(Tile tile, float xPosHand) {
-        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
+        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPosHand, 0.85f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
         tileGameObject.tag = "Hand";
     }
 
+    /// <summary>
+    /// Update the Room's Custom Properties with the discarded tile and tosses the tile to the middle of the GameTable.
+    /// </summary>
+    // TODO: detect changes in CustomProperties which contains the word discardtilepropkey
+    public void DiscardTile(Tile tile) {
+        // Add the discarded tile to the DiscardTileList
+        List<Tile> discardTiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
+        Hashtable ht = new Hashtable();
+        discardTiles.Add(tile);
+        ht.Add(DiscardTileListPropKey, discardTiles);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(0, 0.85f, -3f), Quaternion.Euler(270f, 180f, 0f));
+        foreach (Transform child in tileGameObject.transform) {
+            child.GetComponent<MeshCollider>().convex = true;
+        }
+        Rigidbody rb = tileGameObject.AddComponent<Rigidbody>();
+        rb.AddForce(new Vector3(0, 0, 10), ForceMode.Impulse);
+
+    }
     #endregion
 
     #region Custom Types
