@@ -847,17 +847,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (taggedHand.Length == 0) {
             xPosHand = -((handSize - 1) / 2f) * xSepHand;
 
-            int tileNumber = 0;
-            foreach (Tile tile in playerManager.hand) {
-                // Add an offset so the 14th tile will be placed away from the other 13 tiles. Only concerns the player with
-                // the East Wind.
-                if (tileNumber == 13) {
+            // Sort the player's hand when it is first received
+            playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
+
+            for (int i = 0; i < playerManager.hand.Count; i++) {
+                // Add an offset so that the 14th tile will be placed away from the other tiles.
+                if (i == 13) {
                     xPosHand += xOffset;
                 }
 
-                this.InstantiateSingleTile(tile, xPosHand);
+                this.InstantiateSingleTile(playerManager.hand[i], xPosHand);
                 xPosHand += xSepHand;
-                tileNumber++;
             }
             return;
         }
