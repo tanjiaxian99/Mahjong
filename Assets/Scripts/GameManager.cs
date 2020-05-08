@@ -47,8 +47,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// HashTable where the keys are the string names of tiles and values are the tiles' prefab
     /// </summary>
-    // TODO: Might be better to have Dictionary<Tile, GameObject>
-    private Dictionary<string, GameObject> tilesDict = new Dictionary<string, GameObject>();
+    private Dictionary<Tile, GameObject> tilesDict = new Dictionary<Tile, GameObject>();
 
     private float xPosBonus;
 
@@ -627,59 +626,59 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Fill up the tilesDict with the tile prebabs and their string representations
     /// </summary>
     public void InstantiateTilesDict() {
-        tilesDict.Add("Character_One", Character_One);
-        tilesDict.Add("Character_Two", Character_Two);
-        tilesDict.Add("Character_Three", Character_Three);
-        tilesDict.Add("Character_Four", Character_Four);
-        tilesDict.Add("Character_Five", Character_Five);
-        tilesDict.Add("Character_Six", Character_Six);
-        tilesDict.Add("Character_Seven", Character_Seven);
-        tilesDict.Add("Character_Eight", Character_Eight);
-        tilesDict.Add("Character_Nine", Character_Nine);
+        tilesDict.Add(new Tile("Character_One"), Character_One);
+        tilesDict.Add(new Tile("Character_Two"), Character_Two);
+        tilesDict.Add(new Tile("Character_Three"), Character_Three);
+        tilesDict.Add(new Tile("Character_Four"), Character_Four);
+        tilesDict.Add(new Tile("Character_Five"), Character_Five);
+        tilesDict.Add(new Tile("Character_Six"), Character_Six);
+        tilesDict.Add(new Tile("Character_Seven"), Character_Seven);
+        tilesDict.Add(new Tile("Character_Eight"), Character_Eight);
+        tilesDict.Add(new Tile("Character_Nine"), Character_Nine);
 
-        tilesDict.Add("Dot_One", Dot_One);
-        tilesDict.Add("Dot_Two", Dot_Two);
-        tilesDict.Add("Dot_Three", Dot_Three);
-        tilesDict.Add("Dot_Four", Dot_Four);
-        tilesDict.Add("Dot_Five", Dot_Five);
-        tilesDict.Add("Dot_Six", Dot_Six);
-        tilesDict.Add("Dot_Seven", Dot_Seven);
-        tilesDict.Add("Dot_Eight", Dot_Eight);
-        tilesDict.Add("Dot_Nine", Dot_Nine);
+        tilesDict.Add(new Tile("Dot_One"), Dot_One);
+        tilesDict.Add(new Tile("Dot_Two"), Dot_Two);
+        tilesDict.Add(new Tile("Dot_Three"), Dot_Three);
+        tilesDict.Add(new Tile("Dot_Four"), Dot_Four);
+        tilesDict.Add(new Tile("Dot_Five"), Dot_Five);
+        tilesDict.Add(new Tile("Dot_Six"), Dot_Six);
+        tilesDict.Add(new Tile("Dot_Seven"), Dot_Seven);
+        tilesDict.Add(new Tile("Dot_Eight"), Dot_Eight);
+        tilesDict.Add(new Tile("Dot_Nine"), Dot_Nine);
 
-        tilesDict.Add("Bamboo_One", Bamboo_One);
-        tilesDict.Add("Bamboo_Two", Bamboo_Two);
-        tilesDict.Add("Bamboo_Three", Bamboo_Three);
-        tilesDict.Add("Bamboo_Four", Bamboo_Four);
-        tilesDict.Add("Bamboo_Five", Bamboo_Five);
-        tilesDict.Add("Bamboo_Six", Bamboo_Six);
-        tilesDict.Add("Bamboo_Seven", Bamboo_Seven);
-        tilesDict.Add("Bamboo_Eight", Bamboo_Eight);
-        tilesDict.Add("Bamboo_Nine", Bamboo_Nine);
+        tilesDict.Add(new Tile("Bamboo_One"), Bamboo_One);
+        tilesDict.Add(new Tile("Bamboo_Two"), Bamboo_Two);
+        tilesDict.Add(new Tile("Bamboo_Three"), Bamboo_Three);
+        tilesDict.Add(new Tile("Bamboo_Four"), Bamboo_Four);
+        tilesDict.Add(new Tile("Bamboo_Five"), Bamboo_Five);
+        tilesDict.Add(new Tile("Bamboo_Six"), Bamboo_Six);
+        tilesDict.Add(new Tile("Bamboo_Seven"), Bamboo_Seven);
+        tilesDict.Add(new Tile("Bamboo_Eight"), Bamboo_Eight);
+        tilesDict.Add(new Tile("Bamboo_Nine"), Bamboo_Nine);
 
-        tilesDict.Add("Wind_One", Wind_One);
-        tilesDict.Add("Wind_Two", Wind_Two);
-        tilesDict.Add("Wind_Three", Wind_Three);
-        tilesDict.Add("Wind_Four", Wind_Four);
+        tilesDict.Add(new Tile("Wind_One"), Wind_One);
+        tilesDict.Add(new Tile("Wind_Two"), Wind_Two);
+        tilesDict.Add(new Tile("Wind_Three"), Wind_Three);
+        tilesDict.Add(new Tile("Wind_Four"), Wind_Four);
 
-        tilesDict.Add("Dragon_One", Dragon_One);
-        tilesDict.Add("Dragon_Two", Dragon_Two);
-        tilesDict.Add("Dragon_Three", Dragon_Three);
+        tilesDict.Add(new Tile("Dragon_One"), Dragon_One);
+        tilesDict.Add(new Tile("Dragon_Two"), Dragon_Two);
+        tilesDict.Add(new Tile("Dragon_Three"), Dragon_Three);
 
-        tilesDict.Add("Season_One", Season_One);
-        tilesDict.Add("Season_Two", Season_Two);
-        tilesDict.Add("Season_Three", Season_Three);
-        tilesDict.Add("Season_Four", Season_Four);
+        tilesDict.Add(new Tile("Season_One"), Season_One);
+        tilesDict.Add(new Tile("Season_Two"), Season_Two);
+        tilesDict.Add(new Tile("Season_Three"), Season_Three);
+        tilesDict.Add(new Tile("Season_Four"), Season_Four);
 
-        tilesDict.Add("Flower_One", Flower_One);
-        tilesDict.Add("Flower_Two", Flower_Two);
-        tilesDict.Add("Flower_Three", Flower_Three);
-        tilesDict.Add("Flower_Four", Flower_Four);
+        tilesDict.Add(new Tile("Flower_One"), Flower_One);
+        tilesDict.Add(new Tile("Flower_Two"), Flower_Two);
+        tilesDict.Add(new Tile("Flower_Three"), Flower_Three);
+        tilesDict.Add(new Tile("Flower_Four"), Flower_Four);
 
-        tilesDict.Add("Animal_One", Animal_One);
-        tilesDict.Add("Animal_Two", Animal_Two);
-        tilesDict.Add("Animal_Three", Animal_Three);
-        tilesDict.Add("Animal_Four", Animal_Four);
+        tilesDict.Add(new Tile("Animal_One"), Animal_One);
+        tilesDict.Add(new Tile("Animal_Two"), Animal_Two);
+        tilesDict.Add(new Tile("Animal_Three"), Animal_Three);
+        tilesDict.Add(new Tile("Animal_Four"), Animal_Four);
     }
 
 
@@ -764,12 +763,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             bool haveBonusTile = false;
 
             for (int i = 0; i < playerManager.hand.Count; i++) {
+                Debug.LogFormat("Tile before conversion: {0}", playerManager.hand[i]);
                 if (playerManager.hand[i].IsBonus()) {
                     // Add tile to bonus tiles list, which are instantiated separately
                     playerManager.bonusTiles.Add(playerManager.hand[i]);
                     playerManager.hand[i] = this.DrawTile();
                     haveBonusTile = true;
                 }
+                Debug.LogFormat("Tile after conversion: {0}", playerManager.hand[i]);
+                Debug.LogFormat("Bonus tile tally at: {0}", playerManager.bonusTiles.Count);
             }
 
             if (!haveBonusTile) {
@@ -851,6 +853,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
+    // TODO: Method to instantiate tiles in hand
     public void SortTiles() {
         // Destroy current hand first
         GameObject[] taggedHand = GameObject.FindGameObjectsWithTag("Hand");
@@ -864,6 +867,34 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Separation between pivot of tiles
         float xSepHand = 0.83f;
         float xPosHand = -xSepHand * 6;
+
+        foreach (Tile tile in playerManager.hand) {
+            string tileName = tile.ToString();
+            Instantiate(tilesDict[tileName], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
+            xPosHand += xSepHand;
+        }
+    }
+
+    /// <summary>
+    /// If a new tile is drawn, instantiate that new tile. Otherwise, the player's hand has changed significantly 
+    /// (due to discarding a tile or Pong/Chow/Kong). In that case, reinstantiate the player's hand.
+    /// </summary>
+    public void InstantiateLocalHand() {
+        // Separation between pivot of tiles
+        float xSepHand = 0.83f;
+        // x-coordinate of first tile
+        float xPosHand;
+        int handSize = playerManager.hand.Count;
+
+        GameObject[] taggedHand = GameObject.FindGameObjectsWithTag("Hand");
+        // If taggedHand.length is 1, 4, 7, 10, 13, instantiate the drawn tile
+        if ((taggedHand.Length - 1) % 3 == 0) {
+            //playerManager.hand[handSize - 1]
+        }
+
+
+        xPosHand = (handSize - 1) / 2 * xSepHand;
+
 
         foreach (Tile tile in playerManager.hand) {
             string tileName = tile.ToString();
