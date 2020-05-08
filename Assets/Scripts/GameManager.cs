@@ -13,6 +13,7 @@ using ExitGames.Client.Photon;
 using Random = System.Random;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using UnityEditorInternal;
+using UnityEngine.XR;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
@@ -716,39 +717,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             return;
         }
 
-        // Sort tiles by Suit, then by rank
-        playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
+        // Instantiate tiles 
+        this.InstantiateLocalHand();
 
-        // Separation between pivot of tiles
-        float xSepHand = 0.83f;
-        float xPosHand = -xSepHand * 6;
-
-        // Instantiate hand tiles
-        for (int i = 0; i < playerManager.hand.Count; i++) {
-            string tileName = playerManager.hand[i].ToString();
-
-            // Instantiate the 14th tile further away from the other 13
-            if (i == 13) {
-                xPosHand += 0.30f;
-            }
-
-            GameObject tileGameObject = Instantiate(tilesDict[tileName], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
-
-            // Tag the child GameObjects of the tile. Tagging allows the GameObject to be quickly identified when we RayCast
-            foreach (Transform child in tileGameObject.transform) {
-                child.tag = "Hand";
-            }
-
-            xPosHand += xSepHand;
-        }
-        
         // TODO: place bonus tiles in the middle of the screen
         // Instantiate bonus tiles
         xPosBonus = -tableWidth / 2f + 0.27f;
         float xSepBonus = 0.83f * 0.5f;
         foreach (Tile tile in playerManager.bonusTiles) {
-            string tileName = tile.ToString();
-            GameObject newTile = Instantiate(tilesDict[tileName], new Vector3(xPosBonus, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(xPosBonus, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
             xPosBonus += xSepBonus;
@@ -833,7 +810,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     playerManager.myTurn = false;
                     // add tile to discard
                     // discard tile animation
-                    this.SortTiles();
+                    this.InstantiateLocalHand();
                     // sendmove so other players can see the discard tile
                     // tell the next player it is his turn
                 }
@@ -853,53 +830,111 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
-    // TODO: Method to instantiate tiles in hand
-    public void SortTiles() {
-        // Destroy current hand first
-        GameObject[] taggedHand = GameObject.FindGameObjectsWithTag("Hand");
-        foreach (GameObject tagged in taggedHand) {
-            Destroy(tagged);
-        }
-
-        // Sort hand by Rank, then by suit
-        playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
-
-        // Separation between pivot of tiles
-        float xSepHand = 0.83f;
-        float xPosHand = -xSepHand * 6;
-
-        foreach (Tile tile in playerManager.hand) {
-            string tileName = tile.ToString();
-            Instantiate(tilesDict[tileName], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
-            xPosHand += xSepHand;
-        }
-    }
-
     /// <summary>
-    /// If a new tile is drawn, instantiate that new tile. Otherwise, the player's hand has changed significantly 
-    /// (due to discarding a tile or Pong/Chow/Kong). In that case, reinstantiate the player's hand.
+    /// Called whenever there is an update to the player's hand.
     /// </summary>
     public void InstantiateLocalHand() {
         // Separation between pivot of tiles
         float xSepHand = 0.83f;
-        // x-coordinate of first tile
+        // x-coordinate of the position where the tile will be instantiated
         float xPosHand;
+        // The offset specifically for the drawn tile
+        float xOffset = 0.30f;
         int handSize = playerManager.hand.Count;
 
+        // taggedHand represents the tiles currently on the GameTable. It represents the hand one move prior to the current hand.
         GameObject[] taggedHand = GameObject.FindGameObjectsWithTag("Hand");
-        // If taggedHand.length is 1, 4, 7, 10, 13, instantiate the drawn tile
-        if ((taggedHand.Length - 1) % 3 == 0) {
-            //playerManager.hand[handSize - 1]
+
+
+        // Initial instantiation of tiles
+        if (taggedHand.Length == 0) {
+            xPosHand = -((handSize - 1) / 2f) * xSepHand;
+
+            int tileNumber = 0;
+            foreach (Tile tile in playerManager.hand) {
+                // Add an offset so the 14th tile will be placed away from the other 13 tiles. Only concerns the player with
+                // the East Wind.
+                if (tileNumber == 13) {
+                    xPosHand += xOffset;
+                }
+
+                this.InstantiateSingleTile(tile, xPosHand);
+                xPosHand += xSepHand;
+                tileNumber++;
+            }
+            return;
         }
 
 
-        xPosHand = (handSize - 1) / 2 * xSepHand;
+        // When the player draws a tile, there will be one more tile in the player's hand than on the GameTable. Instantiate the drawn tile.
+        // handSize is either 2, 5, 8, 11 or 14.
+        if (taggedHand.Length + 1 == handSize) {
+            xPosHand = (handSize / 2f) * xSepHand + xOffset;
+            Tile tile = playerManager.hand[handSize - 1];
+            this.InstantiateSingleTile(tile, xPosHand);
+            return;
+        }
 
 
-        foreach (Tile tile in playerManager.hand) {
-            string tileName = tile.ToString();
-            Instantiate(tilesDict[tileName], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
-            xPosHand += xSepHand;
+        // When the player discards a tile, there will be one less tile in the player's hand than on the GameTable. 
+        // Destroy all tiles, sort the player's hand, and instantiate the new tiles.
+        // handSize is either 1, 4, 7, 10 or 13.
+        if (taggedHand.Length - 1 == handSize) {
+            xPosHand = -((handSize - 1) / 2f) * xSepHand;
+
+            // Destroy tiles on the GameTable
+            foreach (GameObject tileGameObject in taggedHand) {
+                Destroy(tileGameObject);
+            }
+
+            // Sort the player's hand after discarding a tile
+            playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
+
+            foreach (Tile tile in playerManager.hand) {
+                this.InstantiateSingleTile(tile, xPosHand);
+                xPosHand += xSepHand;
+            }
+            return;
+        }
+
+
+        // When the player Chow, Pong or Kong, there will be two less tiles in the player's hand than on the GameTable. 
+        // Destroy all tiles and instantiate the new tiles (there is no need to sort since Chow/Pong/Kong won't mess up the order)
+        // handSize is either 2, 5, 8, 11 or 14.
+        if (taggedHand.Length - 2 == handSize) {
+            xPosHand = -((handSize - 1) / 2f) * xSepHand;
+
+            // Destroy tiles on the GameTable
+            foreach (GameObject tileGameObject in taggedHand) {
+                Destroy(tileGameObject);
+            }
+            
+            for (int i = 0; i < playerManager.hand.Count; i++) {
+                // Add an offset so that the last tile will be placed away from the other tiles.
+                if (i == playerManager.hand.Count - 1) {
+                    xPosHand += xOffset;
+                }
+
+                this.InstantiateSingleTile(playerManager.hand[i], xPosHand);
+                xPosHand += xSepHand;
+            }
+
+            return;
+        }
+
+        Debug.LogErrorFormat("The player's hand size has an invalid hand size of {0}", handSize);
+    }
+
+
+    /// <summary>
+    /// Helper method for InstantiateLocalHand to instantiate a single tile and tagging the children GameObjects
+    /// </summary>
+    public void InstantiateSingleTile(Tile tile, float xPosHand) {
+        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
+
+        // Tag the child GameObjects of the tile
+        foreach (Transform child in tileGameObject.transform) {
+            child.tag = "Hand";
         }
     }
 
