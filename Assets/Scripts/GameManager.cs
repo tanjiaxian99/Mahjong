@@ -800,32 +800,38 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     public void LocalPlayerMoves() {
-        // Only execute the move if it is the local player's turn
         if (!playerManager.myTurn) {
             return;
         }
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        // Only detect the GameObject hit by the RayCast when the left mouse button is clicked
         if (!Input.GetMouseButtonDown(0)) {
             return;
         }
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;        
 
         if (Physics.Raycast(ray, out hit)) {
             GameObject hitObject = hit.transform.gameObject;
 
             // If the GameObject hit is a child object of a tile from the player's hand, remove that tile.
             if (hitObject.tag == "Hand") {
-                // Retrieve the name of the tile. hitObject.transform.name will only give the name of the child object. E.g. group_0_16777215
+
+                // hitObject.transform.name will only give the name of the child object. E.g. group_0_16777215
                 string tileName = hitObject.transform.parent.name;
+
                 // Remove the phrase '(Clone)' from the back of the name
                 tileName = tileName.Substring(0, tileName.Length - 7);
-                Debug.Log(tileName);
+                Tile tile = new Tile(tileName);
 
-                //playerManager.hand.Remove(hitObject);
-                //Destroy(hitObject);
+                if (playerManager.hand.Contains(tile)) {
+                    Debug.Log("contains");
+                    //playerManager.hand.Remove(tile);
+                    //Destroy(hitObject.transform.parent);
+                    //playerManager.myTurn = false;
+                    // sendmove
+                    //Debug.Log(playerManager.hand.Count);
+                }
             }
         }
         

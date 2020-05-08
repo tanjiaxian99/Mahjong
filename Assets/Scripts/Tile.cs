@@ -9,7 +9,7 @@ using UnityEngine;
 /// Dragon: Red, White, Green;
 /// Animal: Cat, Rat, Rooster, Centipede.
 /// </summary>
-public class Tile {
+public class Tile : IEquatable<Tile> {
     public Suit suit { get; set; }
     public Rank rank { get; set; }
 
@@ -119,5 +119,20 @@ public class Tile {
 
     public override string ToString() {
         return suit + "_" + rank;
+    }
+
+    /// <summary>
+    /// If 2 tiles have the same suit and rank, they are equal, regardless of reference.
+    /// </summary>
+    public bool Equals(Tile other) {
+        if (other == null) {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other)) {
+            return true;
+        }
+
+        return this.suit == other.suit && this.rank == other.rank;
     }
 }
