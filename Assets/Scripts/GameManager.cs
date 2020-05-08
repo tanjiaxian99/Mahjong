@@ -398,6 +398,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.DeterminePlayOrder();
         this.InstantiatePlayers();
         this.GenerateTiles();
+        this.InstantiateDiscardTilesList();
         yield return new WaitForSeconds(1f);
         this.DistributeTiles();
         StartCoroutine("ConvertBonusTiles");
@@ -406,6 +407,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         yield return null;
     }
 
+
+    /// <summary>
+    /// Create a Room Custom Property with a list of discard tiles
+    /// </summary>
+    public void InstantiateDiscardTilesList() {
+        Hashtable ht = new Hashtable();
+        ht.Add(DiscardTileListPropKey, new List<Tile>());
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
 
     /// <summary>
     /// Called by MasterClient to assign a wind to each player
@@ -802,12 +812,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Tile tile = new Tile(tileName);
 
                 if (playerManager.hand.Contains(tile)) {
-                    //Destroy(hitObject.transform.parent.gameObject);
                     playerManager.hand.Remove(tile);
                     playerManager.myTurn = false;
-                    this.InstantiateLocalHand();
 
-                    // add tile to discard
+                    this.InstantiateLocalHand();
+                    this.DiscardTile(tile);
                     // discard tile animation
                     // sendmove so other players can see the discard tile
                     // tell the next player it is his turn
@@ -824,8 +833,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         List<Tile> discardTiles = (List<Tile>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
         Hashtable ht = new Hashtable();
         discardTiles.Add(tile);
-        ht.Add(DiscardTileListPropKey, tile);
+        ht.Add(DiscardTileListPropKey, discardTiles);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(0, 1f, -3f), Quaternion.Euler(270f, 180f, 0f));
     }
 
     /// <summary>
@@ -866,7 +877,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // When the player draws a tile, there will be one more tile in the player's hand than on the GameTable. Instantiate the drawn tile.
         // handSize is either 2, 5, 8, 11 or 14.
         if (taggedHand.Length + 1 == handSize) {
-            Debug.Log("called 2");
             xPosHand = (handSize / 2f) * xSepHand + xOffset;
             Tile tile = playerManager.hand[handSize - 1];
             this.InstantiateSingleTile(tile, xPosHand);
@@ -879,7 +889,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Destroy all tiles, sort the player's hand, and instantiate the new tiles.
         // handSize is either 1, 4, 7, 10 or 13.
         if (taggedHand.Length - 1 == handSize) {
-            Debug.Log("called 3");
             xPosHand = -((handSize - 1) / 2f) * xSepHand;
 
             // Destroy tiles on the GameTable
@@ -931,12 +940,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateSingleTile(Tile tile, float xPosHand) {
         GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPosHand, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
-
-        // Tag the parent GameObject of the tile
         tileGameObject.tag = "Hand";
-        //foreach (Transform child in tileGameObject.transform) {
-        //    child.tag = "Hand";
-        //}
     }
 
     #endregion
