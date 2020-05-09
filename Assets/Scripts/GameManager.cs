@@ -930,7 +930,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         tileGameObject.tag = "Hand";
     }
 
-
     /// <summary>
     /// Update the Room's Custom Properties with the discarded tile and tosses the tile to the middle of the GameTable.
     /// </summary>
@@ -943,19 +942,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht.Add(DiscardTileListPropKey, discardTiles);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
-        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.85f, -2.6f), Quaternion.Euler(270f, 180f, 0f));
+        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.652f, -2.8f), Quaternion.Euler(270f, 180f, 0f));
+        tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
         foreach (Transform child in tileGameObject.transform) {
             child.GetComponent<MeshCollider>().convex = true;
         }
 
-        float xForce;
-        float zForce;
-        float tanAlpha = 2.6f / xPos;
-        //xForce = 64 / (1 + Math.Pow(tanAlpha, 2));
+        // tan(α) = zPos / xPos = zForce / xForce
+        // xForce ** 2 + zforce ** 2 = rForce ** 2
+        // Small offsets have been added to xForce and zForce to give more force to tiles tossed from the sides
+        double rForce = 8;
+        double tanα = 2.8 / (xPos + 0.1);
+        double xForce = Math.Sqrt(Math.Pow(rForce, 2) / (1 + Math.Pow(tanα, 2))) + Math.Abs(xPos / 1.5f);
+        double zForce = Math.Abs(xForce * tanα) + Math.Pow(xPos / 4, 2);
+        if (xPos > 0) {
+            xForce = -xForce;
+        }
 
         Rigidbody rb = tileGameObject.AddComponent<Rigidbody>();
-        rb.AddForce(new Vector3(xForce, 0f, 8f), ForceMode.Impulse);
-
+        rb.AddForce(new Vector3((float) xForce, 0f, (float) zForce), ForceMode.Impulse);
     }
     #endregion
 
