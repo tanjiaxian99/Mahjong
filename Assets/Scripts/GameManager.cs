@@ -14,6 +14,7 @@ using Random = System.Random;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using UnityEditorInternal;
 using UnityEngine.XR;
+using UnityEditor;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
@@ -50,7 +51,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     private Dictionary<Tile, GameObject> tilesDict = new Dictionary<Tile, GameObject>();
 
-    private float xPosBonus;
+    private float zPosRemote;
 
 
     #endregion
@@ -95,7 +96,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public static readonly string PlayerWindPropKey = "pw";
 
     /// <summary>
-    /// Wind of the player
+    /// Play order sequence
     /// </summary>
     public static readonly string PlayOrderPropkey = "po";
 
@@ -108,6 +109,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// List of tiles in the discard pool
     /// </summary>
     public static readonly string DiscardTileListPropKey = "dt";
+
+    /// <summary>
+    /// Number of tiles in the player's hand
+    /// </summary>
+    public static readonly string NumberOfTileInhandPropKey = "no";
 
     #endregion
 
@@ -403,6 +409,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.DistributeTiles();
         StartCoroutine("ConvertBonusTiles");
         this.InstantiateTiles();
+        this.InstantiateRemoteHand();
         this.StartTurn();
         yield return null;
     }
@@ -732,13 +739,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // TODO: place bonus tiles in the middle of the screen
         // Instantiate bonus tiles
-        xPosBonus = -tableWidth / 2f + 0.27f;
+        zPosRemote = -5.58f;
         float xSepBonus = 0.83f * 0.5f;
         foreach (Tile tile in playerManager.bonusTiles) {
-            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(xPosBonus, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(zPosRemote, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
-            xPosBonus += xSepBonus;
+            zPosRemote += xSepBonus;
         }
     }
 
@@ -771,10 +778,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public Tile DrawTile() {
         Random rand = new Random();
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
-        Tile tile;
 
         int randomIndex = rand.Next(tiles.Count());
-        tile = tiles[randomIndex];
+        Tile tile = tiles[randomIndex];
+        playerManager.hand.Add(tile);
         tiles.Remove(tiles[randomIndex]);
 
         // Reinsert updated tiles list into Room Custom Properties
@@ -819,8 +826,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     playerManager.hand.Remove(tile);
                     //playerManager.myTurn = false;
 
-                    this.InstantiateLocalHand();
                     this.DiscardTile(tile, hitObject.transform.position.x);
+                    this.InstantiateLocalHand();
                     // sendmove so other players can see the discard tile
                     // tell the next player it is his turn
                 }
@@ -968,6 +975,27 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Rigidbody rb = tileGameObject.AddComponent<Rigidbody>();
         rb.AddForce(new Vector3((float) xForce, 0f, (float) zForce), ForceMode.Impulse);
     }
+
+
+    /// <summary>
+    /// Instantiate the hands of the remote players
+    /// </summary>
+    public void InstantiateRemoteHand() {
+        List<Tile> temp = new List<Tile>();
+        for (int i = 0; i < 13; i++) {
+            temp.Add(new Tile(0, 0));
+        } 
+
+        zPosRemote = -0.83f * 0.5f * 6;
+        float zSepRemote = 0.83f * 0.5f;
+        foreach (Tile tile in temp) {
+            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(-tableWidth / 2 + 0.5f, 1f, zPosRemote), Quaternion.Euler(0f, -90f, 0f));
+            newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+            zPosRemote += zSepRemote;
+        }
+    }
+
     #endregion
 
     #region Custom Types
