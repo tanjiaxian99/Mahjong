@@ -394,12 +394,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     IEnumerator InitializeGame() {
         this.AssignPlayerWind();
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.2f);
         this.DeterminePlayOrder();
         this.InstantiatePlayers();
         this.GenerateTiles();
         this.InstantiateDiscardTilesList();
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.2f);
         this.DistributeTiles();
         StartCoroutine("ConvertBonusTiles");
         this.InstantiateTiles();
@@ -577,7 +577,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     IEnumerator ConvertBonusTiles() {
         foreach (Player player in (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey]) {
             PhotonNetwork.RaiseEvent(EvConvertBonusTiles, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.2f);
         }
         yield return null;
     }
@@ -800,6 +800,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         if (Physics.Raycast(ray, out hit)) {
             GameObject hitObject = hit.transform.gameObject;
+            
+            if (hitObject.transform.parent == null) {
+                return;
+            }
 
             // If the GameObject hit is a child object of a tile from the player's hand, remove that tile.
             if (hitObject.transform.parent.tag == "Hand") {
@@ -929,6 +933,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPosHand, 0.85f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
         tileGameObject.tag = "Hand";
     }
+
 
     /// <summary>
     /// Update the Room's Custom Properties with the discarded tile and tosses the tile to the middle of the GameTable.
