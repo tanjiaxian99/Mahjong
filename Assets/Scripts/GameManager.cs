@@ -80,12 +80,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvInitialInstantiation = 6;
 
     /// <summary>
-    /// The Convert Flower Tiles event message byte. Used internally for converting bonus tiles (Season, Flower and Animal suits) 
-    /// to normal tiles in the local player's hand.
-    /// </summary>
-    public const byte EvConvertBonusTiles = 7;
-
-    /// <summary>
     /// The Update Remote Hand event message byte. Used internally to update a remote player's hand
     /// </summary>
     public const byte EvUpdateRemoteHand = 8;
@@ -428,8 +422,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateDiscardTilesList();
         yield return new WaitForSeconds(0.2f);
         this.DistributeTiles();
-        StartCoroutine("ConvertBonusTiles");
-        this.InitialInstantiation();
+        StartCoroutine("InitialInstantiation");
         this.StartTurn();
         yield return null;
     }
@@ -593,19 +586,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Raise an event telling all players to instantiate the tiles in their hand.
+    /// Convert the bonus tiles to normal tiles and instantiate the local player's hand and open tiles. Done in playOrder sequence.
     /// </summary>
-    public void InitialInstantiation() {
-        PhotonNetwork.RaiseEvent(EvInitialInstantiation, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
-    }
-
-
-    /// <summary>
-    /// Convert Season, Flower and Animal suit tiles to other tiles. Done in playOrder sequence.
-    /// </summary>
-    IEnumerator ConvertBonusTiles() {
+    IEnumerator InitialInstantiation() {
         foreach (Player player in (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey]) {
-            PhotonNetwork.RaiseEvent(EvConvertBonusTiles, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent(EvInitialInstantiation, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             yield return new WaitForSeconds(0.2f);
         }
         yield return null;
@@ -642,10 +627,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             case EvInitialInstantiation:
                 this.InitialLocalInstantiation();
-                break;
-
-            case EvConvertBonusTiles:
-                this.ConvertLocalBonusTiles();
                 break;
 
             case EvPlayerTurn:
