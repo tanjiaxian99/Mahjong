@@ -90,10 +90,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvUpdateRemoteOpenTiles = 9;
 
     /// <summary>
+    /// The Update Remote Discard Tile event message byte. Used internally to update a remote player's discarded tile
+    /// </summary>
+    public const byte EvUpdateRemoteDiscardTile = 10;
+
+
+    /// <summary>
     /// The Player Turn event message byte. Used internally to track if it is the local player's turn.
     /// </summary>
-    public const byte EvPlayerTurn = 10;
+    public const byte EvPlayerTurn = 11;
 
+    
     /// <summary>
     /// Wind of the player
     /// </summary>
@@ -290,7 +297,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
     void Update() {
-        this.LocalPlayerMoves();
+        // The local player has done a move only when it is his turn and he clicked the left mouse button.
+        if (playerManager.myTurn && Input.GetMouseButtonDown(0)) {
+            this.LocalPlayerMoves();
+        }
+        
     }
 
     #endregion
@@ -638,7 +649,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
 
             case EvUpdateRemoteOpenTiles:
-                //this.InstantiateRemoteOpenTiles();
+                this.InstantiateRemoteOpenTiles(PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender));
+                break;
+
+            case EvUpdateRemoteDiscardTile:
+                //this.InstantiateRemoteDiscardTile();
                 break;
         }
     }
@@ -774,14 +789,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     public void LocalPlayerMoves() {
-        if (!playerManager.myTurn) {
-            return;
-        }
-
-        if (!Input.GetMouseButtonDown(0)) {
-            return;
-        }
-
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;        
 
@@ -804,12 +811,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 if (playerManager.hand.Contains(tile)) {
                     playerManager.hand.Remove(tile);
-                    //playerManager.myTurn = false;
+                    this.InstantiateLocalHand();
+                    this.UpdateRemoteHand();
 
                     this.DiscardTile(tile, hitObject.transform.position.x);
-                    this.InstantiateLocalHand();
-                    // sendmove so other players can see the discard tile
+                    this.UpdateRemoteDiscardTile();
+                    
                     // tell the next player it is his turn
+                    //playerManager.myTurn = false;
                 }
             }
         }
@@ -1038,7 +1047,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player to inform all remote players to update the local player's open tiles on their client
     /// </summary>
     public void UpdateRemoteOpenTiles() {
-        PhotonNetwork.RaiseEvent(EvUpdateRemoteHand, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+        PhotonNetwork.RaiseEvent(EvUpdateRemoteOpenTiles, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+    }
+
+
+    /// <summary>
+    /// Called by the local player to inform all remote players to update the local player's discarded tile on their client
+    /// </summary>
+    /// .
+    public void UpdateRemoteDiscardTile() {
+        PhotonNetwork.RaiseEvent(EvUpdateRemoteDiscardTile, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
     }
 
     #endregion
@@ -1097,8 +1115,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Offset for the drawn tile
         float offset = 0.30f * 0.5f;
 
-        Vector3 position;
-        Quaternion rotation;
+        Vector3 position = Vector3.zero;
+        Quaternion rotation = Quaternion.identity;
 
         int negativeConversion; 
         int remoteTilesSize = remoteTiles.Count;
@@ -1167,7 +1185,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 pos += -negativeConversion * offset;
             }
 
-            GameObject newTile = Instantiate(tilesDict[remoteTiles[i]], new Vector3(-tableWidth / 2 + 0.5f, 1f, pos), Quaternion.Euler(0f, -90f, 0f));
+            GameObject newTile = Instantiate(tilesDict[remoteTiles[i]], position, rotation);
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
             newTile.tag = nickname + "_" + tileType;
 
@@ -1219,10 +1237,66 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Called by the remote player to instantiate the discarded tile
+    /// Called by the remote player to instantiate the discarded tile.
     /// </summary>
-    public void InstantiateDiscardTile() {
+    /// <param name="hPos">The horizontal position of the tile from the perspective of the remote player</param>
+    public void InstantiateRemoteDiscardTile(Player remotePlayer, float hPos) {
+        List<Tile> discardTileList = (List<Tile>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
+        Tile discardedTile = discardTileList[discardTileList.Count - 1];
 
+        // v and h represents vertical and horizontal directions with respect to the perspective of the remote player
+        // tan(α) = vPos / hPos = vForce / hForce; hForce ** 2 + vforce ** 2 = rForce ** 2
+        // Small offsets have been added to xForce and zForce to give more force to tiles tossed from the sides
+        double rForce = 8;
+        double tanα = 2.8 / (hPos + 0.1);
+        double hForce = Math.Sqrt(Math.Pow(rForce, 2) / (1 + Math.Pow(tanα, 2))) + Math.Abs(hPos / 1.5f);
+        double vForce = Math.Abs(hForce * tanα) + Math.Pow(hPos / 4, 2);
+
+        Vector3 position = Vector3.zero;
+        Quaternion rotation = Quaternion.identity;
+
+        // Instantiation position and rotation depends on where the remote player is sitting relative to the local player
+        if (RelativePlayerPosition(remotePlayer).Equals("Left")) {
+            position = new Vector3(-tableWidth / 2 + 0.5f + 0.7f + 0.6f, 1f, hPos);
+            rotation = Quaternion.Euler(-90f, -90f, 0f);
+            if (hPos < 0) {
+                hForce = -hForce;
+            }
+
+        } else if (RelativePlayerPosition(remotePlayer).Equals("Right")) {
+            position = new Vector3(tableWidth / 2 - 0.5f - 0.7f - 0.6f, 1f, hPos);
+            rotation = Quaternion.Euler(0f, 90f, 0f);
+            vForce = -vForce;
+            if (hPos > 0) {
+                hForce = -hForce;
+            }
+
+        } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
+            position = new Vector3(hPos, 1f, 4.4f - 0.7f - 0.6f);
+            rotation = Quaternion.Euler(-90f, 0f, 0f);
+            vForce = -vForce;
+            if (hPos < 0) {
+                hForce = -hForce;
+            }
+
+        }
+
+        GameObject tileGameObject = Instantiate(tilesDict[discardedTile], position, rotation);
+        tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+        foreach (Transform child in tileGameObject.transform) {
+            child.GetComponent<MeshCollider>().convex = true;
+        }
+
+        Rigidbody rb = tileGameObject.AddComponent<Rigidbody>();
+
+        // The application of hForce and VForce on the x-z axes depends on the remote player's position
+        if (RelativePlayerPosition(remotePlayer).Equals("Left") || RelativePlayerPosition(remotePlayer).Equals("Right")) {
+            rb.AddForce(new Vector3((float) vForce, 0f, (float) hForce), ForceMode.Impulse);
+
+        } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
+            rb.AddForce(new Vector3((float) hForce, 0f, (float) vForce), ForceMode.Impulse);
+        }
     }
 
 
