@@ -125,6 +125,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public static readonly string HandTilesCountPropKey = "no";
 
+    /// <summary>
+    /// The local player's open tiles
+    /// </summary>
+    public static readonly string OpenTilesPropKey = "ot";
+
     #endregion
 
     #region Tiles Prefabs
@@ -633,11 +638,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvDistributeTiles:
                 // Update local player's playerManager
                 playerManager.hand = (List<Tile>)photonEvent.CustomData;
-
-                // Add number of tiles in the local player's hand to custom properties
-                ht = new Hashtable();
-                ht.Add(HandTilesCountPropKey, playerManager.hand.Count);
-                PhotonNetwork.SetPlayerCustomProperties(ht);
                 break;
 
             case EvInitialInstantiation:
@@ -774,13 +774,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
         }
 
+        // Add the number of tiles in the local player's hand to custom properties
+        Hashtable ht = new Hashtable();
+        ht.Add(HandTilesCountPropKey, playerManager.hand.Count);
+        PhotonNetwork.SetPlayerCustomProperties(ht);
+
+        // Add the local player's open tiles to custom properties
+        ht = new Hashtable();
+        ht.Add(OpenTilesPropKey, playerManager.openTiles);
+        PhotonNetwork.SetPlayerCustomProperties(ht);
+
         playerManager.UpdateOpenTiles();
         this.InstantiateLocalHand();
         this.UpdateRemoteHand();
         this.InstantiateLocalOpenTiles();
         this.UpdateRemoteOpenTiles();
-
-        // TODO: RaiseEvent to inform remote player's to instantiate this player's bonus tiles
     }
 
 
@@ -819,6 +827,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                     this.DiscardTile(tile, hitObject.transform.position.x);
                     this.InstantiateLocalHand();
+                    this.turnManager.SendMove();
                     // sendmove so other players can see the discard tile
                     // tell the next player it is his turn
                 }
@@ -833,7 +842,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Convert the bonus (Season, Flower and Animal) tiles into normal tiles. Repeat until there are no bonus tiles.
     /// </summary>
     public void ConvertLocalBonusTiles() {
+        List<Tile> openTiles = playerManager.openTiles;
 
+        // TODO: Draw tile
+
+        playerManager.UpdateOpenTiles();
+
+        // Update the list of open tiles on the local player's custom properties
+        Hashtable ht = new Hashtable();
+        ht.Add(OpenTilesPropKey, openTiles);
+        PhotonNetwork.SetPlayerCustomProperties(ht);
     }
 
 
@@ -859,7 +877,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Called whenever there is an update to the player's hand. Raise an event to update the local player's hand tiles on remote clients as well.
+    /// Called whenever there is an update to the player's hand.
     /// </summary>
     public void InstantiateLocalHand() {
         // Separation between pivot of tiles
@@ -1028,6 +1046,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
 
+    /// <summary>
+    /// Called by the local player to inform all remote players to update the local player's open tiles on their client
+    /// </summary>
     public void UpdateRemoteOpenTiles() {
         PhotonNetwork.RaiseEvent(EvUpdateRemoteHand, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
     }
@@ -1062,7 +1083,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the remote player to instantiate the hand of remotePlayer on the local client.
     /// </summary>
     public void InstantiateRemoteOpenTiles(Player remotePlayer) {
-        List<Tile> remoteOpenTiles = remotePlayer.CustomProperties[OpenTilesCountPropKey];
+        List<Tile> remoteOpenTiles = (List<Tile>) remotePlayer.CustomProperties[OpenTilesPropKey];
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(remotePlayer.NickName + "_" + "Open");
