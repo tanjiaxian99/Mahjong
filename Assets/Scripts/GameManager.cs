@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     /// <summary>
     /// The Initial Instantiation event message byte. Used internally for converting the local player's bonus tiles into normal tiles.
-    /// Afterwards, instantiate the local player's hand and open tiles.
+    /// Afterwards, instantiate the local player's hand and open tiles
     /// </summary>
     public const byte EvInitialInstantiation = 6;
 
@@ -91,9 +91,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvUpdateRemoteHand = 8;
 
     /// <summary>
+    /// The Update Remote Open Tiles event message byte. Used internally to update a remote player's open tiles
+    /// </summary>
+    public const byte EvUpdateRemoteOpenTiles = 9;
+
+    /// <summary>
     /// The Player Turn event message byte. Used internally to track if it is the local player's turn.
     /// </summary>
-    public const byte EvPlayerTurn = 9;
+    public const byte EvPlayerTurn = 10;
 
     /// <summary>
     /// Wind of the player
@@ -650,6 +655,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvUpdateRemoteHand:
                 this.InstantiateRemoteHand(PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender));
                 break;
+
+            case EvUpdateRemoteOpenTiles:
+                //this.InstantiateRemoteOpenTiles();
+                break;
         }
     }
 
@@ -767,7 +776,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         playerManager.UpdateOpenTiles();
         this.InstantiateLocalHand();
+        this.UpdateRemoteHand();
         this.InstantiateLocalOpenTiles();
+        this.UpdateRemoteOpenTiles();
+
         // TODO: RaiseEvent to inform remote player's to instantiate this player's bonus tiles
     }
 
@@ -877,7 +889,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.InstantiateSingleTile(playerManager.hand[i], xPosHand);
                 xPosHand += xSepHand;
             }
-            this.UpdateRemoteHand();
             return;
         }
 
@@ -887,7 +898,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             xPosHand = (handSize / 2f) * xSepHand + xOffset;
             Tile tile = playerManager.hand[handSize - 1];
             this.InstantiateSingleTile(tile, xPosHand);
-            this.UpdateRemoteHand();
             return;
         }
 
@@ -910,7 +920,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.InstantiateSingleTile(tile, xPosHand);
                 xPosHand += xSepHand;
             }
-            this.UpdateRemoteHand();
             return;
         }
 
@@ -935,7 +944,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.InstantiateSingleTile(playerManager.hand[i], xPosHand);
                 xPosHand += xSepHand;
             }
-            this.UpdateRemoteHand();
             return;
         }
 
@@ -1016,6 +1024,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player to inform all remote players to update the local player's hand tiles on their client
     /// </summary>
     public void UpdateRemoteHand() {
+        PhotonNetwork.RaiseEvent(EvUpdateRemoteHand, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+    }
+
+
+    public void UpdateRemoteOpenTiles() {
         PhotonNetwork.RaiseEvent(EvUpdateRemoteHand, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
     }
 
@@ -1147,10 +1160,103 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Called by the remote player to instantiate the hand of remotePlayer on the local client.
     /// </summary>
-    public void InstantiateRemoteOpenTiles() {
+    public void InstantiateRemoteOpenTiles(Player remotePlayer) {
 
     }
 
+
+    /// <summary>
+    /// Helper function for InstantiateRemoteHand and InstantiateRemoteOpenTiles
+    /// </summary>
+    public void InstantiateRemoteHelperFunction(string nickname, List<Tile> remoteTiles, string remotePosition, string tileType) {
+        // Starting position to instantiate the tiles
+        float pos;
+
+        // Separation between tiles
+        float sep = 0.83f * 0.5f;
+
+        // Offset for the drawn tile
+        float offset = 0.30f * 0.5f;
+
+        Vector3 position;
+        Quaternion rotation;
+
+        int negativeConversion; 
+        int remoteTilesSize = remoteTiles.Count;
+
+
+
+        // Determine whether negativeConversion is -1 or 1
+        if (remotePosition.Equals("Left") || remotePosition.Equals("Opposite")) {
+            negativeConversion = 1;
+        } else if (remotePosition.Equals("Right")) {
+            negativeConversion = -1;
+        } else {
+            Debug.LogError("Invalid remote position. Only accepted remote positions are 'Left', 'Right' and 'Opposite'");
+            return;
+        }
+
+
+        // Calculating the position of the first tile
+        if (tileType.Equals("Hand") && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize)) {
+            pos = negativeConversion * 0.83f * 0.5f * (remoteTilesSize - 2) / 2;
+        } else {
+            pos = negativeConversion * 0.83f * 0.5f * (remoteTilesSize - 1) / 2;
+        }
+
+
+        // Initial presets depending on remotePosition and tileType
+        if (tileType.Equals("Hand")) {
+            if (remotePosition.Equals("Left")) {
+                position = new Vector3(-tableWidth / 2 + 0.5f, 1f, pos);
+                rotation = Quaternion.Euler(0f, -90f, 0f);
+
+            } else if (remotePosition.Equals("Right")) {
+                position = new Vector3(tableWidth / 2 - 0.5f, 1f, pos);
+                rotation = Quaternion.Euler(0f, 90f, 0f);
+
+            } else if (remotePosition.Equals("Opposite")) {
+                position = new Vector3(pos, 1f, 4.4f);
+                rotation = Quaternion.Euler(0f, 0f, 0f);
+
+            }
+
+        } else if (tileType.Equals("Open")) {
+            if (remotePosition.Equals("Left")) {
+                position = new Vector3(-tableWidth / 2 + 0.5f + 0.7f, 1f, pos);
+                rotation = Quaternion.Euler(-90f, -90f, 0f);
+
+            } else if (remotePosition.Equals("Right")) {
+                position = new Vector3(tableWidth / 2 - 0.5f - 0.7f, 1f, pos);
+                rotation = Quaternion.Euler(0f, 90f, 0f);
+
+            } else if (remotePosition.Equals("Opposite")) {
+                position = new Vector3(pos, 1f, 4.4f - 0.7f);
+                rotation = Quaternion.Euler(-90f, 0f, 0f);
+            }
+
+        } else {
+            Debug.LogError("Invalid tile type. Only accepted tile types are 'Hand' and 'Open'");
+            return;
+        }
+
+
+        // General formula for instantiating remote tiles
+        for (int i = 0; i < remoteTilesSize; i++) {
+            // Instantiate the last hand tile with an offset
+            if (tileType.Equals("Hand") && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize) && remoteTilesSize == i + 1) {
+                pos += -negativeConversion * offset;
+            }
+
+            GameObject newTile = Instantiate(tilesDict[remoteTiles[i]], new Vector3(-tableWidth / 2 + 0.5f, 1f, pos), Quaternion.Euler(0f, -90f, 0f));
+            newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            newTile.tag = nickname;
+
+            pos += -negativeConversion * sep;
+        }
+
+        return;
+    }
 
     /// <summary>
     /// Called by the remote player to instantiate the discarded tile
