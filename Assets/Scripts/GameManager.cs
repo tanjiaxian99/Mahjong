@@ -791,9 +791,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Called immediately when myTurn is set to true
+    /// Called immediately when myTurn is set to true. The only times it is not called is when the East Wind makes the first move, or
+    /// when the player Chow/Pong/Kong
     /// </summary>
     public void PlayerTurnInitialization() {
+        if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
+            return;
+        }
+
         List<Tile> hand = playerManager.hand;
         hand.Add(this.DrawTile());
 
@@ -830,15 +835,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Tile tile = new Tile(tileName);
 
                 if (playerManager.hand.Contains(tile)) {
+                    playerManager.myTurn = false;
                     playerManager.hand.Remove(tile);
+                    
                     this.InstantiateLocalHand();
                     this.UpdateRemoteHand();
 
                     this.DiscardTile(tile, hitObject.transform.position.x);
                     this.UpdateRemoteDiscardTile(tile, hitObject.transform.position.x);
 
+                    // TODO: Integrate more turnManager.SendMove
+                    turnManager.SendMove(null, true);
                     this.nextPlayersTurn();
-                    playerManager.myTurn = false;
+                    
                 }
             }
         }
