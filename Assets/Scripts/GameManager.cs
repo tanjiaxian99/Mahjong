@@ -1146,7 +1146,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             return;
         }
 
-        Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
     }
 
 
@@ -1242,6 +1241,47 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         return;
     }
+
+
+    /// <summary>
+    /// Determine the relative position of the remotePlayer with respect to the local player.
+    /// </summary>
+    public string RelativePlayerPosition(Player remotePlayer) {
+        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
+
+        // Retrieve the local and remote players' positions
+        int localPlayerPos = 0;
+        int remotePlayerPos = 0;
+        for (int i = 0; i < playOrder.Length; i++) {
+            if (playOrder[i] == PhotonNetwork.LocalPlayer) {
+                localPlayerPos = i;
+            }
+
+            if (playOrder[i] == remotePlayer) {
+                remotePlayerPos = i;
+            }
+        }
+
+        // If the remote player is sitting on the left, the (localPlayerPos, remotePlayerPos) combinations are (1, 4), (2, 1), (3, 2), (4, 3)
+        if (remotePlayerPos - localPlayerPos == 3 || localPlayerPos - remotePlayerPos == 1) {
+            return "Left";
+        }
+
+        // If the remote player is sitting on the right, the (localPlayerPos, remotePlayerPos) combinations are (1, 2), (2, 3), (3, 4), (4, 1)
+        if (localPlayerPos - remotePlayerPos == 3 || remotePlayerPos - localPlayerPos == 1) {
+            return "Right";
+        }
+
+        // If the remote player is sitting on the opposite side
+        // (localPlayerPos, remotePlayerPos) combinations are (1, 3), (2, 4), (3, 1), (4, 2)
+        if (Math.Abs(localPlayerPos - remotePlayerPos) == 2) {
+            return "Opposite";
+        }
+
+        Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
+        return "";
+    }
+
 
     /// <summary>
     /// Called by the remote player to instantiate the discarded tile
