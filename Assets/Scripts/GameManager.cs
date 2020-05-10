@@ -642,6 +642,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
+                this.PlayerTurnInitialization();
                 break;
 
             case EvUpdateRemoteHand:
@@ -789,6 +790,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
 
+    /// <summary>
+    /// Called immediately when myTurn is set to true
+    /// </summary>
+    public void PlayerTurnInitialization() {
+        List<Tile> hand = playerManager.hand;
+        hand.Add(this.DrawTile());
+
+        this.ConvertLocalBonusTiles();
+        this.InstantiateLocalHand();
+        this.UpdateRemoteHand();
+        this.InstantiateLocalOpenTiles();
+        this.UpdateRemoteOpenTiles();
+    }
+
+
+    /// <summary>
+    /// Called when the local player wants to select a tile
+    /// </summary>
     public void OnLocalPlayerMove() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;        
@@ -819,7 +838,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     this.UpdateRemoteDiscardTile(tile, hitObject.transform.position.x);
 
                     this.nextPlayersTurn();
-                    //playerManager.myTurn = false;
+                    playerManager.myTurn = false;
                 }
             }
         }
@@ -834,15 +853,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void ConvertLocalBonusTiles() {
         List<Tile> hand = playerManager.hand;
         List<Tile> openTiles = playerManager.openTiles;
-        Tile tile = hand[hand.Count - 1];
 
-        // Check if the tile is a bonusTile
-        if (!tile.IsBonus()) {
-            Debug.LogFormat("The tile {0} is not a bonus tile and thus cannot be converted.", hand[hand.Count - 1]);
-            return;
+        while (true) {
+            Tile tile = hand[hand.Count - 1];
+
+            // Check if the tile is a bonusTile
+            if (!tile.IsBonus()) {
+                break;
+            }
+
+            openTiles.Add(tile);
+            hand[hand.Count - 1] = this.DrawTile();
         }
-        openTiles.Add(tile);
-        hand[hand.Count - 1] = this.DrawTile();
         
         playerManager.UpdateOpenTiles();
 
