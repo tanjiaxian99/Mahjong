@@ -63,10 +63,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvAssignWind = 3;
 
     /// <summary>
-    /// The Instantiate Player event message byte. Used internally for instantiating the local player and 
+    /// The Screen View Adjustment event message byte. Used internally for pointing the camera towards the GameTable and
     /// stretching the GameTable to fill the screen.
     /// </summary>
-    public const byte EvInstantiatePlayer = 4;
+    public const byte EvScreenViewAdjustment = 4;
 
     /// <summary>
     /// The Distribute Tiles event message byte. Used internally for saving data in local player's PlayerManager.
@@ -412,7 +412,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.AssignPlayerWind();
         yield return new WaitForSeconds(0.2f);
         this.DeterminePlayOrder();
-        this.InstantiatePlayers();
+        this.ScreenViewAdjustment();
         this.GenerateTiles();
         this.InstantiateDiscardTilesList();
         yield return new WaitForSeconds(0.2f);
@@ -477,10 +477,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Raise an event telling all players to instantiate their player prefab and stretch their GameTable
+    /// Raise an event telling all players to point their camera towards the GameTable and stretch the GameTable
     /// </summary>
-    public void InstantiatePlayers() {
-        PhotonNetwork.RaiseEvent(EvInstantiatePlayer, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
+    public void ScreenViewAdjustment() {
+        PhotonNetwork.RaiseEvent(EvScreenViewAdjustment, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
     }
 
 
@@ -620,9 +620,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerManager.PlayerWind = wind;
                 break;
 
-            case EvInstantiatePlayer:
-                this.InstantiateLocalPlayer();
-                this.StretchGameTable();
+            case EvScreenViewAdjustment:
+                this.LocalScreenViewAdjustment();
                 break;
 
             case EvDistributeTiles:
@@ -636,7 +635,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
 
             case EvInstantiateTiles:
-                this.InstantiateLocalTiles();
+                this.InitialLocalInstantiation();
                 break;
 
             case EvConvertBonusTiles:
@@ -718,22 +717,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Instantiate the local player in the local client.
+    /// Point the camera towards the GameTable and stretch the GameTable to fill up the screen
     /// </summary>
-    // TODO: Spawning might be unnecessary
-    public void InstantiateLocalPlayer() {
-        // The local player is always seated at the bottom of the screen
+    public void LocalScreenViewAdjustment() {
         Camera.main.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
 
-        // Spawn a character for the local player. 
-        Instantiate(this.playerPrefab, new Vector3(0, 1, -15f), Quaternion.identity);
-    }
-
-
-    /// <summary>
-    /// Stretch the GameTable to fill up the screen
-    /// </summary>
-    public void StretchGameTable() {
         Camera camera = Camera.main;
         tableHeight = 2f * camera.orthographicSize;
         tableWidth = tableHeight * camera.aspect;
@@ -744,9 +732,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Convert the bonus (Season, Flower and Animal) tiles into normal tiles. Repeat until there are no bonus tiles.
+    /// Called by the local player during the initial instantiation of tiles. Bonus tiles are converted, before the
+    /// player's hand and open tiles are instantiated.
     /// </summary>
-    public void ConvertLocalBonusTiles() {
+    public void InitialLocalInstantiation() {
+        if (playerManager.hand == null) {
+            Debug.LogError("The player's hand is empty.");
+            return;
+        }
+
+        if (playerManager.openTiles.Any()) {
+            Debug.LogError("The player has open tiles leftover from the previous game.");
+            return;
+        }
+
+        // Check the local player's hand for bonus tiles. If there are, convert them to normal tiles.
         while (true) {
             bool haveBonusTile = false;
 
@@ -763,45 +763,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
             }
         }
+
         playerManager.UpdateOpenTiles();
-        // TODO: RaiseEvent to inform remote player's to instantiate this player's bonus tiles
-    }
-
-
-    /// <summary>
-    /// After the local player receives the tiles, instantiate the tiles, including bonus tiles.
-    /// </summary>
-    public void InstantiateLocalTiles() {
-        if (playerManager.hand == null) {
-            Debug.Log("The player's hand is empty.");
-            return;
-        }
-
-        // Instantiate hand tiles 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
-
-    }
-
-
-    /// <summary>
-    /// Draw a new tile. No distinction made between front end or back end of Wall Tiles.
-    /// </summary>
-    // TODO: To be called when converting bonus tiles
-    public Tile DrawTile() {
-        Random rand = new Random();
-        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
-
-        int randomIndex = rand.Next(tiles.Count());
-        Tile tile = tiles[randomIndex];
-        tiles.Remove(tiles[randomIndex]);
-
-        // Reinsert updated tiles list into Room Custom Properties
-        Hashtable ht = new Hashtable();
-        ht.Add(WallTileListPropKey, tiles);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-
-        return tile;
+        // TODO: RaiseEvent to inform remote player's to instantiate this player's bonus tiles
     }
 
 
@@ -848,6 +814,36 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
     // TODO: Create a dictionary with discarded tile and current location. In the event that a player disconnects and reconnects,
     // he can reconstruct the scene.
+
+
+    /// <summary>
+    /// Convert the bonus (Season, Flower and Animal) tiles into normal tiles. Repeat until there are no bonus tiles.
+    /// </summary>
+    public void ConvertLocalBonusTiles() {
+
+    }
+
+
+    /// <summary>
+    /// Draw a new tile. No distinction made between front end or back end of Wall Tiles.
+    /// </summary>
+    // TODO: To be called when converting bonus tiles
+    public Tile DrawTile() {
+        Random rand = new Random();
+        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
+
+        int randomIndex = rand.Next(tiles.Count());
+        Tile tile = tiles[randomIndex];
+        tiles.Remove(tiles[randomIndex]);
+
+        // Reinsert updated tiles list into Room Custom Properties
+        Hashtable ht = new Hashtable();
+        ht.Add(WallTileListPropKey, tiles);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        return tile;
+    }
+
 
     /// <summary>
     /// Called whenever there is an update to the player's hand. Raise an event to update the local player's hand tiles on remote clients as well.
