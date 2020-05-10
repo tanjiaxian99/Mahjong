@@ -763,6 +763,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
             }
         }
+        playerManager.UpdateOpenTiles();
         // TODO: RaiseEvent to inform remote player's to instantiate this player's bonus tiles
     }
 
@@ -778,17 +779,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Instantiate hand tiles 
         this.InstantiateLocalHand();
+        this.InstantiateLocalOpenTiles();
 
-        // TODO: place bonus tiles in the middle of the screen
-        // Instantiate bonus tiles
-        float zPosRemote = -5.58f;
-        float xSepBonus = 0.83f * 0.5f;
-        foreach (Tile tile in playerManager.bonusTiles) {
-            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(zPosRemote, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
-            newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-            zPosRemote += xSepBonus;
-        }
     }
 
 
@@ -962,6 +954,27 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         tileGameObject.tag = "Hand";
     }
 
+    
+    /// <summary>
+    /// Instantiate the open tiles of the local player. Called when there is an update to the bonusTiles/comboTiles list.
+    /// </summary>
+    public void InstantiateLocalOpenTiles() {
+        int openSize = playerManager.openTiles.Count;
+        float xPosOpen = (openSize - 1) / 2;
+        float xSepOpen = 0.83f * 0.5f;
+        
+        // taggedOpen represents the tiles currently on the GameTable. It represents the hand one move prior to the current hand.
+        GameObject[] taggedOpen = GameObject.FindGameObjectsWithTag("Open");
+
+        foreach (Tile tile in playerManager.openTiles) {
+            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            newTile.tag = "Open";
+
+            xPosOpen += xSepOpen;
+        }
+    }
+
 
     /// <summary>
     /// Update the Room's Custom Properties with the discarded tile and tosses the tile to the middle of the GameTable.
@@ -1041,6 +1054,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
         }
 
+
         // If the remote player is sitting on the left. (localPlayerPos, remotePlayerPos) combinations are (1, 4), (2, 1), (3, 2), (4, 3)
         if (remotePlayerPos - localPlayerPos == 3 || localPlayerPos - remotePlayerPos == 1) {
             float zPosRemote;
@@ -1060,7 +1074,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 GameObject newTile = Instantiate(tilesDict[remoteHand[i]], new Vector3(-tableWidth / 2 + 0.5f, 1f, zPosRemote), Quaternion.Euler(0f, -90f, 0f));
                 newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                //newTile.tag = remotePlayer.NickName;
+                newTile.tag = remotePlayer.NickName;
 
                 zPosRemote -= zSepRemote;
             }
@@ -1089,7 +1103,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 GameObject newTile = Instantiate(tilesDict[remoteHand[i]], new Vector3(tableWidth / 2 - 0.5f, 1f, zPosRemote), Quaternion.Euler(0f, 90f, 0f));
                 newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                //newTile.tag = remotePlayer.NickName;
+                newTile.tag = remotePlayer.NickName;
 
                 zPosRemote += zSepRemote;
             }
@@ -1118,7 +1132,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 GameObject newTile = Instantiate(tilesDict[remoteHand[i]], new Vector3(xPosRemote, 1f, 4.4f), Quaternion.Euler(0f, 0f, 0f));
                 newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                //newTile.tag = remotePlayer.NickName;
+                newTile.tag = remotePlayer.NickName;
 
                 xPosRemote -= xSepRemote;
             }
