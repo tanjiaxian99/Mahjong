@@ -15,6 +15,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using UnityEditorInternal;
 using UnityEngine.XR;
 using UnityEditor;
+using UnityEngine.Apple.TV;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
@@ -84,9 +85,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvConvertBonusTiles = 7;
 
     /// <summary>
-    /// The Instantiate Remote Tiles event message byte. Used internally to instantiate a remote player's hand
+    /// The Update Remote Hand event message byte. Used internally to update a remote player's hand
     /// </summary>
-    public const byte EvInstantiateRemoteHand = 8;
+    public const byte EvUpdateRemoteHand = 8;
 
     /// <summary>
     /// The Player Turn event message byte. Used internally to track if it is the local player's turn.
@@ -342,13 +343,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
+    /// Call to leave the room
+    /// </summary>
+    public void LeaveRoom() {
+        PhotonNetwork.LeaveRoom();
+    }
+
+    /// <summary>
     /// When the player leaves the room, call the Launcher scene
     /// </summary>
     public override void OnLeftRoom() {
         Debug.Log("The local player has left the room");
         SceneManager.LoadScene(0);
     }
-
 
     public override void OnDisconnected(DisconnectCause cause) {
         // Implement disconnectedPanel UI
@@ -631,13 +638,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvInstantiateTiles:
                 this.InstantiateLocalTiles();
                 break;
+
             case EvConvertBonusTiles:
                 this.ConvertLocalBonusTiles();
                 break;
+
             case EvPlayerTurn:
                 playerManager.myTurn = true;
                 break;
-            case EvInstantiateRemoteHand:
+
+            case EvUpdateRemoteHand:
                 this.InstantiateRemoteHand(PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender));
                 break;
         }
@@ -646,11 +656,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     #endregion
 
     #region Methods called by Local Player
-
-    public void LeaveRoom() {
-        PhotonNetwork.LeaveRoom();
-    }
-
 
     /// <summary>
     /// Fill up the tilesDict with the tile prebabs and their string representations
@@ -758,8 +763,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
             }
         }
-
-        PhotonNetwork.RaiseEvent(EvInstantiateRemoteHand, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
         // TODO: RaiseEvent to inform remote player's to instantiate this player's bonus tiles
     }
 
@@ -855,7 +858,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     // he can reconstruct the scene.
 
     /// <summary>
-    /// Called whenever there is an update to the player's hand.
+    /// Called whenever there is an update to the player's hand. Raise an event to update the local player's hand tiles on remote clients as well.
     /// </summary>
     public void InstantiateLocalHand() {
         // Separation between pivot of tiles
@@ -885,7 +888,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.InstantiateSingleTile(playerManager.hand[i], xPosHand);
                 xPosHand += xSepHand;
             }
-
+            this.UpdateRemoteHand();
             return;
         }
 
@@ -895,7 +898,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             xPosHand = (handSize / 2f) * xSepHand + xOffset;
             Tile tile = playerManager.hand[handSize - 1];
             this.InstantiateSingleTile(tile, xPosHand);
-
+            this.UpdateRemoteHand();
             return;
         }
 
@@ -918,7 +921,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.InstantiateSingleTile(tile, xPosHand);
                 xPosHand += xSepHand;
             }
-
+            this.UpdateRemoteHand();
             return;
         }
 
@@ -943,6 +946,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.InstantiateSingleTile(playerManager.hand[i], xPosHand);
                 xPosHand += xSepHand;
             }
+            this.UpdateRemoteHand();
             return;
         }
 
@@ -993,12 +997,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         rb.AddForce(new Vector3((float) xForce, 0f, (float) zForce), ForceMode.Impulse);
     }
 
+
+    /// <summary>
+    /// Called by the local player to inform all remote players to update the local player's hand tiles on their client
+    /// </summary>
+    public void UpdateRemoteHand() {
+        PhotonNetwork.RaiseEvent(EvUpdateRemoteHand, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+    }
+
     #endregion
 
     #region Methods called by Remote Player
 
     /// <summary>
-    /// Instantiate the hands of the remote players
+    /// Called by the remote player to instantiate the hand of remotePlayer on the local client.
     /// </summary>
     public void InstantiateRemoteHand(Player remotePlayer) {
         int remoteHandSize = (int)remotePlayer.CustomProperties[HandTilesCountPropKey];
@@ -1115,6 +1127,23 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
     }
+
+
+    /// <summary>
+    /// Called by the remote player to instantiate the hand of remotePlayer on the local client.
+    /// </summary>
+    public void InstantiateRemoteOpenTiles() {
+
+    }
+
+
+    /// <summary>
+    /// Called by the remote player to instantiate the discarded tile
+    /// </summary>
+    public void InstantiateDiscardTile() {
+
+    }
+
 
     #endregion
 

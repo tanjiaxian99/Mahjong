@@ -21,7 +21,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public List<Tile> bonusTiles { get; set; } = new List<Tile>();
 
-    public List<Tile> showTiles { get; set; } = new List<Tile>();
+    public List<Tile> comboTiles { get; set; } = new List<Tile>();
+
+    public List<Tile> openTiles { get; set; } = new List<Tile>();
 
     public bool myTurn = false;
 
@@ -35,6 +37,19 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     #region Private Methods
 
+    /// <summary>
+    /// Update the tiles which are face up on the GameTable. It consists of bonus tiles and combo tiles.
+    /// </summary>
+    public void UpdateOpenTiles() {
+        openTiles.Clear();
+        foreach (Tile tile in bonusTiles) {
+            openTiles.Add(tile);
+        }
+        
+        foreach (Tile tile in comboTiles) {
+            openTiles.Add
+        }
+    }
     
     #endregion
 }
