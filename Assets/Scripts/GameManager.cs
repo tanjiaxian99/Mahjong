@@ -1071,28 +1071,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // If the remote player is sitting on the left. (localPlayerPos, remotePlayerPos) combinations are (1, 4), (2, 1), (3, 2), (4, 3)
         if (remotePlayerPos - localPlayerPos == 3 || localPlayerPos - remotePlayerPos == 1) {
-            float zPosRemote;
-            float zSepRemote = 0.83f * 0.5f;
-
-            if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize)) {
-                 zPosRemote = 0.83f * 0.5f * (remoteHandSize - 2) / 2;
-            } else {
-                zPosRemote = 0.83f * 0.5f * (remoteHandSize - 1) / 2;
-            }
-            
-            for (int i = 0; i < remoteHandSize; i++) {
-                // Instantiate the last tile with an offset
-                if (new[] { 2, 5, 8, 11, 14}.Contains(remoteHandSize) && remoteHandSize == i + 1) {
-                    zPosRemote -= 0.30f * 0.5f;
-                }
-
-                GameObject newTile = Instantiate(tilesDict[remoteHand[i]], new Vector3(-tableWidth / 2 + 0.5f, 1f, zPosRemote), Quaternion.Euler(0f, -90f, 0f));
-                newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                newTile.tag = remotePlayer.NickName;
-
-                zPosRemote -= zSepRemote;
-            }
-
+            this.InstantiateRemoteTiles(remotePlayer.NickName, remoteHand, "Left", "Hand");
             return;
         }
 
@@ -1100,28 +1079,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // If the remote player is sitting on the right
         // (localPlayerPos, remotePlayerPos) combinations are (1, 2), (2, 3), (3, 4), (4, 1)
         if (localPlayerPos - remotePlayerPos == 3 || remotePlayerPos - localPlayerPos == 1) {
-            float zPosRemote;
-            float zSepRemote = 0.83f * 0.5f;
-
-            if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize)) {
-                zPosRemote = -0.83f * 0.5f * (remoteHandSize - 2) / 2;
-            } else {
-                zPosRemote = -0.83f * 0.5f * (remoteHandSize - 1) / 2;
-            }
-
-            for (int i = 0; i < remoteHandSize; i++) {
-                // Instantiate the last tile with an offset
-                if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize) && remoteHandSize == i + 1) {
-                    zPosRemote += 0.30f * 0.5f;
-                }
-
-                GameObject newTile = Instantiate(tilesDict[remoteHand[i]], new Vector3(tableWidth / 2 - 0.5f, 1f, zPosRemote), Quaternion.Euler(0f, 90f, 0f));
-                newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                newTile.tag = remotePlayer.NickName;
-
-                zPosRemote += zSepRemote;
-            }
-
+            InstantiateRemoteTiles(remotePlayer.NickName, remoteHand, "Right", "Hand");
             return;
         }
 
@@ -1129,30 +1087,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // If the remote player is sitting on the opposite side
         // (localPlayerPos, remotePlayerPos) combinations are (1, 3), (2, 4), (3, 1), (4, 2)
         if (Math.Abs(localPlayerPos - remotePlayerPos) == 2) {
-            float xPosRemote;
-            float xSepRemote = 0.83f * 0.5f;
-
-            if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize)) {
-                xPosRemote = 0.83f * 0.5f * (remoteHandSize - 2) / 2;
-            } else {
-                xPosRemote = 0.83f * 0.5f * (remoteHandSize - 1) / 2;
-            }
-
-            for (int i = 0; i < remoteHandSize; i++) {
-                // Instantiate the last tile with an offset
-                if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize) && remoteHandSize == i + 1) {
-                    xPosRemote -= 0.30f * 0.5f;
-                }
-
-                GameObject newTile = Instantiate(tilesDict[remoteHand[i]], new Vector3(xPosRemote, 1f, 4.4f), Quaternion.Euler(0f, 0f, 0f));
-                newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                newTile.tag = remotePlayer.NickName;
-
-                xPosRemote -= xSepRemote;
-            }
-
+            InstantiateRemoteTiles(remotePlayer.NickName, remoteHand, "Opposite", "Hand");
             return;
         }
+
+        Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
 
     }
 
@@ -1168,7 +1107,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Helper function for InstantiateRemoteHand and InstantiateRemoteOpenTiles
     /// </summary>
-    public void InstantiateRemoteHelperFunction(string nickname, List<Tile> remoteTiles, string remotePosition, string tileType) {
+    public void InstantiateRemoteTiles(string nickname, List<Tile> remoteTiles, string remotePosition, string tileType) {
         // Starting position to instantiate the tiles
         float pos;
 
