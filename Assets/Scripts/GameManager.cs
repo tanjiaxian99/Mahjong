@@ -84,9 +84,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvConvertBonusTiles = 7;
 
     /// <summary>
+    /// The Instantiate Remote Tiles event message byte. Used internally to instantiate a remote player's hand
+    /// </summary>
+    public const byte EvInstantiateRemoteHand = 8;
+
+    /// <summary>
     /// The Player Turn event message byte. Used internally to track if it is the local player's turn.
     /// </summary>
-    public const byte EvPlayerTurn = 8;
+    public const byte EvPlayerTurn = 9;
 
     /// <summary>
     /// Wind of the player
@@ -632,12 +637,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
                 break;
+            case EvInstantiateRemoteHand:
+                this.InstantiateRemoteHand(PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender));
+                break;
         }
     }
 
     #endregion
 
-    #region Local Player Methods
+    #region Methods called by Local Player
 
     public void LeaveRoom() {
         PhotonNetwork.LeaveRoom();
@@ -750,6 +758,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
             }
         }
+
+        PhotonNetwork.RaiseEvent(EvInstantiateRemoteHand, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+        // TODO: RaiseEvent to inform remote player's to instantiate this player's bonus tiles
     }
 
 
@@ -982,12 +993,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         rb.AddForce(new Vector3((float) xForce, 0f, (float) zForce), ForceMode.Impulse);
     }
 
-
-
-
     #endregion
 
-    #region Remote Player Methods
+    #region Methods called by Remote Player
 
     /// <summary>
     /// Instantiate the hands of the remote players
