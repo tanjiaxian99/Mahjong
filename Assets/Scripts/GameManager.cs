@@ -299,7 +299,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     void Update() {
         // The local player has done a move only when it is his turn and he clicked the left mouse button.
         if (playerManager.myTurn && Input.GetMouseButtonDown(0)) {
-            this.LocalPlayerMoves();
+            this.OnLocalPlayerMove();
         }
         
     }
@@ -387,7 +387,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Debug.LogFormat("Turn {0} has begun", turn);
 
         Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
-        PhotonNetwork.RaiseEvent(EvPlayerTurn, true, new RaiseEventOptions() { TargetActors = new int[] { playOrder[0].ActorNumber } }, SendOptions.SendReliable);
+        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { playOrder[0].ActorNumber } }, SendOptions.SendReliable);
     }
 
     public void OnTurnCompleted(int turn) {
@@ -789,7 +789,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
 
-    public void LocalPlayerMoves() {
+    public void OnLocalPlayerMove() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;        
 
@@ -817,8 +817,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                     this.DiscardTile(tile, hitObject.transform.position.x);
                     this.UpdateRemoteDiscardTile(tile, hitObject.transform.position.x);
-                    
-                    // tell the next player it is his turn
+
+                    this.nextPlayersTurn();
                     //playerManager.myTurn = false;
                 }
             }
@@ -1058,6 +1058,39 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// .
     public void UpdateRemoteDiscardTile(Tile tile, float hPos) {
         PhotonNetwork.RaiseEvent(EvUpdateRemoteDiscardTile, (tile, hPos), new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+    }
+
+    
+    /// <summary>
+    /// Called by the local player to inform the next player that it is his turn
+    /// </summary>
+    public void nextPlayersTurn() {
+        Player[] playOrder = (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
+        int localPlayerPos = 0;
+        Player nextPlayer;
+
+        for (int i = 0; i < playOrder.Length; i++) {
+            if (playOrder[i] == PhotonNetwork.LocalPlayer) {
+                localPlayerPos = i;
+                break;
+            }
+        }
+
+        // If there is only one player, call the local player again
+        if (playOrder.Length == 1) {
+            nextPlayer = PhotonNetwork.LocalPlayer;
+            return;
+        }
+
+        // Call the first player if the local player is the last player in the play order
+        if (localPlayerPos == playOrder.Length - 1) {
+            nextPlayer = playOrder[0];
+            return;
+        }
+
+        nextPlayer = playOrder[localPlayerPos + 1];
+
+        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { nextPlayer.ActorNumber } }, SendOptions.SendReliable);
     }
 
     #endregion
