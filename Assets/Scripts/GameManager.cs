@@ -51,8 +51,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     private Dictionary<Tile, GameObject> tilesDict = new Dictionary<Tile, GameObject>();
 
-    private float zPosRemote;
-
 
     #endregion
 
@@ -113,7 +111,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Number of tiles in the player's hand
     /// </summary>
-    public static readonly string NumberOfTileInhandPropKey = "no";
+    public static readonly string HandTilesCountPropKey = "no";
 
     #endregion
 
@@ -409,7 +407,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.DistributeTiles();
         StartCoroutine("ConvertBonusTiles");
         this.InstantiateTiles();
-        this.InstantiateRemoteHand();
         this.StartTurn();
         yield return null;
     }
@@ -423,6 +420,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht.Add(DiscardTileListPropKey, new List<Tile>());
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
+
 
     /// <summary>
     /// Called by MasterClient to assign a wind to each player
@@ -464,6 +462,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht.Add(PlayOrderPropkey, playOrder);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
+
 
     /// <summary>
     /// Raise an event telling all players to instantiate their player prefab and stretch their GameTable
@@ -617,6 +616,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvDistributeTiles:
                 // Update local player's playerManager
                 playerManager.hand = (List<Tile>)photonEvent.CustomData;
+
+                // Add number of tiles in the local player's hand to custom properties
+                ht = new Hashtable();
+                ht.Add(HandTilesCountPropKey, playerManager.hand.Count);
+                PhotonNetwork.SetPlayerCustomProperties(ht);
                 break;
 
             case EvInstantiateTiles:
@@ -703,6 +707,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Instantiate the local player in the local client.
     /// </summary>
+    // TODO: Spawning might be unnecessary
     public void InstantiateLocalPlayer() {
         // The local player is always seated at the bottom of the screen
         Camera.main.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
@@ -724,30 +729,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         gameTable.transform.localScale = new Vector3(tableWidth, 1, tableHeight);
     }
 
-
-    /// <summary>
-    /// After the local player receives the tiles, instantiate the tiles, including bonus tiles.
-    /// </summary>
-    public void InstantiateLocalTiles() {
-        if (playerManager.hand == null) {
-            Debug.Log("The player's hand is empty.");
-            return;
-        }
-
-        // Instantiate tiles 
-        this.InstantiateLocalHand();
-
-        // TODO: place bonus tiles in the middle of the screen
-        // Instantiate bonus tiles
-        zPosRemote = -5.58f;
-        float xSepBonus = 0.83f * 0.5f;
-        foreach (Tile tile in playerManager.bonusTiles) {
-            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(zPosRemote, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
-            newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-            zPosRemote += xSepBonus;
-        }
-    }
 
     /// <summary>
     /// Convert the bonus (Season, Flower and Animal) tiles into normal tiles. Repeat until there are no bonus tiles.
@@ -773,15 +754,40 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
+    /// After the local player receives the tiles, instantiate the tiles, including bonus tiles.
+    /// </summary>
+    public void InstantiateLocalTiles() {
+        if (playerManager.hand == null) {
+            Debug.Log("The player's hand is empty.");
+            return;
+        }
+
+        // Instantiate hand tiles 
+        this.InstantiateLocalHand();
+
+        // TODO: place bonus tiles in the middle of the screen
+        // Instantiate bonus tiles
+        float zPosRemote = -5.58f;
+        float xSepBonus = 0.83f * 0.5f;
+        foreach (Tile tile in playerManager.bonusTiles) {
+            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(zPosRemote, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+            zPosRemote += xSepBonus;
+        }
+    }
+
+
+    /// <summary>
     /// Draw a new tile. No distinction made between front end or back end of Wall Tiles.
     /// </summary>
+    // TODO: To be called when converting bonus tiles
     public Tile DrawTile() {
         Random rand = new Random();
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
         int randomIndex = rand.Next(tiles.Count());
         Tile tile = tiles[randomIndex];
-        playerManager.hand.Add(tile);
         tiles.Remove(tiles[randomIndex]);
 
         // Reinsert updated tiles list into Room Custom Properties
@@ -977,23 +983,129 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
 
+
+
+    #endregion
+
+    #region Remote Player Methods
+
     /// <summary>
     /// Instantiate the hands of the remote players
     /// </summary>
-    public void InstantiateRemoteHand() {
-        List<Tile> temp = new List<Tile>();
-        for (int i = 0; i < 13; i++) {
-            temp.Add(new Tile(0, 0));
-        } 
+    public void InstantiateRemoteHand(Player remotePlayer) {
+        int remoteHandSize = (int)remotePlayer.CustomProperties[HandTilesCountPropKey];
+        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
 
-        zPosRemote = -0.83f * 0.5f * 6;
-        float zSepRemote = 0.83f * 0.5f;
-        foreach (Tile tile in temp) {
-            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(-tableWidth / 2 + 0.5f, 1f, zPosRemote), Quaternion.Euler(0f, -90f, 0f));
-            newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-            zPosRemote += zSepRemote;
+        // Represents the tiles currently on the GameTable which the remote player had
+        GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag("Hand");
+        // Destroy the remote player's hand tiles
+        foreach (GameObject tileGameObject in taggedRemoteHand) {
+            Destroy(tileGameObject);
         }
+
+        List<Tile> remoteHand = new List<Tile>();
+        for (int i = 0; i < remoteHandSize; i++) {
+            remoteHand.Add(new Tile(0, 0));
+        }
+
+        // Retrieve the local and remote players' positions
+        int localPlayerPos = 0;
+        int remotePlayerPos = 0;
+        for (int i = 0; i < playOrder.Length; i++) {
+            if (playOrder[i] == PhotonNetwork.LocalPlayer) {
+                localPlayerPos = i;
+            }
+
+            if (playOrder[i] == remotePlayer) {
+                remotePlayerPos = i;
+            }
+        }
+
+        // If the remote player is sitting on the left. (localPlayerPos, remotePlayerPos) combinations are (1, 4), (2, 1), (3, 2), (4, 3)
+        if (remotePlayerPos - localPlayerPos == 3 || localPlayerPos - remotePlayerPos == 1) {
+            float zPosRemote;
+            float zSepRemote = 0.83f * 0.5f;
+
+            if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize)) {
+                 zPosRemote = 0.83f * 0.5f * (remoteHandSize - 2) / 2;
+            } else {
+                zPosRemote = 0.83f * 0.5f * (remoteHandSize - 1) / 2;
+            }
+            
+            for (int i = 0; i < remoteHandSize; i++) {
+                // Instantiate the last tile with an offset
+                if (new[] { 2, 5, 8, 11, 14}.Contains(remoteHandSize) && remoteHandSize == i + 1) {
+                    zPosRemote -= 0.30f * 0.5f;
+                }
+
+                GameObject newTile = Instantiate(tilesDict[remoteHand[i]], new Vector3(-tableWidth / 2 + 0.5f, 1f, zPosRemote), Quaternion.Euler(0f, -90f, 0f));
+                newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                //newTile.tag = remotePlayer.NickName;
+
+                zPosRemote -= zSepRemote;
+            }
+
+            return;
+        }
+
+
+        // If the remote player is sitting on the right
+        // (localPlayerPos, remotePlayerPos) combinations are (1, 2), (2, 3), (3, 4), (4, 1)
+        if (localPlayerPos - remotePlayerPos == 3 || remotePlayerPos - localPlayerPos == 1) {
+            float zPosRemote;
+            float zSepRemote = 0.83f * 0.5f;
+
+            if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize)) {
+                zPosRemote = -0.83f * 0.5f * (remoteHandSize - 2) / 2;
+            } else {
+                zPosRemote = -0.83f * 0.5f * (remoteHandSize - 1) / 2;
+            }
+
+            for (int i = 0; i < remoteHandSize; i++) {
+                // Instantiate the last tile with an offset
+                if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize) && remoteHandSize == i + 1) {
+                    zPosRemote += 0.30f * 0.5f;
+                }
+
+                GameObject newTile = Instantiate(tilesDict[remoteHand[i]], new Vector3(tableWidth / 2 - 0.5f, 1f, zPosRemote), Quaternion.Euler(0f, 90f, 0f));
+                newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                //newTile.tag = remotePlayer.NickName;
+
+                zPosRemote += zSepRemote;
+            }
+
+            return;
+        }
+
+
+        // If the remote player is sitting on the opposite side
+        // (localPlayerPos, remotePlayerPos) combinations are (1, 3), (2, 4), (3, 1), (4, 2)
+        if (Math.Abs(localPlayerPos - remotePlayerPos) == 2) {
+            float xPosRemote;
+            float xSepRemote = 0.83f * 0.5f;
+
+            if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize)) {
+                xPosRemote = 0.83f * 0.5f * (remoteHandSize - 2) / 2;
+            } else {
+                xPosRemote = 0.83f * 0.5f * (remoteHandSize - 1) / 2;
+            }
+
+            for (int i = 0; i < remoteHandSize; i++) {
+                // Instantiate the last tile with an offset
+                if (new[] { 2, 5, 8, 11, 14 }.Contains(remoteHandSize) && remoteHandSize == i + 1) {
+                    xPosRemote -= 0.30f * 0.5f;
+                }
+
+                GameObject newTile = Instantiate(tilesDict[remoteHand[i]], new Vector3(xPosRemote, 1f, 4.4f), Quaternion.Euler(0f, 0f, 0f));
+                newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                //newTile.tag = remotePlayer.NickName;
+
+                xPosRemote -= xSepRemote;
+            }
+
+            return;
+        }
+
     }
 
     #endregion
