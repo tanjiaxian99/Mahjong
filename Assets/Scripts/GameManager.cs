@@ -653,7 +653,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
 
             case EvUpdateRemoteDiscardTile:
-                //this.InstantiateRemoteDiscardTile();
+                Tuple<Tile, float> data = (Tuple<Tile, float>) photonEvent.CustomData;
+                this.InstantiateRemoteDiscardTile(PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender), data.Item1, data.Item2);
                 break;
         }
     }
@@ -815,7 +816,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     this.UpdateRemoteHand();
 
                     this.DiscardTile(tile, hitObject.transform.position.x);
-                    this.UpdateRemoteDiscardTile();
+                    this.UpdateRemoteDiscardTile(tile, hitObject.transform.position.x);
                     
                     // tell the next player it is his turn
                     //playerManager.myTurn = false;
@@ -1055,8 +1056,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player to inform all remote players to update the local player's discarded tile on their client
     /// </summary>
     /// .
-    public void UpdateRemoteDiscardTile() {
-        PhotonNetwork.RaiseEvent(EvUpdateRemoteDiscardTile, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+    public void UpdateRemoteDiscardTile(Tile tile, float hPos) {
+        PhotonNetwork.RaiseEvent(EvUpdateRemoteDiscardTile, (tile, hPos), new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
     }
 
     #endregion
@@ -1240,10 +1241,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the remote player to instantiate the discarded tile.
     /// </summary>
     /// <param name="hPos">The horizontal position of the tile from the perspective of the remote player</param>
-    public void InstantiateRemoteDiscardTile(Player remotePlayer, float hPos) {
-        List<Tile> discardTileList = (List<Tile>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
-        Tile discardedTile = discardTileList[discardTileList.Count - 1];
-
+    public void InstantiateRemoteDiscardTile(Player remotePlayer, Tile discardedTile, float hPos) {
         // v and h represents vertical and horizontal directions with respect to the perspective of the remote player
         // tan(α) = vPos / hPos = vForce / hForce; hForce ** 2 + vforce ** 2 = rForce ** 2
         // Small offsets have been added to xForce and zForce to give more force to tiles tossed from the sides
@@ -1298,7 +1296,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             rb.AddForce(new Vector3((float) hForce, 0f, (float) vForce), ForceMode.Impulse);
         }
     }
-
 
     #endregion
 
