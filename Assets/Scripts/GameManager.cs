@@ -16,6 +16,7 @@ using UnityEditorInternal;
 using UnityEngine.XR;
 using UnityEditor;
 using UnityEngine.Apple.TV;
+using WebSocketSharp;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
@@ -291,8 +292,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             this.InstantiateTilesDict();
             this.OnJoinedRoom();
 
-            // Register customType List<Tile>
-            bool register = PhotonPeer.RegisterType(typeof(List<Tile>), 255, SerializeTilesList, DeserializeTilesList);
+            // Register customType Tile and List<Tile>
+            PhotonPeer.RegisterType(typeof(List<Tile>), 255, SerializeTilesList, DeserializeTilesList);
         }
     }
 
@@ -642,7 +643,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
-                this.PlayerTurnInitialization();
+                this.PlayerStartTurn();
                 break;
 
             case EvUpdateRemoteHand:
@@ -654,8 +655,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
 
             case EvUpdateRemoteDiscardTile:
-                Tuple<Tile, float> data = (Tuple<Tile, float>) photonEvent.CustomData;
-                this.InstantiateRemoteDiscardTile(PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender), data.Item1, data.Item2);
+                Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
+                List <Tile> discardTilesList = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
+                Tile tile = discardTilesList[discardTilesList.Count - 1];
+                float hPos = (float) photonEvent.CustomData;
+
+                this.InstantiateRemoteDiscardTile(sender, tile, hPos);
                 break;
         }
     }
@@ -794,7 +799,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called immediately when myTurn is set to true. The only times it is not called is when the East Wind makes the first move, or
     /// when the player Chow/Pong/Kong
     /// </summary>
-    public void PlayerTurnInitialization() {
+    public void PlayerStartTurn() {
         if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
             return;
         }
@@ -842,7 +847,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     this.UpdateRemoteHand();
 
                     this.DiscardTile(tile, hitObject.transform.position.x);
-                    this.UpdateRemoteDiscardTile(tile, hitObject.transform.position.x);
+                    this.UpdateRemoteDiscardTile(hitObject.transform.position.x);
 
                     // TODO: Integrate more turnManager.SendMove
                     turnManager.SendMove(null, true);
@@ -1087,8 +1092,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player to inform all remote players to update the local player's discarded tile on their client
     /// </summary>
     /// .
-    public void UpdateRemoteDiscardTile(Tile tile, float hPos) {
-        PhotonNetwork.RaiseEvent(EvUpdateRemoteDiscardTile, (tile, hPos), new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+    public void UpdateRemoteDiscardTile(float hPos) {
+        PhotonNetwork.RaiseEvent(EvUpdateRemoteDiscardTile, hPos, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
     }
 
     
@@ -1364,6 +1369,27 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     #endregion
 
     #region Custom Types
+
+    ///// <summary>
+    ///// Deserialize the byteStream into a Tile
+    ///// </summary>
+    //public static object DeserializeTile(byte[] data) {
+    //    Tile tile = new Tile(0, 0);
+    //    tile.Id = data[0];
+    //    return tile;
+    //}
+
+
+    ///// <summary>
+    ///// Serialize Tile into a byteStream
+    ///// </summary>
+    //public static byte[] SerializeTile(object customType) {
+    //    var tile = (Tile) customType;
+    //    byte[] byteArray = new byte[1];
+    //    byteArray[0] = tile.Id;
+    //    return byteArray;
+    //}
+
 
     /// <summary>
     /// Deserialize the byteStream into a List<Tile>
