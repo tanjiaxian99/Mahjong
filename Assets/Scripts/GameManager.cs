@@ -963,6 +963,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // taggedOpen represents the tiles currently on the GameTable. It represents the hand one move prior to the current hand.
         GameObject[] taggedOpen = GameObject.FindGameObjectsWithTag("Open");
 
+        foreach (GameObject gameObject in taggedOpen) {
+            Destroy(gameObject);
+        }
+
         foreach (Tile tile in playerManager.openTiles) {
             GameObject newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);

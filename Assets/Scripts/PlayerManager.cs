@@ -47,7 +47,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
         }
         
         foreach (Tile tile in comboTiles) {
-            openTiles.Add
+            openTiles.Add(tile);
         }
     }
     
