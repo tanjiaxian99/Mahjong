@@ -808,7 +808,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                     this.DiscardTile(tile, hitObject.transform.position.x);
                     this.InstantiateLocalHand();
-                    this.turnManager.SendMove();
                     // sendmove so other players can see the discard tile
                     // tell the next player it is his turn
                 }
@@ -820,13 +819,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Convert the bonus (Season, Flower and Animal) tiles into normal tiles. Repeat until there are no bonus tiles.
+    /// Convert the bonus (Season, Flower and Animal) tile into a normal tile.
     /// </summary>
     public void ConvertLocalBonusTiles() {
+        List<Tile> hand = playerManager.hand;
         List<Tile> openTiles = playerManager.openTiles;
+        Tile tile = hand[hand.Count - 1];
 
-        // TODO: Draw tile
-
+        // Check if the tile is a bonusTile
+        if (!tile.IsBonus()) {
+            Debug.LogFormat("The tile {0} is not a bonus tile and thus cannot be converted.", hand[hand.Count - 1]);
+            return;
+        }
+        openTiles.Add(tile);
+        hand[hand.Count - 1] = this.DrawTile();
+        
         playerManager.UpdateOpenTiles();
 
         // Update the list of open tiles on the local player's custom properties
