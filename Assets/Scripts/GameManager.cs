@@ -1041,7 +1041,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateRemoteHand(Player remotePlayer) {
         int remoteHandSize = (int)remotePlayer.CustomProperties[HandTilesCountPropKey];
-        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag(remotePlayer.NickName + "_" + "Hand");
@@ -1055,43 +1054,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             remoteHand.Add(new Tile(0, 0));
         }
 
-        // Retrieve the local and remote players' positions
-        int localPlayerPos = 0;
-        int remotePlayerPos = 0;
-        for (int i = 0; i < playOrder.Length; i++) {
-            if (playOrder[i] == PhotonNetwork.LocalPlayer) {
-                localPlayerPos = i;
-            }
-
-            if (playOrder[i] == remotePlayer) {
-                remotePlayerPos = i;
-            }
-        }
-
-
-        // If the remote player is sitting on the left. (localPlayerPos, remotePlayerPos) combinations are (1, 4), (2, 1), (3, 2), (4, 3)
-        if (remotePlayerPos - localPlayerPos == 3 || localPlayerPos - remotePlayerPos == 1) {
-            this.InstantiateRemoteTiles(remotePlayer.NickName, remoteHand, "Left", "Hand");
-            return;
-        }
-
-
-        // If the remote player is sitting on the right
-        // (localPlayerPos, remotePlayerPos) combinations are (1, 2), (2, 3), (3, 4), (4, 1)
-        if (localPlayerPos - remotePlayerPos == 3 || remotePlayerPos - localPlayerPos == 1) {
-            InstantiateRemoteTiles(remotePlayer.NickName, remoteHand, "Right", "Hand");
-            return;
-        }
-
-
-        // If the remote player is sitting on the opposite side
-        // (localPlayerPos, remotePlayerPos) combinations are (1, 3), (2, 4), (3, 1), (4, 2)
-        if (Math.Abs(localPlayerPos - remotePlayerPos) == 2) {
-            InstantiateRemoteTiles(remotePlayer.NickName, remoteHand, "Opposite", "Hand");
-            return;
-        }
-
-        Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
+        InstantiateRemoteTiles(remotePlayer.NickName, remoteHand, this.RelativePlayerPosition(remotePlayer), "Hand");
     }
 
 
@@ -1100,7 +1063,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateRemoteOpenTiles(Player remotePlayer) {
         List<Tile> remoteOpenTiles = remotePlayer.CustomProperties[OpenTilesCountPropKey];
-        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(remotePlayer.NickName + "_" + "Open");
@@ -1109,43 +1071,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Destroy(tileGameObject);
         }
 
-
-        // Retrieve the local and remote players' positions
-        int localPlayerPos = 0;
-        int remotePlayerPos = 0;
-        for (int i = 0; i < playOrder.Length; i++) {
-            if (playOrder[i] == PhotonNetwork.LocalPlayer) {
-                localPlayerPos = i;
-            }
-
-            if (playOrder[i] == remotePlayer) {
-                remotePlayerPos = i;
-            }
-        }
-
-
-        // If the remote player is sitting on the left. (localPlayerPos, remotePlayerPos) combinations are (1, 4), (2, 1), (3, 2), (4, 3)
-        if (remotePlayerPos - localPlayerPos == 3 || localPlayerPos - remotePlayerPos == 1) {
-            this.InstantiateRemoteTiles(remotePlayer.NickName, remoteOpenTiles, "Left", "Open");
-            return;
-        }
-
-
-        // If the remote player is sitting on the right
-        // (localPlayerPos, remotePlayerPos) combinations are (1, 2), (2, 3), (3, 4), (4, 1)
-        if (localPlayerPos - remotePlayerPos == 3 || remotePlayerPos - localPlayerPos == 1) {
-            InstantiateRemoteTiles(remotePlayer.NickName, remoteOpenTiles, "Right", "Open");
-            return;
-        }
-
-
-        // If the remote player is sitting on the opposite side
-        // (localPlayerPos, remotePlayerPos) combinations are (1, 3), (2, 4), (3, 1), (4, 2)
-        if (Math.Abs(localPlayerPos - remotePlayerPos) == 2) {
-            InstantiateRemoteTiles(remotePlayer.NickName, remoteOpenTiles, "Opposite", "Open");
-            return;
-        }
-
+        InstantiateRemoteTiles(remotePlayer.NickName, remoteOpenTiles, this.RelativePlayerPosition(remotePlayer), "Hand");
     }
 
 
