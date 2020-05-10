@@ -74,9 +74,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvDistributeTiles = 5;
 
     /// <summary>
-    /// The Instantiate Tiles event message byte. Used internally for instantiating the tiles in the local player's hand.
+    /// The Initial Instantiation event message byte. Used internally for converting the local player's bonus tiles into normal tiles.
+    /// Afterwards, instantiate the local player's hand and open tiles.
     /// </summary>
-    public const byte EvInstantiateTiles = 6;
+    public const byte EvInitialInstantiation = 6;
 
     /// <summary>
     /// The Convert Flower Tiles event message byte. Used internally for converting bonus tiles (Season, Flower and Animal suits) 
@@ -418,7 +419,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         yield return new WaitForSeconds(0.2f);
         this.DistributeTiles();
         StartCoroutine("ConvertBonusTiles");
-        this.InstantiateTiles();
+        this.InitialInstantiation();
         this.StartTurn();
         yield return null;
     }
@@ -584,8 +585,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Raise an event telling all players to instantiate the tiles in their hand.
     /// </summary>
-    public void InstantiateTiles() {
-        PhotonNetwork.RaiseEvent(EvInstantiateTiles, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
+    public void InitialInstantiation() {
+        PhotonNetwork.RaiseEvent(EvInitialInstantiation, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
     }
 
 
@@ -634,7 +635,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 PhotonNetwork.SetPlayerCustomProperties(ht);
                 break;
 
-            case EvInstantiateTiles:
+            case EvInitialInstantiation:
                 this.InitialLocalInstantiation();
                 break;
 
