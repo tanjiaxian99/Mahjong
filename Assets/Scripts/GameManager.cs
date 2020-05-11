@@ -609,7 +609,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             PhotonNetwork.RaiseEvent(EvInitialInstantiation, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             yield return new WaitForSeconds(0.2f);
         }
-        yield return null;
     }
 
     #endregion
@@ -766,12 +765,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InitialLocalInstantiation() {
         if (playerManager.hand == null) {
             Debug.LogError("The player's hand is empty.");
-            return;
         }
 
         if (playerManager.openTiles.Any()) {
             Debug.LogError("The player has open tiles leftover from the previous game.");
-            return;
         }
 
         // Check the local player's hand for bonus tiles. If there are, convert them to normal tiles.
@@ -793,11 +790,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
         
         playerManager.UpdateOpenTiles();
-        this.InstantiateLocalHand();
-        this.UpdateRemoteHand();
-        this.InstantiateLocalOpenTiles();
-        this.UpdateRemoteOpenTiles();
-
+        
         // Add the number of tiles in the local player's hand to custom properties
         Hashtable ht = new Hashtable();
         ht.Add(HandTilesCountPropKey, playerManager.hand.Count);
@@ -807,6 +800,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht = new Hashtable();
         ht.Add(OpenTilesPropKey, playerManager.openTiles);
         PhotonNetwork.SetPlayerCustomProperties(ht);
+
+        this.InstantiateLocalHand();
+        Debug.Log("called");
+        this.UpdateRemoteHand();
+        this.InstantiateLocalOpenTiles();
+        this.UpdateRemoteOpenTiles();
     }
 
 
@@ -1176,7 +1175,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InstantiateRemoteOpenTiles(Player remotePlayer) {
         List<Tile> remoteOpenTiles = (List<Tile>) remotePlayer.CustomProperties[OpenTilesPropKey];
         PlayerManager.Wind wind = (PlayerManager.Wind) windsDict[remotePlayer.ActorNumber];
-        Debug.LogFormat("Playerwind: {0}, number of open tiles: {1}", wind, remoteOpenTiles.Count);
+
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(wind + "_" + "Open");
 
@@ -1185,7 +1184,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Destroy(tileGameObject);
         }
 
-        InstantiateRemoteTiles(wind, remoteOpenTiles, this.RelativePlayerPosition(remotePlayer), "Hand");
+        InstantiateRemoteTiles(wind, remoteOpenTiles, this.RelativePlayerPosition(remotePlayer), "Open");
     }
 
 
@@ -1261,7 +1260,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 } else if (remotePosition.Equals("Right")) {
                     position = new Vector3(tableWidth / 2 - 0.5f - 0.7f, 1f, pos);
-                    rotation = Quaternion.Euler(0f, 90f, 0f);
+                    rotation = Quaternion.Euler(-90f, 90f, 0f);
 
                 } else if (remotePosition.Equals("Opposite")) {
                     position = new Vector3(pos, 1f, 4.4f - 0.7f);
