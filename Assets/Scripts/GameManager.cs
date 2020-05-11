@@ -1166,7 +1166,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         for (int i = 0; i < remoteHandSize; i++) {
             remoteHand.Add(new Tile(0, 0));
         }
-        Debug.LogErrorFormat("RemoteHandSize: {0}", remoteHandSize);
         InstantiateRemoteTiles(wind, remoteHand, this.RelativePlayerPosition(remotePlayer), "Hand");
     }
 
@@ -1229,48 +1228,50 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
 
-        // Initial presets depending on remotePosition and tileType
-        if (tileType.Equals("Hand")) {
-            if (remotePosition.Equals("Left")) {
-                position = new Vector3(-tableWidth / 2 + 0.5f, 1f, pos);
-                rotation = Quaternion.Euler(0f, -90f, 0f);
-
-            } else if (remotePosition.Equals("Right")) {
-                position = new Vector3(tableWidth / 2 - 0.5f, 1f, pos);
-                rotation = Quaternion.Euler(0f, 90f, 0f);
-
-            } else if (remotePosition.Equals("Opposite")) {
-                position = new Vector3(pos, 1f, 4.4f);
-                rotation = Quaternion.Euler(0f, 0f, 0f);
-
-            }
-
-        } else if (tileType.Equals("Open")) {
-            if (remotePosition.Equals("Left")) {
-                position = new Vector3(-tableWidth / 2 + 0.5f + 0.7f, 1f, pos);
-                rotation = Quaternion.Euler(-90f, -90f, 0f);
-
-            } else if (remotePosition.Equals("Right")) {
-                position = new Vector3(tableWidth / 2 - 0.5f - 0.7f, 1f, pos);
-                rotation = Quaternion.Euler(0f, 90f, 0f);
-
-            } else if (remotePosition.Equals("Opposite")) {
-                position = new Vector3(pos, 1f, 4.4f - 0.7f);
-                rotation = Quaternion.Euler(-90f, 0f, 0f);
-            }
-
-        } else {
-            Debug.LogError("Invalid tile type. Only accepted tile types are 'Hand' and 'Open'");
-            return;
-        }
-
-
         // General formula for instantiating remote tiles
         for (int i = 0; i < remoteTilesSize; i++) {
+
             // Instantiate the last hand tile with an offset
-            if (tileType.Equals("Hand") && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize) && remoteTilesSize == i + 1) {
+            if (tileType.Equals("Hand") && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize) && remoteTilesSize - 1 == i) {
                 pos += -negativeConversion * offset;
             }
+
+
+            // Calculate the position and rotation of each tile
+            if (tileType.Equals("Hand")) {
+                if (remotePosition.Equals("Left")) {
+                    position = new Vector3(-tableWidth / 2 + 0.5f, 1f, pos);
+                    rotation = Quaternion.Euler(0f, -90f, 0f);
+
+                } else if (remotePosition.Equals("Right")) {
+                    position = new Vector3(tableWidth / 2 - 0.5f, 1f, pos);
+                    rotation = Quaternion.Euler(0f, 90f, 0f);
+
+                } else if (remotePosition.Equals("Opposite")) {
+                    position = new Vector3(pos, 1f, 4.4f);
+                    rotation = Quaternion.Euler(0f, 0f, 0f);
+
+                }
+
+            } else if (tileType.Equals("Open")) {
+                if (remotePosition.Equals("Left")) {
+                    position = new Vector3(-tableWidth / 2 + 0.5f + 0.7f, 1f, pos);
+                    rotation = Quaternion.Euler(-90f, -90f, 0f);
+
+                } else if (remotePosition.Equals("Right")) {
+                    position = new Vector3(tableWidth / 2 - 0.5f - 0.7f, 1f, pos);
+                    rotation = Quaternion.Euler(0f, 90f, 0f);
+
+                } else if (remotePosition.Equals("Opposite")) {
+                    position = new Vector3(pos, 1f, 4.4f - 0.7f);
+                    rotation = Quaternion.Euler(-90f, 0f, 0f);
+                }
+
+            } else {
+                Debug.LogError("Invalid tile type. Only accepted tile types are 'Hand' and 'Open'");
+                return;
+            }
+
 
             GameObject newTile = Instantiate(tilesDict[remoteTiles[i]], position, rotation);
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
