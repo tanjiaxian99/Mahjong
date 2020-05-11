@@ -12,11 +12,6 @@ using ExitGames.Client.Photon;
 
 using Random = System.Random;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
-using UnityEditorInternal;
-using UnityEngine.XR;
-using UnityEditor;
-using UnityEngine.Apple.TV;
-using WebSocketSharp;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
@@ -434,12 +429,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     IEnumerator InitializeGame() {
         this.AssignPlayerWind();
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(1f);
         this.DeterminePlayOrder();
         this.ScreenViewAdjustment();
         this.GenerateTiles();
         this.InstantiateDiscardTilesList();
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(1f);
         this.DistributeTiles();
         StartCoroutine("InitialInstantiation");
         this.StartTurn();
@@ -465,8 +460,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind playerWind;
 
         foreach (Player player in PhotonNetwork.PlayerList) {
-            //int randomIndex = rand.Next(winds.Count());
-            int randomIndex = (int)PlayerManager.Wind.EAST;
+            //int randomIndex = (int)PlayerManager.Wind.EAST;
+            int randomIndex = RandomNumber(winds.Count());
             playerWind = winds[randomIndex];
             winds.Remove(winds[randomIndex]);
 
