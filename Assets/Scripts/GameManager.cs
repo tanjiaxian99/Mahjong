@@ -392,7 +392,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
     public void OnTurnCompleted(int turn) {
-        throw new System.NotImplementedException();
+        this.StartTurn();
     }
 
     // What the local client does when a remote player performs a move
@@ -402,7 +402,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     // What the local client does when a remote player finishes a move
     public void OnPlayerFinished(Player player, int turn, object move) {
-        throw new System.NotImplementedException();
+        
     }
 
     // TODO: Does time refers to time of a single player's turn?
@@ -852,7 +852,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     // TODO: Integrate more turnManager.SendMove
                     turnManager.SendMove(null, true);
                     this.nextPlayersTurn();
-                    
+                    Debug.Log("called");
                 }
             }
         }
@@ -1101,6 +1101,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player to inform the next player that it is his turn
     /// </summary>
     public void nextPlayersTurn() {
+        
+
         Player[] playOrder = (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
         int localPlayerPos = 0;
         Player nextPlayer;
@@ -1115,16 +1117,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // If there is only one player, call the local player again
         if (playOrder.Length == 1) {
             nextPlayer = PhotonNetwork.LocalPlayer;
-            return;
-        }
-
-        // Call the first player if the local player is the last player in the play order
-        if (localPlayerPos == playOrder.Length - 1) {
+        } else if (localPlayerPos == playOrder.Length - 1) {
+            // Call the first player if the local player is the last player in the play order
             nextPlayer = playOrder[0];
-            return;
+        } else {
+            nextPlayer = playOrder[localPlayerPos + 1];
         }
 
-        nextPlayer = playOrder[localPlayerPos + 1];
+
+        
 
         PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { nextPlayer.ActorNumber } }, SendOptions.SendReliable);
     }
