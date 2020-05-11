@@ -48,10 +48,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     private PunTurnManager turnManager;
 
     /// <summary>
-    /// HashTable where the keys are the string names of tiles and values are the tiles' prefab
+    /// Dictionary containing a player's actor number and his playerWind in integer form
+    /// </summary>
+    private Dictionary<int, int> windsDict = new Dictionary<int, int>();
+
+    /// <summary>
+    /// Dictionary containing string names of tiles and their respective prefab
     /// </summary>
     private Dictionary<Tile, GameObject> tilesDict = new Dictionary<Tile, GameObject>();
-
 
     #endregion
 
@@ -460,31 +464,31 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind playerWind;
 
         foreach (Player player in PhotonNetwork.PlayerList) {
-            //int randomIndex = (int)PlayerManager.Wind.EAST;
-            int randomIndex = RandomNumber(winds.Count());
+            int randomIndex = (int)PlayerManager.Wind.EAST;
+            //int randomIndex = RandomNumber(winds.Count());
             playerWind = winds[randomIndex];
             winds.Remove(winds[randomIndex]);
-
-            PhotonNetwork.RaiseEvent(EvAssignWind, playerWind, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+            windsDict.Add(player.ActorNumber, (int) playerWind);
         }
+
+        PhotonNetwork.RaiseEvent(EvAssignWind, windsDict, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
 
         Debug.LogFormat("The 4 winds have been assigned to each player");
     }
 
 
     /// <summary>
-    /// Update the room's custom properties with the play order.
-    /// Play order starts from East Wind and ends at South.
+    /// Update the room's custom properties with the play order. Play order starts from East Wind and ends at South.
     /// </summary>
     public void DeterminePlayOrder() {
         // TODO: An array containing the nicknames might be sufficient.
         Player[] playOrder = new Player[numberOfPlayersToStart];
 
-        foreach (Player player in PhotonNetwork.PlayerList) {
-            // PlayerManager.Wind is order from East to South. Retrieving the wind of the player and converting it to an int
-            // will give the proper play order
-            int index = (int)player.CustomProperties[PlayerWindPropKey];
-            playOrder[index] = player;
+        foreach (int actorNumber in windsDict.Keys) {
+            // The values of windsDict are PlayerManager.Wind types, which are order from East:0 to South: 3
+            // The integer value of windsDict themselves is the order of play
+            int index = windsDict[actorNumber];
+            playOrder[index] = PhotonNetwork.LocalPlayer.Get(actorNumber);
         }
 
         Hashtable ht = new Hashtable();
@@ -617,7 +621,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         switch (eventCode) {
             case EvAssignWind:
-                PlayerManager.Wind wind = (PlayerManager.Wind)photonEvent.CustomData;
+                windsDict = (Dictionary<int, int>)photonEvent.CustomData;
+                PlayerManager.Wind wind = (PlayerManager.Wind) windsDict[PhotonNetwork.LocalPlayer.ActorNumber];
 
                 // Update local player's custom properties
                 Hashtable ht = new Hashtable();
@@ -1112,8 +1117,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player to inform the next player that it is his turn
     /// </summary>
     public void nextPlayersTurn() {
-        
-
         Player[] playOrder = (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
         int localPlayerPos = 0;
         Player nextPlayer;
@@ -1150,9 +1153,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateRemoteHand(Player remotePlayer) {
         int remoteHandSize = (int)remotePlayer.CustomProperties[HandTilesCountPropKey];
+        PlayerManager.Wind wind = (PlayerManager.Wind) windsDict[remotePlayer.ActorNumber];
 
         // Represents the tiles currently on the GameTable which the remote player had
-        GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag(remotePlayer.NickName + "_" + "Hand");
+        GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag(wind + "_" + "Hand");
         // Destroy the remote player's hand tiles
         foreach (GameObject tileGameObject in taggedRemoteHand) {
             Destroy(tileGameObject);
@@ -1163,7 +1167,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             remoteHand.Add(new Tile(0, 0));
         }
 
-        InstantiateRemoteTiles(remotePlayer.NickName, remoteHand, this.RelativePlayerPosition(remotePlayer), "Hand");
+        InstantiateRemoteTiles(wind, remoteHand, this.RelativePlayerPosition(remotePlayer), "Hand");
     }
 
 
@@ -1172,22 +1176,23 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateRemoteOpenTiles(Player remotePlayer) {
         List<Tile> remoteOpenTiles = (List<Tile>) remotePlayer.CustomProperties[OpenTilesPropKey];
+        PlayerManager.Wind wind = (PlayerManager.Wind) windsDict[remotePlayer.ActorNumber];
 
         // Represents the tiles currently on the GameTable which the remote player had
-        GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(remotePlayer.NickName + "_" + "Open");
+        GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(wind + "_" + "Open");
         // Destroy the remote player's hand tiles
         foreach (GameObject tileGameObject in taggedRemoteOpenTiles) {
             Destroy(tileGameObject);
         }
 
-        InstantiateRemoteTiles(remotePlayer.NickName, remoteOpenTiles, this.RelativePlayerPosition(remotePlayer), "Hand");
+        InstantiateRemoteTiles(wind, remoteOpenTiles, this.RelativePlayerPosition(remotePlayer), "Hand");
     }
 
 
     /// <summary>
     /// Helper function for InstantiateRemoteHand and InstantiateRemoteOpenTiles
     /// </summary>
-    public void InstantiateRemoteTiles(string nickname, List<Tile> remoteTiles, string remotePosition, string tileType) {
+    public void InstantiateRemoteTiles(PlayerManager.Wind wind, List<Tile> remoteTiles, string remotePosition, string tileType) {
         // Starting position to instantiate the tiles
         float pos;
 
@@ -1269,7 +1274,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             GameObject newTile = Instantiate(tilesDict[remoteTiles[i]], position, rotation);
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-            newTile.tag = nickname + "_" + tileType;
+            newTile.tag = wind + "_" + tileType;
 
             pos += -negativeConversion * sep;
         }
