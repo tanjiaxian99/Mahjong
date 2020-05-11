@@ -46,6 +46,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     [Tooltip("The factor by which to scale the tiles such that they fill different screen sizes proportionately")]
     private float scaleFactor = 1f;
 
+    private static readonly Random random = new Random();
+
+    private static readonly object syncLock = new object();
+
     private PunTurnManager turnManager;
 
     /// <summary>
@@ -457,7 +461,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by MasterClient to assign a wind to each player
     /// </summary>
     public void AssignPlayerWind() {
-        Random rand = new Random();
         List<PlayerManager.Wind> winds = ((PlayerManager.Wind[])Enum.GetValues(typeof(PlayerManager.Wind))).ToList();
         PlayerManager.Wind playerWind;
 
@@ -568,7 +571,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// while the rest receives 13
     /// </summary>
     public void DistributeTiles() {
-        Random rand = new Random();
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
         foreach (Tile tile in tiles) {
         }
@@ -578,7 +580,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             for (int i = 0; i < 14; i++) {
                 // Choose a tile randomly from the complete tiles list and add it to the player's tiles
-                int randomIndex = rand.Next(tiles.Count());
+                int randomIndex = RandomNumber(tiles.Count());
                 playerTiles.Add(tiles[randomIndex]);
                 tiles.Remove(tiles[randomIndex]);
 
@@ -671,6 +673,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     #endregion
 
     #region Methods called by Local Player
+
+    /// <summary>
+    /// Generates a random number. lock() makes it thread-safe
+    /// </summary>
+    // https://stackoverflow.com/questions/767999/random-number-generator-only-generating-one-random-number
+    public static int RandomNumber(int max) {
+        lock (syncLock) { // synchronize
+            return random.Next(max);
+        }
+    }
 
     /// <summary>
     /// Fill up the tilesDict with the tile prebabs and their string representations
@@ -894,10 +906,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     // TODO: To be called when converting bonus tiles
     public Tile DrawTile() {
-        Random rand = new Random();
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
-        int randomIndex = rand.Next(tiles.Count());
+        int randomIndex = RandomNumber(tiles.Count());
         Tile tile = tiles[randomIndex];
         tiles.Remove(tiles[randomIndex]);
 
