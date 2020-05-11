@@ -928,7 +928,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Separation between pivot of tiles
         float xSepHand = 0.83f;
         // x-coordinate of the position where the tile will be instantiated
-        float xPosHand;
+        float xPosHand = 0;
         // The offset specifically for the drawn tile
         float xOffset = 0.30f;
         int handSize = playerManager.hand.Count;
@@ -938,8 +938,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Initial instantiation of tiles
         if (taggedHand.Length == 0) {
-            xPosHand = -((handSize - 1) / 2f) * xSepHand;
-
+            // Both formulas will yield the same xPosHand
+            if (handSize == 13) {
+                xPosHand = -((handSize - 1) / 2f) * xSepHand;
+            } else if (handSize == 14){
+                xPosHand = -((handSize - 2) / 2f) * xSepHand;
+            }
+            
             // Sort the player's hand when it is first received
             playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
 
@@ -958,6 +963,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // When the player draws a tile, there will be one more tile in the player's hand than on the GameTable. Instantiate the drawn tile.
         // handSize is either 2, 5, 8, 11 or 14.
         if (taggedHand.Length + 1 == handSize) {
+            Debug.Log("called second");
             xPosHand = (handSize / 2f) * xSepHand + xOffset;
             Tile tile = playerManager.hand[handSize - 1];
             this.InstantiateSingleTile(tile, xPosHand);
@@ -969,6 +975,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Destroy all tiles, sort the player's hand, and instantiate the new tiles.
         // handSize is either 1, 4, 7, 10 or 13.
         if (taggedHand.Length - 1 == handSize) {
+            Debug.Log("called first");
             xPosHand = -((handSize - 1) / 2f) * xSepHand;
 
             // Destroy tiles on the GameTable
