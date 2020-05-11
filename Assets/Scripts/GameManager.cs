@@ -963,7 +963,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // When the player draws a tile, there will be one more tile in the player's hand than on the GameTable. Instantiate the drawn tile.
         // handSize is either 2, 5, 8, 11 or 14.
         if (taggedHand.Length + 1 == handSize) {
-            Debug.Log("called second");
             xPosHand = (handSize / 2f) * xSepHand + xOffset;
             Tile tile = playerManager.hand[handSize - 1];
             this.InstantiateSingleTile(tile, xPosHand);
@@ -975,7 +974,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Destroy all tiles, sort the player's hand, and instantiate the new tiles.
         // handSize is either 1, 4, 7, 10 or 13.
         if (taggedHand.Length - 1 == handSize) {
-            Debug.Log("called first");
             xPosHand = -((handSize - 1) / 2f) * xSepHand;
 
             // Destroy tiles on the GameTable
@@ -1035,8 +1033,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateLocalOpenTiles() {
         int openSize = playerManager.openTiles.Count;
-        float xPosOpen = (openSize - 1) / 2;
         float xSepOpen = 0.83f * 0.5f;
+        float xPosOpen = -(openSize - 1) / 2f * xSepOpen;
         
         // taggedOpen represents the tiles currently on the GameTable. It represents the hand one move prior to the current hand.
         GameObject[] taggedOpen = GameObject.FindGameObjectsWithTag("Open");
