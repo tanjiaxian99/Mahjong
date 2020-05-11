@@ -584,7 +584,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 tiles.Remove(tiles[randomIndex]);
 
                 // Don't give the 14th tile if the player is not the East Wind
-                if (i == 13 && !((PlayerManager.Wind)player.CustomProperties[PlayerWindPropKey] == PlayerManager.Wind.EAST)) {
+                if (i == 12 && (PlayerManager.Wind)player.CustomProperties[PlayerWindPropKey] != PlayerManager.Wind.EAST) {
                     break;
                 }
             }
@@ -791,6 +791,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
             }
         }
+        
+        playerManager.UpdateOpenTiles();
+        this.InstantiateLocalHand();
+        this.UpdateRemoteHand();
+        this.InstantiateLocalOpenTiles();
+        this.UpdateRemoteOpenTiles();
 
         // Add the number of tiles in the local player's hand to custom properties
         Hashtable ht = new Hashtable();
@@ -801,12 +807,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht = new Hashtable();
         ht.Add(OpenTilesPropKey, playerManager.openTiles);
         PhotonNetwork.SetPlayerCustomProperties(ht);
-
-        playerManager.UpdateOpenTiles();
-        this.InstantiateLocalHand();
-        this.UpdateRemoteHand();
-        this.InstantiateLocalOpenTiles();
-        this.UpdateRemoteOpenTiles();
     }
 
 
@@ -1176,9 +1176,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InstantiateRemoteOpenTiles(Player remotePlayer) {
         List<Tile> remoteOpenTiles = (List<Tile>) remotePlayer.CustomProperties[OpenTilesPropKey];
         PlayerManager.Wind wind = (PlayerManager.Wind) windsDict[remotePlayer.ActorNumber];
-
+        Debug.LogFormat("Playerwind: {0}, number of open tiles: {1}", wind, remoteOpenTiles.Count);
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(wind + "_" + "Open");
+
         // Destroy the remote player's hand tiles
         foreach (GameObject tileGameObject in taggedRemoteOpenTiles) {
             Destroy(tileGameObject);
