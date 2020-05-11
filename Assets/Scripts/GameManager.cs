@@ -1,17 +1,16 @@
-﻿using System;
-using System.Linq;
+﻿using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Pun.UtilityScripts;
+using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
-using Photon.Pun;
-using Photon.Realtime;
-using Photon.Pun.UtilityScripts;
-using ExitGames.Client.Photon;
-
-using Random = System.Random;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Random = System.Random;
+using UnityEngine.SocialPlatforms;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
@@ -62,11 +61,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     #region OnEvent Fields
 
     /// <summary>
-    /// The Wind Assignment event message byte. Used internally for saving data in local player's custom properties.
-    /// </summary>
-    public const byte EvAssignWind = 3;
-
-    /// <summary>
     /// The Screen View Adjustment event message byte. Used internally for pointing the camera towards the GameTable and
     /// stretching the GameTable to fill the screen.
     /// </summary>
@@ -83,28 +77,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public const byte EvInitialInstantiation = 6;
 
-    /// <summary>
-    /// The Update Remote Hand event message byte. Used internally to update a remote player's hand
-    /// </summary>
-    public const byte EvUpdateRemoteHand = 8;
-
-    /// <summary>
-    /// The Update Remote Open Tiles event message byte. Used internally to update a remote player's open tiles
-    /// </summary>
-    public const byte EvUpdateRemoteOpenTiles = 9;
-
-    /// <summary>
-    /// The Update Remote Discard Tile event message byte. Used internally to update a remote player's discarded tile
-    /// </summary>
-    public const byte EvUpdateRemoteDiscardTile = 10;
-
 
     /// <summary>
     /// The Player Turn event message byte. Used internally to track if it is the local player's turn.
     /// </summary>
     public const byte EvPlayerTurn = 11;
 
-    
+
+    /// <summary>
+    /// Dictionary containing actor numbers and wind assignments
+    /// </summary>
+    public static readonly string WindDictPropKey = "wd";
+
     /// <summary>
     /// Wind of the player
     /// </summary>
@@ -121,9 +105,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public static readonly string WallTileListPropKey = "wt";
 
     /// <summary>
-    /// List of tiles in the discard pool
+    /// The discarder's actor number, the tile discarded, and the discard position
     /// </summary>
-    public static readonly string DiscardTileListPropKey = "dt";
+    public static readonly string DiscardTilePropKey = "dt";
 
     /// <summary>
     /// Number of tiles in the player's hand
@@ -280,7 +264,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #region MonoBehavior Callbacks
 
-    void Start() {
+    void Awake() {
         if (playerPrefab == null) {
             Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
         } else {
@@ -297,6 +281,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             // Register customType Tile and List<Tile>
             PhotonPeer.RegisterType(typeof(List<Tile>), 255, SerializeTilesList, DeserializeTilesList);
+            PhotonPeer.RegisterType(typeof(Tuple<int, Tile, float>), 254, SerializeTuple, DeserializeTuple);
         }
     }
 
@@ -369,6 +354,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.LeaveRoom();
     }
 
+
     /// <summary>
     /// When the player leaves the room, call the Launcher scene
     /// </summary>
@@ -377,11 +363,54 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         SceneManager.LoadScene(0);
     }
 
+
     public override void OnDisconnected(DisconnectCause cause) {
         // Implement disconnectedPanel UI
         Debug.LogFormat("Local player has disconnected due to cause {0}", cause);
     }
-    
+
+
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) {
+        if (propertiesThatChanged.ContainsKey(WindDictPropKey)) {
+            windsDict = (Dictionary<int, int>) PhotonNetwork.CurrentRoom.CustomProperties[WindDictPropKey];
+            PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[PhotonNetwork.LocalPlayer.ActorNumber];
+
+            // Update local player's custom properties
+            Hashtable ht = new Hashtable();
+            ht.Add(PlayerWindPropKey, wind);
+            PhotonNetwork.SetPlayerCustomProperties(ht);
+
+            // Update local player's playerManager
+            playerManager.PlayerWind = wind;
+
+        } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
+            Tuple<int, Tile, float> discardTile = (Tuple<int, Tile, float>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
+            Player player = PhotonNetwork.LocalPlayer.Get(discardTile.Item1);
+            Tile tile = discardTile.Item2;
+            float hPos = discardTile.Item3;
+
+            // Only instantiate the tile if a remote player threw it
+            if (player == PhotonNetwork.LocalPlayer) {
+                return;
+            }
+
+            this.InstantiateRemoteDiscardTile(player, tile, hPos);
+        }
+    }
+
+
+    /// <summary>
+    /// Called when a remote player's hand or open tiles changes
+    /// </summary>
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) {
+        if (changedProps.ContainsKey(HandTilesCountPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {
+            this.InstantiateRemoteHand(targetPlayer);
+
+        } else if (changedProps.ContainsKey(OpenTilesPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {
+            this.InstantiateRemoteOpenTiles(targetPlayer);
+        }
+    }
+
     #endregion
 
     #region IPunTurnManagerCallbacks Callbacks
@@ -432,14 +461,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called at the start of every game (when PunTurnManager.Turn == 0) by MasterClient
     /// </summary>
     IEnumerator InitializeGame() {
+        // At this point, Start hasn't been called yet. Wait a frame before proceeding with the Coroutine
+        yield return null;
         this.AssignPlayerWind();
-        yield return new WaitForSeconds(1f);
         this.DeterminePlayOrder();
         this.ScreenViewAdjustment();
         this.GenerateTiles();
-        this.InstantiateDiscardTilesList();
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
+        // Local room custom properties updated immediately. No need to delay between GenerateTiles and Distribute Tiles
         this.DistributeTiles();
+        //this.InstantiateDiscardTilesList();
         StartCoroutine("InitialInstantiation");
         this.StartTurn();
         yield return null;
@@ -449,11 +480,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Create a Room Custom Property with a list of discard tiles
     /// </summary>
-    public void InstantiateDiscardTilesList() {
-        Hashtable ht = new Hashtable();
-        ht.Add(DiscardTileListPropKey, new List<Tile>());
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-    }
+    // TODO: For the local client to keep track of discard tiles and their positions?
+    //public void InstantiateDiscardTilesList() {
+    //    Hashtable ht = new Hashtable();
+    //    ht.Add(DiscardTilePropKey, new List<Tile>());
+    //    PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    //}
 
 
     /// <summary>
@@ -464,14 +496,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind playerWind;
 
         foreach (Player player in PhotonNetwork.PlayerList) {
-            //int randomIndex = (int)PlayerManager.Wind.EAST;
-            int randomIndex = RandomNumber(winds.Count());
+            int randomIndex = (int)PlayerManager.Wind.EAST;
+            //int randomIndex = RandomNumber(winds.Count());
             playerWind = winds[randomIndex];
             winds.Remove(winds[randomIndex]);
             windsDict.Add(player.ActorNumber, (int) playerWind);
         }
 
-        PhotonNetwork.RaiseEvent(EvAssignWind, windsDict, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
+        Hashtable ht = new Hashtable();
+        ht.Add(WindDictPropKey, windsDict);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
         Debug.LogFormat("The 4 winds have been assigned to each player");
     }
@@ -571,6 +605,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void DistributeTiles() {
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
+
         foreach (Tile tile in tiles) {
         }
 
@@ -619,19 +654,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         byte eventCode = photonEvent.Code;
 
         switch (eventCode) {
-            case EvAssignWind:
-                windsDict = (Dictionary<int, int>)photonEvent.CustomData;
-                PlayerManager.Wind wind = (PlayerManager.Wind) windsDict[PhotonNetwork.LocalPlayer.ActorNumber];
-
-                // Update local player's custom properties
-                Hashtable ht = new Hashtable();
-                ht.Add(PlayerWindPropKey, wind);
-                PhotonNetwork.SetPlayerCustomProperties(ht);
-
-                // Update local player's playerManager
-                playerManager.PlayerWind = wind;
-                break;
-
             case EvScreenViewAdjustment:
                 this.LocalScreenViewAdjustment();
                 break;
@@ -648,23 +670,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
                 this.PlayerStartTurn();
-                break;
-
-            case EvUpdateRemoteHand:
-                this.InstantiateRemoteHand(PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender));
-                break;
-
-            case EvUpdateRemoteOpenTiles:
-                this.InstantiateRemoteOpenTiles(PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender));
-                break;
-
-            case EvUpdateRemoteDiscardTile:
-                Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
-                List <Tile> discardTilesList = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
-                Tile tile = discardTilesList[discardTilesList.Count - 1];
-                float hPos = (float) photonEvent.CustomData;
-
-                this.InstantiateRemoteDiscardTile(sender, tile, hPos);
                 break;
         }
     }
@@ -802,10 +807,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.SetPlayerCustomProperties(ht);
 
         this.InstantiateLocalHand();
-        Debug.Log("called");
-        this.UpdateRemoteHand();
         this.InstantiateLocalOpenTiles();
-        this.UpdateRemoteOpenTiles();
     }
 
 
@@ -823,9 +825,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         this.ConvertLocalBonusTiles();
         this.InstantiateLocalHand();
-        this.UpdateRemoteHand();
         this.InstantiateLocalOpenTiles();
-        this.UpdateRemoteOpenTiles();
     }
 
 
@@ -858,10 +858,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     playerManager.hand.Remove(tile);
                     
                     this.InstantiateLocalHand();
-                    this.UpdateRemoteHand();
-
                     this.DiscardTile(tile, hitObject.transform.position.x);
-                    this.UpdateRemoteDiscardTile(hitObject.transform.position.x);
 
                     // TODO: Integrate more turnManager.SendMove
                     turnManager.SendMove(null, true);
@@ -1058,10 +1055,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     // TODO: detect changes in CustomProperties which contains the word discardtilepropkey
     public void DiscardTile(Tile tile, float xPos) {
         // Add the discarded tile to the DiscardTileList
-        List<Tile> discardTiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTileListPropKey];
         Hashtable ht = new Hashtable();
-        discardTiles.Add(tile);
-        ht.Add(DiscardTileListPropKey, discardTiles);
+        Tuple<int, Tile, float> tuple = new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, tile, xPos);
+        ht.Add(DiscardTilePropKey, tuple);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
         GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.652f, -2.8f), Quaternion.Euler(270f, 180f, 0f));
@@ -1086,32 +1082,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         rb.AddForce(new Vector3((float) xForce, 0f, (float) zForce), ForceMode.Impulse);
     }
 
-
-    /// <summary>
-    /// Called by the local player to inform all remote players to update the local player's hand tiles on their client
-    /// </summary>
-    public void UpdateRemoteHand() {
-        PhotonNetwork.RaiseEvent(EvUpdateRemoteHand, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
-    }
-
-
-    /// <summary>
-    /// Called by the local player to inform all remote players to update the local player's open tiles on their client
-    /// </summary>
-    public void UpdateRemoteOpenTiles() {
-        PhotonNetwork.RaiseEvent(EvUpdateRemoteOpenTiles, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
-    }
-
-
-    /// <summary>
-    /// Called by the local player to inform all remote players to update the local player's discarded tile on their client
-    /// </summary>
-    /// .
-    public void UpdateRemoteDiscardTile(float hPos) {
-        PhotonNetwork.RaiseEvent(EvUpdateRemoteDiscardTile, hPos, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
-    }
-
-    
+   
     /// <summary>
     /// Called by the local player to inform the next player that it is his turn
     /// </summary>
@@ -1388,25 +1359,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #region Custom Types
 
-    ///// <summary>
-    ///// Deserialize the byteStream into a Tile
-    ///// </summary>
-    //public static object DeserializeTile(byte[] data) {
-    //    Tile tile = new Tile(0, 0);
-    //    tile.Id = data[0];
-    //    return tile;
-    //}
+    /// <summary>
+    /// Serialize List<Tile> into a byteStream
+    /// </summary>
+    public static byte[] SerializeTilesList(object customType) {
+        var tilesList = (List<Tile>)customType;
+        byte[] byteArray = new byte[tilesList.Count];
 
-
-    ///// <summary>
-    ///// Serialize Tile into a byteStream
-    ///// </summary>
-    //public static byte[] SerializeTile(object customType) {
-    //    var tile = (Tile) customType;
-    //    byte[] byteArray = new byte[1];
-    //    byteArray[0] = tile.Id;
-    //    return byteArray;
-    //}
+        for (int i = 0; i < tilesList.Count; i++) {
+            byteArray[i] = tilesList[i].Id;
+        }
+        return byteArray;
+    }
 
 
     /// <summary>
@@ -1426,17 +1390,51 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Serialize List<Tile> into a byteStream
+    /// Serialize Tuple<int, Tile, float> into a byteStream
     /// </summary>
-    public static byte[] SerializeTilesList(object customType) {
-        var tilesList = (List<Tile>)customType;
-        byte[] byteArray = new byte[tilesList.Count];
+    public static readonly byte[] memTuple = new byte[5 + 2 + 5];
+    public static short SerializeTuple (StreamBuffer outStream, object customobject) {
+        var tuple = (Tuple<int, Tile, float>) customobject;
+        
+        lock (memTuple) {
+            byte[] bytes = memTuple;
+            int index = 0;
 
-        for (int i = 0; i < tilesList.Count; i++) {
-            byteArray[i] = tilesList[i].Id;
+            Protocol.Serialize(tuple.Item1, bytes, ref index);
+            Protocol.Serialize(tuple.Item2.Id, bytes, ref index);
+            Protocol.Serialize(tuple.Item3, bytes, ref index);
+            outStream.Write(bytes, 0, 5 + 2 + 5);
         }
-        return byteArray;
+
+        return 5 + 2 + 5;
     }
+
+
+    /// <summary>
+    /// Deserialize the byteStream into a Tuple<int, Tile, float>
+    /// </summary>
+    private static object DeserializeTuple (StreamBuffer inStream, short length) {
+        Tuple<int, Tile, float> tuple = new Tuple<int, Tile, float>(0, new Tile(0, 0), 0f);
+        int actorNumber;
+        int tileId;
+        Tile tile = new Tile(0, 0);
+        float pos;
+        
+        lock (memTuple) {
+            inStream.Read(memTuple, 0, 5 + 2 + 5);
+            int index = 0;
+            
+            Protocol.Deserialize(out actorNumber, memTuple, ref index);
+            Protocol.Deserialize(out tileId, memTuple, ref index);
+            Protocol.Deserialize(out pos, memTuple, ref index);
+
+            
+            tile.Id = (byte) tileId;
+        }
+
+        return new Tuple<int, Tile, float>(actorNumber, tile, pos);
+    }
+
 
     #endregion
 }
