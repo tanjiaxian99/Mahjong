@@ -383,8 +383,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #region IPunTurnManagerCallbacks Callbacks
 
-    // We only need 1 turn?
+    // We only care about the first turn
     public void OnTurnBegins(int turn) {
+        if (turn > 1) {
+            return;
+        }
         Debug.LogFormat("Turn {0} has begun", turn);
 
         Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
@@ -805,6 +808,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         List<Tile> hand = playerManager.hand;
+        Debug.Log(hand.Count);
         hand.Add(this.DrawTile());
 
         this.ConvertLocalBonusTiles();
@@ -852,7 +856,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     // TODO: Integrate more turnManager.SendMove
                     turnManager.SendMove(null, true);
                     this.nextPlayersTurn();
-                    Debug.Log("called");
                 }
             }
         }
