@@ -808,7 +808,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         List<Tile> hand = playerManager.hand;
-        Debug.Log(hand.Count);
         hand.Add(this.DrawTile());
 
         this.ConvertLocalBonusTiles();
@@ -869,8 +868,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void ConvertLocalBonusTiles() {
         List<Tile> hand = playerManager.hand;
-        List<Tile> openTiles = playerManager.openTiles;
-
+        
         while (true) {
             Tile tile = hand[hand.Count - 1];
 
@@ -878,8 +876,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             if (!tile.IsBonus()) {
                 break;
             }
-
-            openTiles.Add(tile);
+            playerManager.bonusTiles.Add(tile);
             hand[hand.Count - 1] = this.DrawTile();
         }
         
@@ -887,7 +884,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Update the list of open tiles on the local player's custom properties
         Hashtable ht = new Hashtable();
-        ht.Add(OpenTilesPropKey, openTiles);
+        ht.Add(OpenTilesPropKey, playerManager.openTiles);
         PhotonNetwork.SetPlayerCustomProperties(ht);
     }
 
