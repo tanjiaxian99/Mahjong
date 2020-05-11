@@ -464,8 +464,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind playerWind;
 
         foreach (Player player in PhotonNetwork.PlayerList) {
-            int randomIndex = (int)PlayerManager.Wind.EAST;
-            //int randomIndex = RandomNumber(winds.Count());
+            //int randomIndex = (int)PlayerManager.Wind.EAST;
+            int randomIndex = RandomNumber(winds.Count());
             playerWind = winds[randomIndex];
             winds.Remove(winds[randomIndex]);
             windsDict.Add(player.ActorNumber, (int) playerWind);
@@ -1166,7 +1166,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         for (int i = 0; i < remoteHandSize; i++) {
             remoteHand.Add(new Tile(0, 0));
         }
-
+        Debug.LogErrorFormat("RemoteHandSize: {0}", remoteHandSize);
         InstantiateRemoteTiles(wind, remoteHand, this.RelativePlayerPosition(remotePlayer), "Hand");
     }
 
