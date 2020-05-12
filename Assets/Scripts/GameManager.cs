@@ -379,7 +379,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Hashtable ht = new Hashtable();
             ht.Add(PlayerWindPropKey, wind);
             PhotonNetwork.SetPlayerCustomProperties(ht);
-
             // Update local player's playerManager
             playerManager.PlayerWind = wind;
 
@@ -387,6 +386,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Tuple<int, Tile, float> discardTile = (Tuple<int, Tile, float>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
             Player player = PhotonNetwork.LocalPlayer.Get(discardTile.Item1);
             Tile tile = discardTile.Item2;
+            Debug.Log(tile);
             float hPos = discardTile.Item3;
 
             // Only instantiate the tile if a remote player threw it
@@ -468,7 +468,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.ScreenViewAdjustment();
         this.GenerateTiles();
         // Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
         this.DistributeTiles();
         //this.InstantiateDiscardTilesList();
         StartCoroutine("InitialInstantiation");
@@ -496,8 +496,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind playerWind;
 
         foreach (Player player in PhotonNetwork.PlayerList) {
-            //int randomIndex = (int)PlayerManager.Wind.EAST;
-            int randomIndex = RandomNumber(winds.Count());
+            int randomIndex = (int) PlayerManager.Wind.EAST;
+            if (numberOfPlayersToStart > 1) {
+                randomIndex = RandomNumber(winds.Count());
+            }
+
             playerWind = winds[randomIndex];
             winds.Remove(winds[randomIndex]);
             windsDict.Add(player.ActorNumber, (int) playerWind);
@@ -611,7 +614,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         foreach (Player player in PhotonNetwork.PlayerList) {
             List<Tile> playerTiles = new List<Tile>();
-
+            Debug.LogFormat("Own player's wind: {0}", playerManager.PlayerWind);
             for (int i = 0; i < 14; i++) {
                 // Choose a tile randomly from the complete tiles list and add it to the player's tiles
                 int randomIndex = RandomNumber(tiles.Count());
@@ -619,6 +622,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 tiles.Remove(tiles[randomIndex]);
 
                 // Don't give the 14th tile if the player is not the East Wind
+                Debug.Log(player.CustomProperties[PlayerWindPropKey]);
                 if (i == 12 && (PlayerManager.Wind)player.CustomProperties[PlayerWindPropKey] != PlayerManager.Wind.EAST) {
                     break;
                 }
@@ -795,14 +799,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
         
         playerManager.UpdateOpenTiles();
-        
-        // Add the number of tiles in the local player's hand to custom properties
-        Hashtable ht = new Hashtable();
-        ht.Add(HandTilesCountPropKey, playerManager.hand.Count);
-        PhotonNetwork.SetPlayerCustomProperties(ht);
 
         // Add the local player's open tiles to custom properties
-        ht = new Hashtable();
+        Hashtable ht = new Hashtable();
         ht.Add(OpenTilesPropKey, playerManager.openTiles);
         PhotonNetwork.SetPlayerCustomProperties(ht);
 
@@ -921,6 +920,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called whenever there is an update to the player's hand.
     /// </summary>
     public void InstantiateLocalHand() {
+        // Update the local player's hand count custom property
+        Hashtable ht = new Hashtable();
+        ht.Add(HandTilesCountPropKey, playerManager.hand.Count);
+        PhotonNetwork.SetPlayerCustomProperties(ht);
+
+
         // Separation between pivot of tiles
         float xSepHand = 0.83f;
         // x-coordinate of the position where the tile will be instantiated
