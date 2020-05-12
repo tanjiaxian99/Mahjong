@@ -1393,9 +1393,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Serialize Tuple<int, Tile, float> into a byteStream
+    /// Serialize Tuple<int, Tile, float> into a byteStream. sizeof(memTuple) = sizeof(int) + sizeof(short) + sizeof(int)
     /// </summary>
-    public static readonly byte[] memTuple = new byte[5 + 2 + 5];
+    public static readonly byte[] memTuple = new byte[10];
     public static short SerializeTuple (StreamBuffer outStream, object customobject) {
         var tuple = (Tuple<int, Tile, float>) customobject;
         
@@ -1406,10 +1406,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Protocol.Serialize(tuple.Item1, bytes, ref index);
             Protocol.Serialize(tuple.Item2.Id, bytes, ref index);
             Protocol.Serialize(tuple.Item3, bytes, ref index);
-            outStream.Write(bytes, 0, 5 + 2 + 5);
+            outStream.Write(bytes, 0, 10);
         }
 
-        return 5 + 2 + 5;
+        return 10;
     }
 
 
@@ -1424,7 +1424,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         float pos;
         
         lock (memTuple) {
-            inStream.Read(memTuple, 0, 5 + 2 + 5);
+            inStream.Read(memTuple, 0, 10);
             int index = 0;
             
             Protocol.Deserialize(out actorNumber, memTuple, ref index);

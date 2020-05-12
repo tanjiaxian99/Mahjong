@@ -44,6 +44,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
         // Show name inputField and 'Play' button
         progressLabel.SetActive(false);
         controlPanel.SetActive(true);
+
+        // For debugging
+        this.Connect();
     }
 
     #endregion
