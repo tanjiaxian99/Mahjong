@@ -386,7 +386,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Tuple<int, Tile, float> discardTile = (Tuple<int, Tile, float>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
             Player player = PhotonNetwork.LocalPlayer.Get(discardTile.Item1);
             Tile tile = discardTile.Item2;
-            Debug.Log(tile);
             float hPos = discardTile.Item3;
 
             // Only instantiate the tile if a remote player threw it
@@ -614,7 +613,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         foreach (Player player in PhotonNetwork.PlayerList) {
             List<Tile> playerTiles = new List<Tile>();
-            Debug.LogFormat("Own player's wind: {0}", playerManager.PlayerWind);
+
             for (int i = 0; i < 14; i++) {
                 // Choose a tile randomly from the complete tiles list and add it to the player's tiles
                 int randomIndex = RandomNumber(tiles.Count());
@@ -622,7 +621,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 tiles.Remove(tiles[randomIndex]);
 
                 // Don't give the 14th tile if the player is not the East Wind
-                Debug.Log(player.CustomProperties[PlayerWindPropKey]);
                 if (i == 12 && (PlayerManager.Wind)player.CustomProperties[PlayerWindPropKey] != PlayerManager.Wind.EAST) {
                     break;
                 }
@@ -1421,7 +1419,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     private static object DeserializeTuple (StreamBuffer inStream, short length) {
         Tuple<int, Tile, float> tuple = new Tuple<int, Tile, float>(0, new Tile(0, 0), 0f);
         int actorNumber;
-        int tileId;
+        short tileId;
         Tile tile = new Tile(0, 0);
         float pos;
         
@@ -1436,7 +1434,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             
             tile.Id = (byte) tileId;
         }
-
         return new Tuple<int, Tile, float>(actorNumber, tile, pos);
     }
 
