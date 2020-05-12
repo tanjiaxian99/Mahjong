@@ -56,6 +56,8 @@ public class Launcher : MonoBehaviourPunCallbacks {
         // Automatically connect to a random room when firstConnection is true, which is when the player
         // connects to the Photon server for the first time.
         if (firstConnection) {
+            // If numberOfPlayersToStart == 1 and a second client calls JoinRandomRoom, an exception is raised:
+            // Deserialization failed for Operation Response. System.Exception: Read failed. Custom type not found: 255.
             PhotonNetwork.JoinRandomRoom();
             firstConnection = false;
         }

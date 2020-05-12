@@ -264,7 +264,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #region MonoBehavior Callbacks
 
-    void Awake() {
+    void Start() {
         if (playerPrefab == null) {
             Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
         } else {
@@ -467,8 +467,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.DeterminePlayOrder();
         this.ScreenViewAdjustment();
         this.GenerateTiles();
-        yield return new WaitForSeconds(0.5f);
-        // Local room custom properties updated immediately. No need to delay between GenerateTiles and Distribute Tiles
+        // Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
+        yield return new WaitForSeconds(1f);
         this.DistributeTiles();
         //this.InstantiateDiscardTilesList();
         StartCoroutine("InitialInstantiation");
@@ -496,8 +496,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind playerWind;
 
         foreach (Player player in PhotonNetwork.PlayerList) {
-            int randomIndex = (int)PlayerManager.Wind.EAST;
-            //int randomIndex = RandomNumber(winds.Count());
+            //int randomIndex = (int)PlayerManager.Wind.EAST;
+            int randomIndex = RandomNumber(winds.Count());
             playerWind = winds[randomIndex];
             winds.Remove(winds[randomIndex]);
             windsDict.Add(player.ActorNumber, (int) playerWind);
