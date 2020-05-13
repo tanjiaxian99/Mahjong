@@ -262,11 +262,11 @@ namespace Photon.Pun.UtilityScripts
         /// <summary>
         /// Called by PhotonNetwork
         /// </summary>
-        /// <param name="propertiesThatChanged">Properties that changed.</param>
+        /// <param name = "propertiesThatChanged" > Properties that changed.</param>
         public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
         {
 
-            //   Debug.Log("OnRoomPropertiesUpdate: "+propertiesThatChanged.ToStringFull());
+            //Debug.Log("OnRoomPropertiesUpdate: " + propertiesThatChanged.ToStringFull());
 
             if (propertiesThatChanged.ContainsKey("Turn"))
             {

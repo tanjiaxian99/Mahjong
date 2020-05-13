@@ -3,7 +3,17 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Hand
+  - Open
+  - EAST_Hand
+  - EAST_Open
+  - NORTH_Hand
+  - NORTH_Open
+  - WEST_Hand
+  - WEST_Open
+  - SOUTH_Hand
+  - SOUTH_Open
   layers:
   - Default
   - TransparentFX

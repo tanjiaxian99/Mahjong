@@ -1,16 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
 /// Class for all tiles. Rank sequence is as follows:
-/// Character, Dot, Bamboo, Season and Flower: the number on the tile
-/// Wind: East, South, West, North
-/// Dragon: Red, White, Green
-/// Animal: Cat, Rat, Rooster, Centipede
+/// Character, Dot, Bamboo, Season and Flower: the number on the tile;
+/// Wind: East, South, West, North;
+/// Dragon: Red, White, Green;
+/// Animal: Cat, Rat, Rooster, Centipede.
 /// </summary>
-public class Tile {
-    private Suit suit { get; set; }
-    private Rank rank { get; set; }
+public class Tile : IEquatable<Tile> {
+    public Suit suit { get; set; }
+    public Rank rank { get; set; }
 
     public enum Suit {
         Character,
@@ -35,8 +36,44 @@ public class Tile {
         Nine,
     }
 
-    // Raises error if rank does not belong in suit
+    /// <summary>
+    /// The Id of each tile is a 2-digit number: the first digit represents the suit while the second represents the rank.
+    /// </summary>
+    public byte Id {
+        get {
+            return (byte) ((int)suit * 10 + (int)rank);
+        } set {
+            suit = (Suit) (value / 10);
+            rank = (Rank) (value % 10);
+        }
+    }
+
+
+    /// <summary>
+    /// Default constructor. Calls Initialize, which is shared with the secondary constructor.
+    /// </summary>
     public Tile(Suit suit, Rank rank) {
+        this.Initialize(suit, rank);
+    }
+
+
+    /// <summary>
+    /// Secondary constructor. Calls Initialize, which is shared with the default constructor.
+    /// </summary>
+    public Tile(string name) {
+        string[] part = name.Split('_');
+        Enum.TryParse(part[0], out Suit suit);
+        Enum.TryParse(part[1], out Rank rank);
+        this.Initialize(suit, rank);
+    }
+
+
+    /// <summary>
+    /// Initialize a new Tile object. Called by both constructors.
+    /// </summary>
+    /// <param name="suit"></param>
+    /// <param name="rank"></param>
+    public void Initialize(Suit suit, Rank rank) {
         if (suit < Suit.Character || suit > Suit.Animal) {
             Debug.LogError("The tile has an invalid suit");
             return;
@@ -75,4 +112,29 @@ public class Tile {
         this.suit = suit;
         this.rank = rank;
     }
+
+    public bool IsBonus() {
+        return suit == Suit.Season || suit == Suit.Flower || suit == Suit.Animal;
+    }
+
+    public override string ToString() {
+        return suit + "_" + rank;
+    }
+
+    /// <summary>
+    /// If 2 tiles have the same suit and rank, they are equal, regardless of reference.
+    /// </summary>
+    public bool Equals(Tile tile) {
+        return suit == tile.suit &&
+               rank == tile.rank;
+    }
+    
+    public override int GetHashCode() {
+        int hashCode = 39855015;
+        hashCode = hashCode * -1521134295 + suit.GetHashCode();
+        hashCode = hashCode * -1521134295 + rank.GetHashCode();
+        return hashCode;
+    }
+
+    
 }
