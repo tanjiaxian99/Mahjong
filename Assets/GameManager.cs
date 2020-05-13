@@ -851,6 +851,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Tile tile = new Tile(tileName);
 
                 if (playerManager.hand.Contains(tile)) {
+                    int tilePos = playerManager.hand.IndexOf(tile);
+                    Debug.Log(tilePos);
                     playerManager.myTurn = false;
                     playerManager.hand.Remove(tile);
                     
@@ -1063,7 +1065,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht.Add(DiscardTilePropKey, tuple);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
-        GameObject tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.652f, -2.8f), Quaternion.Euler(270f, 180f, 0f));
+        GameObject tileGameObject;
+        // For the edge case where the local client aspect ratio is 4:3 and the 14th tile is discarded
+        if (tableWidth / tableHeight < 1.34 && xPos > 0.83 * 6 + 0.30) {
+            tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.652f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+        } else {
+            tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.652f, -2.8f), Quaternion.Euler(270f, 180f, 0f));
+        }
+        
         tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
         foreach (Transform child in tileGameObject.transform) {
@@ -1073,16 +1082,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // tan(α) = zPos / xPos = zForce / xForce
         // xForce ** 2 + zforce ** 2 = rForce ** 2
         // Small offsets have been added to xForce and zForce to give more force to tiles tossed from the sides
-        double rForce = 8;
-        double tanα = 2.8 / (xPos + 0.1);
-        double xForce = Math.Sqrt(Math.Pow(rForce, 2) / (1 + Math.Pow(tanα, 2))) + Math.Abs(xPos / 1.5f);
-        double zForce = Math.Abs(xForce * tanα) + Math.Pow(xPos / 4, 2);
+        double zPos = 2.8;
+        double rForce = 9;
+        double tanα = zPos / (xPos + 0.1);
+        double xForce = Math.Sqrt(Math.Pow(rForce, 2) / (1 + Math.Pow(tanα, 2))) + Math.Abs(xPos / 3f);
+        double zForce = Math.Abs(xForce * tanα) + Math.Pow(xPos / 3.5d, 2);
         if (xPos > 0) {
             xForce = -xForce;
         }
 
         Rigidbody rb = tileGameObject.AddComponent<Rigidbody>();
-        rb.AddForce(new Vector3((float) xForce, 0f, (float) zForce), ForceMode.Impulse);
+        rb.AddForce(new Vector3((float) xForce, 0f, (float) zForce), ForceMode.VelocityChange);
     }
 
    
@@ -1110,9 +1120,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else {
             nextPlayer = playOrder[localPlayerPos + 1];
         }
-
-
-        
 
         PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { nextPlayer.ActorNumber } }, SendOptions.SendReliable);
     }
@@ -1302,36 +1309,46 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the remote player to instantiate the discarded tile.
     /// </summary>
     /// <param name="hPos">The horizontal position of the tile from the perspective of the remote player</param>
-    public void InstantiateRemoteDiscardTile(Player remotePlayer, Tile discardedTile, float hPos) {
+    public void InstantiateRemoteDiscardTile(Player remotePlayer, Tile discardedTile, float pos) {
+        // Scale down discard tile discard position 
+       double hPos = pos / 2d;
+
         // v and h represents vertical and horizontal directions with respect to the perspective of the remote player
         // tan(α) = vPos / hPos = vForce / hForce; hForce ** 2 + vforce ** 2 = rForce ** 2
         // Small offsets have been added to xForce and zForce to give more force to tiles tossed from the sides
-        double rForce = 8;
-        double tanα = 2.8 / (hPos + 0.1);
-        double hForce = Math.Sqrt(Math.Pow(rForce, 2) / (1 + Math.Pow(tanα, 2))) + Math.Abs(hPos / 1.5f);
-        double vForce = Math.Abs(hForce * tanα) + Math.Pow(hPos / 4, 2);
+        double vPos = 0;
+        if (RelativePlayerPosition(remotePlayer).Equals("Left") || RelativePlayerPosition(remotePlayer).Equals("Right")) {
+            vPos = tableWidth / 2 - 0.5f - 0.7f - 0.6f;
+        } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
+            vPos = 4.4f - 0.7f - 0.6f;
+        }
+
+        double rForce = 9;
+        double tanα = vPos / (hPos + 0.1);
+        double hForce = Math.Sqrt(Math.Pow(rForce, 2) / (1 + Math.Pow(tanα, 2))) + Math.Abs(hPos / 3f);
+        double vForce = Math.Abs(hForce * tanα) + Math.Pow(hPos / 3.5d, 2);
 
         Vector3 position = Vector3.zero;
         Quaternion rotation = Quaternion.identity;
 
         // Instantiation position and rotation depends on where the remote player is sitting relative to the local player
         if (RelativePlayerPosition(remotePlayer).Equals("Left")) {
-            position = new Vector3(-tableWidth / 2 + 0.5f + 0.7f + 0.6f, 1f, hPos);
+            position = new Vector3((float) -vPos, 0.655f, (float) -hPos);
             rotation = Quaternion.Euler(-90f, -90f, 0f);
             if (hPos < 0) {
                 hForce = -hForce;
             }
 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Right")) {
-            position = new Vector3(tableWidth / 2 - 0.5f - 0.7f - 0.6f, 1f, hPos);
-            rotation = Quaternion.Euler(0f, 90f, 0f);
+            position = new Vector3((float) vPos, 0.655f, (float) hPos);
+            rotation = Quaternion.Euler(-90f, 90f, 0f);
             vForce = -vForce;
             if (hPos > 0) {
                 hForce = -hForce;
             }
 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
-            position = new Vector3(hPos, 1f, 4.4f - 0.7f - 0.6f);
+            position = new Vector3((float) -hPos, 0.655f, 4.4f - 0.7f - 0.6f);
             rotation = Quaternion.Euler(-90f, 0f, 0f);
             vForce = -vForce;
             if (hPos < 0) {
