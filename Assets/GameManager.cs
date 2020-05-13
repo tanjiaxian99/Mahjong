@@ -851,8 +851,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Tile tile = new Tile(tileName);
 
                 if (playerManager.hand.Contains(tile)) {
-                    int tilePos = playerManager.hand.IndexOf(tile);
-                    Debug.Log(tilePos);
                     playerManager.myTurn = false;
                     playerManager.hand.Remove(tile);
                     
@@ -1068,9 +1066,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         GameObject tileGameObject;
         // For the edge case where the local client aspect ratio is 4:3 and the 14th tile is discarded
         if (tableWidth / tableHeight < 1.34 && xPos > 0.83 * 6 + 0.30) {
-            tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.652f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.65f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
         } else {
-            tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.652f, -2.8f), Quaternion.Euler(270f, 180f, 0f));
+            tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.65f, -2.8f), Quaternion.Euler(270f, 180f, 0f));
         }
         
         tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -1092,6 +1090,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         Rigidbody rb = tileGameObject.AddComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezePositionY;
         rb.AddForce(new Vector3((float) xForce, 0f, (float) zForce), ForceMode.VelocityChange);
     }
 
@@ -1313,34 +1312,43 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Scale down discard tile discard position 
        double hPos = pos / 2d;
 
+
+        double vPos = 0;
+        double rForce = 0;
+
         // v and h represents vertical and horizontal directions with respect to the perspective of the remote player
         // tan(α) = vPos / hPos = vForce / hForce; hForce ** 2 + vforce ** 2 = rForce ** 2
         // Small offsets have been added to xForce and zForce to give more force to tiles tossed from the sides
-        double vPos = 0;
         if (RelativePlayerPosition(remotePlayer).Equals("Left") || RelativePlayerPosition(remotePlayer).Equals("Right")) {
             vPos = tableWidth / 2 - 0.5f - 0.7f - 0.6f;
+            rForce = 9 * Math.Sqrt(tableWidth / 10f);
         } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
             vPos = 4.4f - 0.7f - 0.6f;
+            rForce = 9;
         }
 
-        double rForce = 9;
         double tanα = vPos / (hPos + 0.1);
         double hForce = Math.Sqrt(Math.Pow(rForce, 2) / (1 + Math.Pow(tanα, 2))) + Math.Abs(hPos / 3f);
-        double vForce = Math.Abs(hForce * tanα) + Math.Pow(hPos / 3.5d, 2);
+        double vForce = 0;
+        if (RelativePlayerPosition(remotePlayer).Equals("Left") || RelativePlayerPosition(remotePlayer).Equals("Right")) {
+            vForce = Math.Abs(hForce * tanα);
+        } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
+            vForce = Math.Abs(hForce * tanα) + Math.Pow(hPos / 3.5d, 2);
+        }
 
         Vector3 position = Vector3.zero;
         Quaternion rotation = Quaternion.identity;
 
         // Instantiation position and rotation depends on where the remote player is sitting relative to the local player
         if (RelativePlayerPosition(remotePlayer).Equals("Left")) {
-            position = new Vector3((float) -vPos, 0.655f, (float) -hPos);
+            position = new Vector3((float) -vPos, 0.65f, (float) -hPos);
             rotation = Quaternion.Euler(-90f, -90f, 0f);
             if (hPos < 0) {
                 hForce = -hForce;
             }
 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Right")) {
-            position = new Vector3((float) vPos, 0.655f, (float) hPos);
+            position = new Vector3((float) vPos, 0.65f, (float) hPos);
             rotation = Quaternion.Euler(-90f, 90f, 0f);
             vForce = -vForce;
             if (hPos > 0) {
@@ -1348,7 +1356,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
-            position = new Vector3((float) -hPos, 0.655f, 4.4f - 0.7f - 0.6f);
+            position = new Vector3((float) -hPos, 0.65f, 4.4f - 0.7f - 0.6f);
             rotation = Quaternion.Euler(-90f, 0f, 0f);
             vForce = -vForce;
             if (hPos < 0) {
@@ -1365,13 +1373,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         Rigidbody rb = tileGameObject.AddComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezePositionY;
 
         // The application of hForce and VForce on the x-z axes depends on the remote player's position
         if (RelativePlayerPosition(remotePlayer).Equals("Left") || RelativePlayerPosition(remotePlayer).Equals("Right")) {
-            rb.AddForce(new Vector3((float) vForce, 0f, (float) hForce), ForceMode.Impulse);
+            rb.AddForce(new Vector3((float) vForce, 0f, (float) hForce), ForceMode.VelocityChange);
 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
-            rb.AddForce(new Vector3((float) hForce, 0f, (float) vForce), ForceMode.Impulse);
+            rb.AddForce(new Vector3((float) hForce, 0f, (float) vForce), ForceMode.VelocityChange);
         }
     }
 
