@@ -818,7 +818,34 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         List<Tile> hand = playerManager.hand;
+
+        // Check if the discarded tile could be Chow/Ponged/Konged
+        Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
+        Tile tile = discardTileInfo.Item2;
+        List<Tile[]> chowCombos = tile.ChowCombinations(hand);
+
+        if (chowCombos.Count != 0) {
+            // Show chow combos on left, centralised
+        }
+
+        if (tile.CanPong(hand)) {
+            // Show pong on right, centralised
+        }
+
+        if (tile.CanKong(hand)) {
+            // Show pong and kong on right, centralised
+        }
+
+
         hand.Add(this.DrawTile());
+
+        if (hand[hand.Count - 1].CanKong(hand)) {
+            // Show hidden kong on right, centralised
+        }
+
+        if (hand[hand.Count - 1].CanKong(playerManager.openTiles)) {
+            // Show hidden kong on right, centralised
+        }
 
         this.ConvertLocalBonusTiles();
         this.InstantiateLocalHand();
@@ -1310,9 +1337,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <param name="hPos">The horizontal position of the tile from the perspective of the remote player</param>
     public void InstantiateRemoteDiscardTile(Player remotePlayer, Tile discardedTile, float pos) {
         // Scale down discard tile discard position 
-       double hPos = pos / 2d;
-
-
+        double hPos = pos / 2d;
         double vPos = 0;
         double rForce = 0;
 
