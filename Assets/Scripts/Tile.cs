@@ -172,9 +172,9 @@ public class Tile : IEquatable<Tile> {
 
 
     /// <summary>
-    /// Returns (true, true) if the discard tile can be ponged and konged, contingent on the player's hand.
+    /// Returns true if the discard tile can be ponged, contingent on the player's hand.
     /// </summary>
-    public (bool, bool) CanPongOrKong(List<Tile> hand) {
+    public bool CanPong(List<Tile> hand) {
         int equalCount = 0;
 
         foreach (Tile tile in hand) {
@@ -183,13 +183,23 @@ public class Tile : IEquatable<Tile> {
             }
         }
 
-        if (equalCount == 2) {
-            return (true, false);
-        } else if (equalCount == 3) {
-            return (true, true);
-        } else {
-            return (false, false);
+        return equalCount == 2;
+    }
+
+
+    /// <summary>
+    /// Returns true if the drawn/discard tile can be konged
+    /// </summary>
+    public bool CanKong(List<Tile> tileList) {
+        int equalCount = 0;
+
+        foreach (Tile tile in tileList) {
+            if (this.Equals(tile)) {
+                equalCount++;
+            }
         }
+
+        return equalCount == 3;
     }
 
 
