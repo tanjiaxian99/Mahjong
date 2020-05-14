@@ -52,9 +52,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     private Dictionary<int, int> windsDict = new Dictionary<int, int>();
 
     /// <summary>
-    /// Dictionary containing string names of tiles and their respective prefab
+    /// Dictionary containing Tile objects and their respective prefab
     /// </summary>
     private Dictionary<Tile, GameObject> tilesDict = new Dictionary<Tile, GameObject>();
+
+    /// <summary>
+    /// Dictionary containing Tile objects and their respective sprite
+    /// </summary>
+    private Dictionary<Tile, Sprite> spritesDict = new Dictionary<Tile, Sprite>();
 
     #endregion
 
@@ -121,7 +126,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #endregion
 
-    #region Tiles Prefabs
+    #region Tiles 3D Prefabs
     [SerializeField]
     private GameObject Character_One;
 
@@ -262,6 +267,148 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #endregion
 
+    #region Tiles Sprite
+
+    [SerializeField]
+    private Sprite Character_One_Sprite;
+
+    [SerializeField]
+    private Sprite Character_Two_Sprite;
+
+    [SerializeField]
+    private Sprite Character_Three_Sprite;
+
+    [SerializeField]
+    private Sprite Character_Four_Sprite;
+
+    [SerializeField]
+    private Sprite Character_Five_Sprite;
+
+    [SerializeField]
+    private Sprite Character_Six_Sprite;
+
+    [SerializeField]
+    private Sprite Character_Seven_Sprite;
+
+    [SerializeField]
+    private Sprite Character_Eight_Sprite;
+
+    [SerializeField]
+    private Sprite Character_Nine_Sprite;
+
+    [SerializeField]
+    private Sprite Dot_One_Sprite;
+
+    [SerializeField]
+    private Sprite Dot_Two_Sprite;
+
+    [SerializeField]
+    private Sprite Dot_Three_Sprite;
+
+    [SerializeField]
+    private Sprite Dot_Four_Sprite;
+
+    [SerializeField]
+    private Sprite Dot_Five_Sprite;
+
+    [SerializeField]
+    private Sprite Dot_Six_Sprite;
+
+    [SerializeField]
+    private Sprite Dot_Seven_Sprite;
+
+    [SerializeField]
+    private Sprite Dot_Eight_Sprite;
+
+    [SerializeField]
+    private Sprite Dot_Nine_Sprite;
+
+    [SerializeField]
+    private Sprite Bamboo_One_Sprite;
+
+    [SerializeField]
+    private Sprite Bamboo_Two_Sprite;
+
+    [SerializeField]
+    private Sprite Bamboo_Three_Sprite;
+
+    [SerializeField]
+    private Sprite Bamboo_Four_Sprite;
+
+    [SerializeField]
+    private Sprite Bamboo_Five_Sprite;
+
+    [SerializeField]
+    private Sprite Bamboo_Six_Sprite;
+
+    [SerializeField]
+    private Sprite Bamboo_Seven_Sprite;
+
+    [SerializeField]
+    private Sprite Bamboo_Eight_Sprite;
+
+    [SerializeField]
+    private Sprite Bamboo_Nine_Sprite;
+
+    [SerializeField]
+    private Sprite Wind_One_Sprite;
+
+    [SerializeField]
+    private Sprite Wind_Two_Sprite;
+
+    [SerializeField]
+    private Sprite Wind_Three_Sprite;
+
+    [SerializeField]
+    private Sprite Wind_Four_Sprite;
+
+    [SerializeField]
+    private Sprite Dragon_One_Sprite;
+
+    [SerializeField]
+    private Sprite Dragon_Two_Sprite;
+
+    [SerializeField]
+    private Sprite Dragon_Three_Sprite;
+
+    [SerializeField]
+    private Sprite Season_One_Sprite;
+
+    [SerializeField]
+    private Sprite Season_Two_Sprite;
+
+    [SerializeField]
+    private Sprite Season_Three_Sprite;
+
+    [SerializeField]
+    private Sprite Season_Four_Sprite;
+
+    [SerializeField]
+    private Sprite Flower_One_Sprite;
+
+    [SerializeField]
+    private Sprite Flower_Two_Sprite;
+
+    [SerializeField]
+    private Sprite Flower_Three_Sprite;
+
+    [SerializeField]
+    private Sprite Flower_Four_Sprite;
+
+    [SerializeField]
+    private Sprite Animal_One_Sprite;
+
+    [SerializeField]
+    private Sprite Animal_Two_Sprite;
+
+    [SerializeField]
+    private Sprite Animal_Three_Sprite;
+
+    [SerializeField]
+    private Sprite Animal_Four_Sprite;
+
+    #endregion
+
     #region MonoBehavior Callbacks
 
     void Start() {
@@ -275,8 +422,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             turnManager.TurnManagerListener = this;
             this.turnManager.TurnDuration = 1000f;
 
-            // Set up a HashTable for tiles
+            // Set up a dictionary for tiles prefabs and their sprites
             this.InstantiateTilesDict();
+            this.InstantiateSpritesDict();
+
+            // Had to be called manually since PhotonNetwork wasn't calling it
             this.OnJoinedRoom();
 
             // Register customType Tile and List<Tile>
@@ -691,7 +841,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
     /// <summary>
-    /// Fill up the tilesDict with the tile prebabs and their string representations
+    /// Fill up the tilesDict with Tile objects and their respective prefabs
     /// </summary>
     public void InstantiateTilesDict() {
         tilesDict.Add(new Tile("Character_One"), Character_One);
@@ -747,6 +897,66 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         tilesDict.Add(new Tile("Animal_Two"), Animal_Two);
         tilesDict.Add(new Tile("Animal_Three"), Animal_Three);
         tilesDict.Add(new Tile("Animal_Four"), Animal_Four);
+    }
+
+
+    /// <summary>
+    /// Fill up the spritesDict with Tile objects and their respective sprites
+    /// </summary>
+    public void InstantiateSpritesDict() {
+        spritesDict.Add(new Tile("Character_One"), Character_One_Sprite);
+        spritesDict.Add(new Tile("Character_Two"), Character_Two_Sprite);
+        spritesDict.Add(new Tile("Character_Three"), Character_Three_Sprite);
+        spritesDict.Add(new Tile("Character_Four"), Character_Four_Sprite);
+        spritesDict.Add(new Tile("Character_Five"), Character_Five_Sprite);
+        spritesDict.Add(new Tile("Character_Six"), Character_Six_Sprite);
+        spritesDict.Add(new Tile("Character_Seven"), Character_Seven_Sprite);
+        spritesDict.Add(new Tile("Character_Eight"), Character_Eight_Sprite);
+        spritesDict.Add(new Tile("Character_Nine"), Character_Nine_Sprite);
+
+        spritesDict.Add(new Tile("Dot_One"), Dot_One_Sprite);
+        spritesDict.Add(new Tile("Dot_Two"), Dot_Two_Sprite);
+        spritesDict.Add(new Tile("Dot_Three"), Dot_Three_Sprite);
+        spritesDict.Add(new Tile("Dot_Four"), Dot_Four_Sprite);
+        spritesDict.Add(new Tile("Dot_Five"), Dot_Five_Sprite);
+        spritesDict.Add(new Tile("Dot_Six"), Dot_Six_Sprite);
+        spritesDict.Add(new Tile("Dot_Seven"), Dot_Seven_Sprite);
+        spritesDict.Add(new Tile("Dot_Eight"), Dot_Eight_Sprite);
+        spritesDict.Add(new Tile("Dot_Nine"), Dot_Nine_Sprite);
+
+        spritesDict.Add(new Tile("Bamboo_One"), Bamboo_One_Sprite);
+        spritesDict.Add(new Tile("Bamboo_Two"), Bamboo_Two_Sprite);
+        spritesDict.Add(new Tile("Bamboo_Three"), Bamboo_Three_Sprite);
+        spritesDict.Add(new Tile("Bamboo_Four"), Bamboo_Four_Sprite);
+        spritesDict.Add(new Tile("Bamboo_Five"), Bamboo_Five_Sprite);
+        spritesDict.Add(new Tile("Bamboo_Six"), Bamboo_Six_Sprite);
+        spritesDict.Add(new Tile("Bamboo_Seven"), Bamboo_Seven_Sprite);
+        spritesDict.Add(new Tile("Bamboo_Eight"), Bamboo_Eight_Sprite);
+        spritesDict.Add(new Tile("Bamboo_Nine"), Bamboo_Nine_Sprite);
+
+        spritesDict.Add(new Tile("Wind_One"), Wind_One_Sprite);
+        spritesDict.Add(new Tile("Wind_Two"), Wind_Two_Sprite);
+        spritesDict.Add(new Tile("Wind_Three"), Wind_Three_Sprite);
+        spritesDict.Add(new Tile("Wind_Four"), Wind_Four_Sprite);
+
+        spritesDict.Add(new Tile("Dragon_One"), Dragon_One_Sprite);
+        spritesDict.Add(new Tile("Dragon_Two"), Dragon_Two_Sprite);
+        spritesDict.Add(new Tile("Dragon_Three"), Dragon_Three_Sprite);
+
+        spritesDict.Add(new Tile("Season_One"), Season_One_Sprite);
+        spritesDict.Add(new Tile("Season_Two"), Season_Two_Sprite);
+        spritesDict.Add(new Tile("Season_Three"), Season_Three_Sprite);
+        spritesDict.Add(new Tile("Season_Four"), Season_Four_Sprite);
+
+        spritesDict.Add(new Tile("Flower_One"), Flower_One_Sprite);
+        spritesDict.Add(new Tile("Flower_Two"), Flower_Two_Sprite);
+        spritesDict.Add(new Tile("Flower_Three"), Flower_Three_Sprite);
+        spritesDict.Add(new Tile("Flower_Four"), Flower_Four_Sprite);
+
+        spritesDict.Add(new Tile("Animal_One"), Animal_One_Sprite);
+        spritesDict.Add(new Tile("Animal_Two"), Animal_Two_Sprite);
+        spritesDict.Add(new Tile("Animal_Three"), Animal_Three_Sprite);
+        spritesDict.Add(new Tile("Animal_Four"), Animal_Four_Sprite);
     }
 
 
