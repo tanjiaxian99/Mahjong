@@ -113,13 +113,68 @@ public class Tile : IEquatable<Tile> {
         this.rank = rank;
     }
 
+
     public bool IsBonus() {
         return suit == Suit.Season || suit == Suit.Flower || suit == Suit.Animal;
     }
 
+
+    /// <summary>
+    /// Returns a list of chow combinations for the tile, contingent on the player's hand.
+    /// </summary>
+    public List<Tile[]> ChowCombinations(List<Tile> hand) {
+        List<Tile[]> combinations = new List<Tile[]>();
+        Tile[] combo;
+
+        // Only Character, Dot and Bamboo suits can chow
+        if (this.suit != Suit.Character || this.suit != Suit.Dot || this.suit != Suit.Bamboo) {
+            return combinations;
+        }
+
+        // Chow can only happen between tiles of the same suit
+        List<Tile> sameSuit = new List<Tile>();
+        foreach (Tile tile in hand) {
+            if (tile.suit == this.suit) {
+                sameSuit.Add(tile);
+            }
+        }
+
+        // Can't chow if there is only one tile from the same suit
+        if (sameSuit.Count <= 1) {
+            return combinations;
+        }
+
+        Tile tileMinusTwo = new Tile(this.suit, this.rank - 2);
+        Tile tileMinusOne = new Tile(this.suit, this.rank - 1);
+        Tile tilePlusOne = new Tile(this.suit, this.rank + 1);
+        Tile tilePlusTwo = new Tile(this.suit, this.rank + 2);
+
+        // The tile forms a sequence as the first tile
+        if (hand.Contains(tilePlusOne) && hand.Contains(tilePlusTwo)) {
+            combo = new Tile[] { this, tilePlusOne, tilePlusTwo};
+            combinations.Add(combo);
+        }
+
+        // The tile forms a sequence as the middle tile
+        if (hand.Contains(tileMinusOne) && hand.Contains(tilePlusOne)) {
+            combo = new Tile[] { tileMinusOne, this, tilePlusOne };
+            combinations.Add(combo);
+        }
+
+        // The tile forms a sequence as the last tile
+        if (hand.Contains(tileMinusTwo) && hand.Contains(tileMinusOne)) {
+            combo = new Tile[] { tileMinusTwo, tileMinusOne, this };
+            combinations.Add(combo);
+        }
+
+        return combinations;
+    }
+
+
     public override string ToString() {
         return suit + "_" + rank;
     }
+
 
     /// <summary>
     /// If 2 tiles have the same suit and rank, they are equal, regardless of reference.
@@ -129,6 +184,7 @@ public class Tile : IEquatable<Tile> {
                rank == tile.rank;
     }
     
+
     public override int GetHashCode() {
         int hashCode = 39855015;
         hashCode = hashCode * -1521134295 + suit.GetHashCode();
