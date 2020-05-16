@@ -9,6 +9,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = System.Random;
 using UnityEngine.SocialPlatforms;
@@ -61,6 +62,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Dictionary containing Tile objects and their respective sprite
     /// </summary>
     private Dictionary<Tile, Sprite> spritesDict = new Dictionary<Tile, Sprite>();
+
+    /// <summary>
+    /// Cache for Chow Combinations return value
+    /// </summary>
+    private List<object[]> chowCombos;
 
     #endregion
 
@@ -1053,10 +1059,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Check if the discarded tile could be Chow/Ponged/Konged
         Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
         Tile tile = discardTileInfo.Item2;
-        var chowCombos = tile.ChowCombinations(hand);
+        chowCombos = tile.ChowCombinations(hand);
 
         if (chowCombos.Count != 0) {
-            this.ChowMechanics(chowCombos);
+            this.ChowUI(chowCombos);
             return;
         }
 
@@ -1082,7 +1088,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Called when the player can chow
     /// </summary>
-    public void ChowMechanics(List<object[]> chowCombos) {
+    public void ChowUI(List<object[]> chowCombos) {
         for (int i = 0; i < chowCombos.Count; i++) {
 
             // TODO: Might be better to implement a dictionary
@@ -1099,13 +1105,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             // Instantiate the tile sprites
             for (int j = 0; j < 3; j++) {
-                object[] tileArray = chowCombos[i];
+                object[] tileAndStringArray = chowCombos[i];
                 Transform imageTransform = spritesPanel.GetChild(j);
                 Image image = imageTransform.GetComponent<Image>();
-                image.sprite = spritesDict[(Tile)tileArray[j]];
+                image.sprite = spritesDict[(Tile)tileAndStringArray[j]];
 
                 // The drawn/discarded tile is painted yellow
-                if (j == 0 && ((string)tileArray[3]).Equals("First") || j == 1 && ((string)tileArray[3]).Equals("Second") || j == 2 && ((string)tileArray[3]).Equals("Third")) {
+                if (j == 0 && ((string)tileAndStringArray[3]).Equals("First") || j == 1 && ((string)tileAndStringArray[3]).Equals("Second") || j == 2 && ((string)tileAndStringArray[3]).Equals("Third")) {
                     image.color = new Color(1f, 1f, 0f);
                 }
 
@@ -1116,11 +1122,62 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Called when "Ok" is pressed for a Chow Combo
+    /// Called when "Ok" is clicked for Chow Combo
     /// </summary>
-    public void OnChowOk () {
+    public void OnChowOk() {
+        GameObject button = EventSystem.current.currentSelectedGameObject;
+        GameObject chowComboGameObject = button.transform.parent.parent.gameObject;
+        object[] tileAndStringArray;
+
+        // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
+        // chowCombo list. This was set up in ChowUI.
+        int index = (int) Char.GetNumericValue(chowComboGameObject.name[1]);
+        tileAndStringArray = chowCombos[index];
+
+        Tile otherTile;
+        Tile[] handTile = new Tile[2];
+
+        // TODO: A better way of doing this?
+        if (((string)tileAndStringArray[3]).Equals("First")) {
+            otherTile = (Tile) tileAndStringArray[0];
+            handTile[0] = (Tile)tileAndStringArray[1];
+            handTile[1] = (Tile)tileAndStringArray[2];
+
+        } else if (((string)tileAndStringArray[3]).Equals("Second")) {
+            otherTile = (Tile)tileAndStringArray[1];
+            handTile[0] = (Tile)tileAndStringArray[0];
+            handTile[1] = (Tile)tileAndStringArray[2];
+
+        } else if (((string)tileAndStringArray[3]).Equals("Third")) {
+            otherTile = (Tile)tileAndStringArray[2];
+            handTile[0] = (Tile)tileAndStringArray[0];
+            handTile[1] = (Tile)tileAndStringArray[1];
+        }
+
+        // Update discard tile properties to indicate to all players to remove the latest discard tile
+        Hashtable ht = new Hashtable();
+        ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        // Update both the player's hand and the combo tiles list
+        foreach (Tile tile in handTile) {
+            playerManager.hand.Remove(tile);
+            playerManager.bonusTiles.Add(tile);
+        }
+
+        playerManager.UpdateOpenTiles();
+        this.InstantiateLocalHand();
+        this.InstantiateLocalOpenTiles();
+    }
+
+
+    /// <summary>
+    /// Called when "Skip" button is clicked for Chow Combo
+    /// </summary>
+    public void OnChowSkip() {
       
     }
+
 
     /// <summary>
     /// Called when the local player wants to select a tile
