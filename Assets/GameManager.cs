@@ -62,18 +62,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     private Dictionary<Tile, Sprite> spritesDict = new Dictionary<Tile, Sprite>();
 
-    /// <summary>
-    /// The left panel containing possible Chow combinations
-    /// </summary>
-    [SerializeField]
-    private GameObject leftPanel;
-
-    /// <summary>
-    /// The right panel containing possible Pong & Kong combinations
-    /// </summary>
-    [SerializeField]
-    private GameObject rightPanel;
-
     #endregion
 
     #region OnEvent Fields
@@ -1065,7 +1053,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Check if the discarded tile could be Chow/Ponged/Konged
         Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
         Tile tile = discardTileInfo.Item2;
-        List<Tile[]> chowCombos = tile.ChowCombinations(hand);
+        var chowCombos = tile.ChowCombinations(hand);
 
         if (chowCombos.Count != 0) {
             this.ChowMechanics(chowCombos);
@@ -1094,7 +1082,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Called when the player can chow
     /// </summary>
-    public void ChowMechanics(List<Tile[]> chowCombos) {
+    public void ChowMechanics(List<object[]> chowCombos) {
         for (int i = 0; i < chowCombos.Count; i++) {
 
             // TODO: Might be better to implement a dictionary
@@ -1108,17 +1096,31 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
 
             Transform spritesPanel = chowComboGameObject.transform.GetChild(0);
+
+            // Instantiate the tile sprites
             for (int j = 0; j < 3; j++) {
-                Tile[] tileArray = chowCombos[i];
+                object[] tileArray = chowCombos[i];
                 Transform imageTransform = spritesPanel.GetChild(j);
                 Image image = imageTransform.GetComponent<Image>();
-                image.sprite = spritesDict[tileArray[j]];
-            }
+                image.sprite = spritesDict[(Tile)tileArray[j]];
 
+                // The drawn/discarded tile is painted yellow
+                if (j == 0 && ((string)tileArray[3]).Equals("First") || j == 1 && ((string)tileArray[3]).Equals("Second") || j == 2 && ((string)tileArray[3]).Equals("Third")) {
+                    image.color = new Color(1f, 1f, 0f);
+                }
+
+            }
             ChowComboOne.SetActive(true);
         }
     }
 
+
+    /// <summary>
+    /// Called when "Ok" is pressed for a Chow Combo
+    /// </summary>
+    public void OnChowOk () {
+      
+    }
 
     /// <summary>
     /// Called when the local player wants to select a tile

@@ -122,7 +122,8 @@ public class Tile : IEquatable<Tile> {
 
 
     /// <summary>
-    /// Returns a list of chow combinations for the tile, contingent on the player's hand.
+    /// Returns a list of chow combinations for the tile, contingent on the player's hand. Last item in the object array specifies
+    /// which tile is the drawn/discard tile.
     /// </summary>
     public List<object[]> ChowCombinations(List<Tile> hand) {
         List<object[]> combinations = new List<object[]>();
@@ -165,7 +166,7 @@ public class Tile : IEquatable<Tile> {
 
         // The tile forms a sequence as the last tile
         if (hand.Contains(tileMinusTwo) && hand.Contains(tileMinusOne)) {
-            combo = new object[] { tileMinusTwo, tileMinusOne, this, "third" };
+            combo = new object[] { tileMinusTwo, tileMinusOne, this, "Third" };
             combinations.Add(combo);
         }
 
