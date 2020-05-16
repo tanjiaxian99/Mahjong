@@ -53,6 +53,7 @@ public class TestTiles : MonoBehaviour {
             Transform imageTransform = spritesPanel.GetChild(i);
             Image image = imageTransform.GetComponent<Image>();
             image.sprite = tileSprite;
+            image.color = new Color(1f, 1f, 0f);
         }
 
         ChowComboOne.SetActive(true);

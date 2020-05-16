@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+
 /// <summary>
 /// Class for all tiles. Rank sequence is as follows:
 /// Character, Dot, Bamboo, Season and Flower: the number on the tile;
@@ -122,9 +124,9 @@ public class Tile : IEquatable<Tile> {
     /// <summary>
     /// Returns a list of chow combinations for the tile, contingent on the player's hand.
     /// </summary>
-    public List<Tile[]> ChowCombinations(List<Tile> hand) {
-        List<Tile[]> combinations = new List<Tile[]>();
-        Tile[] combo;
+    public List<object[]> ChowCombinations(List<Tile> hand) {
+        List<object[]> combinations = new List<object[]>();
+        object[] combo;
 
         // Only Character, Dot and Bamboo suits can chow
         if (this.suit != Suit.Character || this.suit != Suit.Dot || this.suit != Suit.Bamboo) {
@@ -151,19 +153,19 @@ public class Tile : IEquatable<Tile> {
 
         // The tile forms a sequence as the first tile
         if (hand.Contains(tilePlusOne) && hand.Contains(tilePlusTwo)) {
-            combo = new Tile[] { this, tilePlusOne, tilePlusTwo};
+            combo = new object[] { this, tilePlusOne, tilePlusTwo, "First"};
             combinations.Add(combo);
         }
 
         // The tile forms a sequence as the middle tile
         if (hand.Contains(tileMinusOne) && hand.Contains(tilePlusOne)) {
-            combo = new Tile[] { tileMinusOne, this, tilePlusOne };
+            combo = new object[] { tileMinusOne, this, tilePlusOne, "Second" };
             combinations.Add(combo);
         }
 
         // The tile forms a sequence as the last tile
         if (hand.Contains(tileMinusTwo) && hand.Contains(tileMinusOne)) {
-            combo = new Tile[] { tileMinusTwo, tileMinusOne, this };
+            combo = new object[] { tileMinusTwo, tileMinusOne, this, "third" };
             combinations.Add(combo);
         }
 

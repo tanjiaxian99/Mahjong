@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = System.Random;
@@ -138,7 +139,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #endregion
 
-    #region Tiles 3D Prefabs
+    #region Tile 3D Prefabs
     [SerializeField]
     private GameObject Character_One;
 
@@ -279,7 +280,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #endregion
 
-    #region Tiles Sprite
+    #region Tile Sprites
 
     [SerializeField]
     private Sprite Character_One_Sprite;
@@ -418,6 +419,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     [SerializeField]
     private Sprite Animal_Four_Sprite;
+
+    #endregion
+
+    #region UI fields
+
+    [SerializeField]
+    private GameObject ChowComboOne;
+
+    [SerializeField]
+    private GameObject ChowComboTwo;
+
+    [SerializeField]
+    private GameObject ChowComboThree;
+
+    [SerializeField]
+    private GameObject PongCombo;
+
+    [SerializeField]
+    private GameObject KongCombo;
 
     #endregion
 
@@ -1048,8 +1068,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         List<Tile[]> chowCombos = tile.ChowCombinations(hand);
 
         if (chowCombos.Count != 0) {
-            // Show chow combos on left, centralised
-
+            this.ChowMechanics(chowCombos);
             return;
         }
 
@@ -1059,10 +1078,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         if (hand[hand.Count - 1].CanKong(hand)) {
             // Show hidden kong on right, centralised
+            return;
         }
 
         if (hand[hand.Count - 1].CanKong(playerManager.openTiles)) {
             // Show hidden kong on right, centralised
+            return;
         }
 
         this.InstantiateLocalHand();
@@ -1070,6 +1091,33 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
 
+    /// <summary>
+    /// Called when the player can chow
+    /// </summary>
+    public void ChowMechanics(List<Tile[]> chowCombos) {
+        for (int i = 0; i < chowCombos.Count; i++) {
+
+            // TODO: Might be better to implement a dictionary
+            GameObject chowComboGameObject;
+            if (i == 0) {
+                chowComboGameObject = ChowComboOne;
+            } else if (i == 1) {
+                chowComboGameObject = ChowComboTwo;
+            } else {
+                chowComboGameObject = ChowComboThree;
+            }
+
+            Transform spritesPanel = chowComboGameObject.transform.GetChild(0);
+            for (int j = 0; j < 3; j++) {
+                Tile[] tileArray = chowCombos[i];
+                Transform imageTransform = spritesPanel.GetChild(j);
+                Image image = imageTransform.GetComponent<Image>();
+                image.sprite = spritesDict[tileArray[j]];
+            }
+
+            ChowComboOne.SetActive(true);
+        }
+    }
 
 
     /// <summary>
