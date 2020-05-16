@@ -61,6 +61,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     private Dictionary<Tile, Sprite> spritesDict = new Dictionary<Tile, Sprite>();
 
+    /// <summary>
+    /// The left panel containing possible Chow combinations
+    /// </summary>
+    [SerializeField]
+    private GameObject leftPanel;
+
+    /// <summary>
+    /// The right panel containing possible Pong & Kong combinations
+    /// </summary>
+    [SerializeField]
+    private GameObject rightPanel;
+
     #endregion
 
     #region OnEvent Fields
@@ -1024,6 +1036,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void PlayerStartTurn() {
         if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
+            // TODO: South Wind has to increase turn number so Turn doesn't stay at 1.
             return;
         }
 
@@ -1036,18 +1049,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         if (chowCombos.Count != 0) {
             // Show chow combos on left, centralised
-        }
 
-        if (tile.CanPong(hand)) {
-            // Show pong on right, centralised
-        }
-
-        if (tile.CanKong(hand)) {
-            // Show pong and kong on right, centralised
+            return;
         }
 
 
         hand.Add(this.DrawTile());
+        this.ConvertLocalBonusTiles();
 
         if (hand[hand.Count - 1].CanKong(hand)) {
             // Show hidden kong on right, centralised
@@ -1057,10 +1065,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Show hidden kong on right, centralised
         }
 
-        this.ConvertLocalBonusTiles();
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
     }
+
+
 
 
     /// <summary>
