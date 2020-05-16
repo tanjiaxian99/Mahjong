@@ -560,6 +560,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTile = (Tuple<int, Tile, float>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
+
+            // Item1 is set to -1 by a player to inform all players to remove the last discard tile. See OnChowOk
+            if (discardTile.Item1 == -1) {
+                this.RemoveDiscardTile();
+                return;
+            }
+
             Player player = PhotonNetwork.LocalPlayer.Get(discardTile.Item1);
             Tile tile = discardTile.Item2;
             float hPos = discardTile.Item3;
