@@ -1722,8 +1722,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when "Skip" button is clicked for Kong Combo
     /// </summary>
     public void OnKongSkip() {
-        // Update MasterClient that the player doesn't want to Pong
-        PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+        if (!playerManager.myTurn) {
+            // Update MasterClient that the player doesn't want to Pong. Only applicable for 3 concealed tiles Kong.
+            PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+        }
 
         PongCombo.SetActive(false);
         KongCombo.SetActive(false);
