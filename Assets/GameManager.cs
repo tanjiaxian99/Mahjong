@@ -1159,9 +1159,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             this.KongUI(hand[hand.Count - 1]);
             return;
         }
-
-        this.InstantiateLocalHand();
-        this.InstantiateLocalOpenTiles();
     }
     
 
@@ -1529,7 +1526,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
         // chowCombo list. This was set up in ChowUI.
-        int index = (int)Char.GetNumericValue(chowComboGameObject.name[1]);
+        int index = (int)Char.GetNumericValue(chowComboGameObject.name[11]);
+        Debug.LogError(index);
+        Debug.LogError(chowCombos.Count);
         tileAndStringArray = chowCombos[index];
 
         Tile otherTile;
@@ -1634,6 +1633,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalOpenTiles();
 
         // The local player automatically update that it is his turn
+        playerManager.myTurn = true;
         playerManager.canTouchHandTiles = true;
     }
 
