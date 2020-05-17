@@ -2025,7 +2025,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 863154032465345303}
-        m_MethodName: OnChowSkip
+        m_MethodName: OnPongSkip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
