@@ -441,13 +441,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     #region UI fields
 
     [SerializeField]
+    private GameObject ChowComboZero;
+
+    [SerializeField]
     private GameObject ChowComboOne;
 
     [SerializeField]
     private GameObject ChowComboTwo;
-
-    [SerializeField]
-    private GameObject ChowComboThree;
 
     [SerializeField]
     private GameObject PongCombo;
@@ -651,10 +651,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
 
-        // Update Room Custom Properties with the next player
-        Hashtable ht = new Hashtable();
-        ht.Add(NextPlayerPropKey, playOrder[0]);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        Player firstPlayer = playOrder[0];
+        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { firstPlayer.ActorNumber } }, SendOptions.SendReliable);
+
+        //// Update Room Custom Properties with the next player
+        //Hashtable ht = new Hashtable();
+        //ht.Add(NextPlayerPropKey, playOrder[0]);
+        //PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
     public void OnTurnCompleted(int turn) {
@@ -1408,7 +1411,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Remove the tag of the tile discarded before the current tile
         GameObject previousDiscard = GameObject.FindGameObjectWithTag("Discard");
-        previousDiscard.tag = "Untagged";
+        if (previousDiscard != null) {
+            previousDiscard.tag = "Untagged";
+        }
 
         GameObject tileGameObject;
         // For the edge case where the local client aspect ratio is 4:3 and the 14th tile is discarded
@@ -1488,11 +1493,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // TODO: Might be better to implement a dictionary
             GameObject chowComboGameObject;
             if (i == 0) {
-                chowComboGameObject = ChowComboOne;
+                chowComboGameObject = ChowComboZero;
             } else if (i == 1) {
-                chowComboGameObject = ChowComboTwo;
+                chowComboGameObject = ChowComboOne;
             } else {
-                chowComboGameObject = ChowComboThree;
+                chowComboGameObject = ChowComboTwo;
             }
 
             Transform spritesPanel = chowComboGameObject.transform.GetChild(0);
@@ -1510,7 +1515,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 }
 
             }
-            ChowComboOne.SetActive(true);
+            ChowComboZero.SetActive(true);
         }
     }
 
@@ -1523,9 +1528,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         GameObject chowComboGameObject = button.transform.parent.parent.gameObject;
         object[] tileAndStringArray;
 
+        ChowComboZero.SetActive(false);
         ChowComboOne.SetActive(false);
         ChowComboTwo.SetActive(false);
-        ChowComboThree.SetActive(false);
 
         // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
         // chowCombo list. This was set up in ChowUI.
@@ -1573,9 +1578,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when "Skip" button is clicked for Chow Combo
     /// </summary>
     public void OnChowSkip() {
+        ChowComboZero.SetActive(false);
         ChowComboOne.SetActive(false);
         ChowComboTwo.SetActive(false);
-        ChowComboThree.SetActive(false);
 
         playerManager.hand.Add(this.DrawTile());
         this.ConvertLocalBonusTiles();
@@ -1973,7 +1978,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Remove the tag of the tile discarded before the current tile
         GameObject previousDiscard = GameObject.FindGameObjectWithTag("Discard");
-        previousDiscard.tag = "Untagged";
+        if (previousDiscard != null) {
+            previousDiscard.tag = "Untagged";
+        }
+        
 
         GameObject tileGameObject = Instantiate(tilesDict[discardedTile], position, rotation);
         tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
