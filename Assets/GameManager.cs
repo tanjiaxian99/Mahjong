@@ -73,6 +73,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public List<bool> PongKongUpdateList = new List<bool>();
 
+    /// <summary>
+    /// The latest tile to be discarded
+    /// </summary>
+    public Tile latestDiscardTile;
+
     #endregion
 
     #region OnEvent Fields
@@ -576,35 +581,35 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             playerManager.PlayerWind = wind;
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
-            Tuple<int, Tile, float> discardTile = (Tuple<int, Tile, float>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
+            Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
 
             // Item1 is set to -1 by a player to inform all players to remove the last discard tile. See OnChowOk
-            if (discardTile.Item1 == -1) {
+            if (discardTileInfo.Item1 == -1) {
                 // Remove the last discard tile
                 GameObject lastDiscardTile = GameObject.FindGameObjectWithTag("Discard");
                 Destroy(lastDiscardTile);
                 return;
             }
 
-            Player player = PhotonNetwork.LocalPlayer.Get(discardTile.Item1);
-            Tile tile = discardTile.Item2;
-            float hPos = discardTile.Item3;
+            Player player = PhotonNetwork.LocalPlayer.Get(discardTileInfo.Item1);
+            latestDiscardTile = discardTileInfo.Item2;
+            float hPos = discardTileInfo.Item3;
 
             // Only instantiate the tile if a remote player threw it
             if (player == PhotonNetwork.LocalPlayer) {
                 return;
             }
 
-            this.InstantiateRemoteDiscardTile(player, tile, hPos);
+            this.InstantiateRemoteDiscardTile(player, latestDiscardTile, hPos);
 
             // Check for Pong/Kong against discard tile
-            if (tile.CanPong(playerManager.hand)) {
-                this.PongUI();
+            if (latestDiscardTile.CanPong(playerManager.hand)) {
+                this.PongUI(latestDiscardTile);
                 return;
             }
 
-            if (tile.CanKong(playerManager.hand)) {
-                this.KongUI();
+            if (latestDiscardTile.CanKong(playerManager.hand)) {
+                this.KongUI(latestDiscardTile);
                 return;
             }
 
@@ -1161,116 +1166,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
     }
-
-
-    /// <summary>
-    /// Called when the player can chow
-    /// </summary>
-    public void ChowUI(List<object[]> chowCombos) {
-        for (int i = 0; i < chowCombos.Count; i++) {
-
-            // TODO: Might be better to implement a dictionary
-            GameObject chowComboGameObject;
-            if (i == 0) {
-                chowComboGameObject = ChowComboOne;
-            } else if (i == 1) {
-                chowComboGameObject = ChowComboTwo;
-            } else {
-                chowComboGameObject = ChowComboThree;
-            }
-
-            Transform spritesPanel = chowComboGameObject.transform.GetChild(0);
-
-            // Instantiate the tile sprites
-            for (int j = 0; j < 3; j++) {
-                object[] tileAndStringArray = chowCombos[i];
-                Transform imageTransform = spritesPanel.GetChild(j);
-                Image image = imageTransform.GetComponent<Image>();
-                image.sprite = spritesDict[(Tile)tileAndStringArray[j]];
-
-                // The drawn/discarded tile is painted yellow
-                if (j == 0 && ((string)tileAndStringArray[3]).Equals("First") || j == 1 && ((string)tileAndStringArray[3]).Equals("Second") || j == 2 && ((string)tileAndStringArray[3]).Equals("Third")) {
-                    image.color = new Color(1f, 1f, 0f);
-                }
-
-            }
-            ChowComboOne.SetActive(true);
-        }
-    }
-
-
-    /// <summary>
-    /// Called when "Ok" is clicked for Chow Combo
-    /// </summary>
-    public void OnChowOk() {
-        GameObject button = EventSystem.current.currentSelectedGameObject;
-        GameObject chowComboGameObject = button.transform.parent.parent.gameObject;
-        object[] tileAndStringArray;
-
-        ChowComboOne.SetActive(false);
-        ChowComboTwo.SetActive(false);
-        ChowComboThree.SetActive(false);
-
-        // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
-        // chowCombo list. This was set up in ChowUI.
-        int index = (int) Char.GetNumericValue(chowComboGameObject.name[1]);
-        tileAndStringArray = chowCombos[index];
-
-        Tile otherTile;
-        Tile[] handTile = new Tile[2];
-
-        // TODO: A better way of doing this?
-        if (((string)tileAndStringArray[3]).Equals("First")) {
-            otherTile = (Tile) tileAndStringArray[0];
-            handTile[0] = (Tile)tileAndStringArray[1];
-            handTile[1] = (Tile)tileAndStringArray[2];
-
-        } else if (((string)tileAndStringArray[3]).Equals("Second")) {
-            otherTile = (Tile)tileAndStringArray[1];
-            handTile[0] = (Tile)tileAndStringArray[0];
-            handTile[1] = (Tile)tileAndStringArray[2];
-
-        } else if (((string)tileAndStringArray[3]).Equals("Third")) {
-            otherTile = (Tile)tileAndStringArray[2];
-            handTile[0] = (Tile)tileAndStringArray[0];
-            handTile[1] = (Tile)tileAndStringArray[1];
-        }
-
-        // Update discard tile properties to indicate to all players to remove the latest discard tile
-        Hashtable ht = new Hashtable();
-        ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-
-        // Update both the player's hand and the combo tiles list
-        foreach (Tile tile in handTile) {
-            playerManager.hand.Remove(tile);
-            playerManager.bonusTiles.Add(tile);
-        }
-
-        playerManager.UpdateOpenTiles();
-        this.InstantiateLocalHand();
-        this.InstantiateLocalOpenTiles();
-    }
-
-
-    /// <summary>
-    /// Called when "Skip" button is clicked for Chow Combo
-    /// </summary>
-    public void OnChowSkip() {
-        GameObject button = EventSystem.current.currentSelectedGameObject;
-        GameObject chowComboGameObject = button.transform.parent.parent.gameObject;
-
-        ChowComboOne.SetActive(false);
-        ChowComboTwo.SetActive(false);
-        ChowComboThree.SetActive(false);
-
-        playerManager.hand.Add(this.DrawTile());
-        this.ConvertLocalBonusTiles();
-
-        this.InstantiateLocalHand();
-        this.InstantiateLocalOpenTiles();
-    }
-
+    
 
     /// <summary>
     /// Called when the local player wants to select a tile
@@ -1576,6 +1472,171 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Hashtable ht = new Hashtable();
         ht.Add(NextPlayerPropKey, nextPlayer);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
+    #endregion
+
+    #region UI Methods
+
+    /// <summary>
+    /// Called when the player can chow
+    /// </summary>
+    public void ChowUI(List<object[]> chowCombos) {
+        for (int i = 0; i < chowCombos.Count; i++) {
+
+            // TODO: Might be better to implement a dictionary
+            GameObject chowComboGameObject;
+            if (i == 0) {
+                chowComboGameObject = ChowComboOne;
+            } else if (i == 1) {
+                chowComboGameObject = ChowComboTwo;
+            } else {
+                chowComboGameObject = ChowComboThree;
+            }
+
+            Transform spritesPanel = chowComboGameObject.transform.GetChild(0);
+
+            // Instantiate the tile sprites
+            for (int j = 0; j < 3; j++) {
+                object[] tileAndStringArray = chowCombos[i];
+                Transform imageTransform = spritesPanel.GetChild(j);
+                Image image = imageTransform.GetComponent<Image>();
+                image.sprite = spritesDict[(Tile)tileAndStringArray[j]];
+
+                // The drawn/discarded tile is painted yellow
+                if (j == 0 && ((string)tileAndStringArray[3]).Equals("First") || j == 1 && ((string)tileAndStringArray[3]).Equals("Second") || j == 2 && ((string)tileAndStringArray[3]).Equals("Third")) {
+                    image.color = new Color(1f, 1f, 0f);
+                }
+
+            }
+            ChowComboOne.SetActive(true);
+        }
+    }
+
+
+    /// <summary>
+    /// Called when "Ok" is clicked for Chow Combo
+    /// </summary>
+    public void OnChowOk() {
+        GameObject button = EventSystem.current.currentSelectedGameObject;
+        GameObject chowComboGameObject = button.transform.parent.parent.gameObject;
+        object[] tileAndStringArray;
+
+        ChowComboOne.SetActive(false);
+        ChowComboTwo.SetActive(false);
+        ChowComboThree.SetActive(false);
+
+        // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
+        // chowCombo list. This was set up in ChowUI.
+        int index = (int)Char.GetNumericValue(chowComboGameObject.name[1]);
+        tileAndStringArray = chowCombos[index];
+
+        Tile otherTile;
+        Tile[] handTile = new Tile[2];
+
+        // TODO: A better way of doing this?
+        if (((string)tileAndStringArray[3]).Equals("First")) {
+            otherTile = (Tile)tileAndStringArray[0];
+            handTile[0] = (Tile)tileAndStringArray[1];
+            handTile[1] = (Tile)tileAndStringArray[2];
+
+        } else if (((string)tileAndStringArray[3]).Equals("Second")) {
+            otherTile = (Tile)tileAndStringArray[1];
+            handTile[0] = (Tile)tileAndStringArray[0];
+            handTile[1] = (Tile)tileAndStringArray[2];
+
+        } else if (((string)tileAndStringArray[3]).Equals("Third")) {
+            otherTile = (Tile)tileAndStringArray[2];
+            handTile[0] = (Tile)tileAndStringArray[0];
+            handTile[1] = (Tile)tileAndStringArray[1];
+        }
+
+        // Update discard tile properties to indicate to all players to remove the latest discard tile
+        Hashtable ht = new Hashtable();
+        ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        // Update both the player's hand and the combo tiles list
+        foreach (Tile tile in handTile) {
+            playerManager.hand.Remove(tile);
+            playerManager.bonusTiles.Add(tile);
+        }
+
+        playerManager.UpdateOpenTiles();
+        this.InstantiateLocalHand();
+        this.InstantiateLocalOpenTiles();
+    }
+
+
+    /// <summary>
+    /// Called when "Skip" button is clicked for Chow Combo
+    /// </summary>
+    public void OnChowSkip() {
+        ChowComboOne.SetActive(false);
+        ChowComboTwo.SetActive(false);
+        ChowComboThree.SetActive(false);
+
+        playerManager.hand.Add(this.DrawTile());
+        this.ConvertLocalBonusTiles();
+
+        this.InstantiateLocalHand();
+        this.InstantiateLocalOpenTiles();
+    }
+
+
+    /// <summary>
+    /// Called when the player can Pong
+    /// </summary>
+    public void PongUI(Tile discardTile) {
+        Transform spritesPanel = PongCombo.transform.GetChild(0);
+
+        // Instantiate the tile sprites
+        for (int i = 0; i < 3; i++) {
+            Transform imageTransform = spritesPanel.GetChild(i);
+            Image image = imageTransform.GetComponent<Image>();
+            image.sprite = spritesDict[discardTile];
+        }
+        PongCombo.SetActive(true);
+    }
+
+
+    /// <summary>
+    /// Called when "Ok" is clicked for Pong Combo
+    /// </summary>
+    public void PongOk() {
+        // Update MasterClient that the player want to Pong
+        PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+
+        PongCombo.SetActive(false);
+
+        // Update discard tile properties to indicate to all players to remove the latest discard tile
+        Hashtable ht = new Hashtable();
+        ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        // Update both the player's hand and the combo tiles list
+        for (int i = 0; i < 2; i++) {
+            playerManager.hand.Remove(latestDiscardTile);
+            playerManager.bonusTiles.Add(latestDiscardTile);
+        }
+
+        playerManager.UpdateOpenTiles();
+        this.InstantiateLocalHand();
+        this.InstantiateLocalOpenTiles();
+
+        // The local player automatically update that it is his turn
+        playerManager.myTurn = true;
+    }
+
+
+    /// <summary>
+    /// Called when "Skip" button is clicked for Pong Combo
+    /// </summary>
+    public void PongSkip() {
+        // Update MasterClient that the player doesn't want to Pong
+        PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+
+        PongCombo.SetActive(false);
     }
 
     #endregion
