@@ -609,6 +609,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
 
             if (latestDiscardTile.CanKong(playerManager.hand)) {
+                this.PongUI(latestDiscardTile);
                 this.KongUI(latestDiscardTile);
                 return;
             }
@@ -902,7 +903,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
-                this.PlayerStartNormalTurn();
+                this.OnPlayerTurn();
                 break;
 
             case EvPongKongUpdate:
@@ -1131,7 +1132,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called immediately when myTurn is set to true. The only times it is not called is when the East Wind makes the first move, or
     /// when the player Pong or Kong
     /// </summary>
-    public void PlayerStartNormalTurn() {
+    public void OnPlayerTurn() {
         if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
             // TODO: South Wind has to increase turn number so Turn doesn't stay at 1.
             return;
@@ -1154,12 +1155,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.ConvertLocalBonusTiles();
 
         if (hand[hand.Count - 1].CanKong(hand)) {
-            // Show hidden kong on right, centralised
+            this.KongUI(hand[hand.Count - 1]);
             return;
         }
 
         if (hand[hand.Count - 1].CanKong(playerManager.openTiles)) {
-            // Show hidden kong on right, centralised
+            this.KongUI(hand[hand.Count - 1]);
             return;
         }
 
@@ -1559,7 +1560,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Update both the player's hand and the combo tiles list
         foreach (Tile tile in handTile) {
             playerManager.hand.Remove(tile);
-            playerManager.bonusTiles.Add(tile);
+            playerManager.comboTiles.Add(tile);
         }
 
         playerManager.UpdateOpenTiles();
@@ -1615,12 +1616,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
         // Update both the player's hand and the combo tiles list. 2 tiles are removed from the player's hand and 3 tiles are
-        // added to bonus tiles.
+        // added to combo tiles.
         for (int i = 0; i < 2; i++) {
             playerManager.hand.Remove(latestDiscardTile);
-            playerManager.bonusTiles.Add(latestDiscardTile);
+            playerManager.comboTiles.Add(latestDiscardTile);
         }
-        playerManager.bonusTiles.Add(latestDiscardTile);
+        playerManager.comboTiles.Add(latestDiscardTile);
 
         playerManager.UpdateOpenTiles();
         this.InstantiateLocalHand();
@@ -1646,9 +1647,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can Kong
     /// </summary>
     public void KongUI(Tile discardTile) {
-        // Display the Pong UI as well
-        this.PongUI(discardTile);
-
         Transform spritesPanel = KongCombo.transform.GetChild(0);
 
         // Instantiate the tile sprites
@@ -1665,31 +1663,58 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when "Ok" is clicked for Kong Combo
     /// </summary>
     public void OnKongOk() {
-        // Update MasterClient that the player want to Pong
-        PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
-
         PongCombo.SetActive(false);
         KongCombo.SetActive(false);
+        List<Tile> hand = playerManager.hand;
+        List<Tile> openTiles = playerManager.openTiles;
+        Tile drawnTile = hand[hand.Count - 1];
 
-        // Update discard tile properties to indicate to all players to remove the latest discard tile
-        Hashtable ht = new Hashtable();
-        ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        if (!playerManager.myTurn) {
+            // 3 concealed tiles Kong
 
-        // Update both the player's hand and the combo tiles list. 3 tiles are removed from the player's hand and 4 tiles are
-        // added to bonus tiles.
-        for (int i = 0; i < 3; i++) {
-            playerManager.hand.Remove(latestDiscardTile);
-            playerManager.bonusTiles.Add(latestDiscardTile);
+            // Update MasterClient that the player want to Kong the discard tile
+            PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+
+            // Update discard tile properties to indicate to all players to remove the latest discard tile
+            Hashtable ht = new Hashtable();
+            ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+            PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+            // Update both the player's hand and the combo tiles list. 3 tiles are removed from the player's hand and 4 tiles are
+            // added to combo tiles.
+            for (int i = 0; i < 3; i++) {
+                hand.Remove(latestDiscardTile);
+                playerManager.comboTiles.Add(latestDiscardTile);
+            }
+            playerManager.comboTiles.Add(latestDiscardTile);
+
+            // The local player automatically update that it is his turn
+            playerManager.myTurn = true;
+
+        } else if (drawnTile.CanKong(hand)) {
+            // 4 concealed tiles Kong. TODO: Different type of tile instantiation.
+
+            // Update both the player's hand and the combo tiles list. 4 tiles are removed from the player's hand and 4 tiles are
+            // added to combo tiles.
+            for (int i = 0; i < 4; i++) {
+                hand.Remove(drawnTile);
+                playerManager.comboTiles.Add(drawnTile);
+            }
+
+        } else if (drawnTile.CanKong(openTiles)) {
+            // 1 concealed tile Kong
+
+            // Update both the player's hand and the combo tiles list. 1 tile is removed from the player's hand and 1 tile is
+            // added to combo tiles.
+            hand.Remove(drawnTile);
+            playerManager.comboTiles.Add(drawnTile);
         }
-        playerManager.bonusTiles.Add(latestDiscardTile);
-
-        playerManager.UpdateOpenTiles();
+        
+        // Always draw a tile regardless of Kong type
+        hand.Add(this.DrawTile());
+        this.ConvertLocalBonusTiles();
         this.InstantiateLocalHand();
-        this.InstantiateLocalOpenTiles();
-
-        // The local player automatically update that it is his turn
-        playerManager.myTurn = true;
+        this.InstantiateLocalOpenTiles();        
     }
 
 
