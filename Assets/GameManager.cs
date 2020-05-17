@@ -1138,6 +1138,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Tile tile = discardTileInfo.Item2;
         chowCombos = tile.ChowCombinations(hand);
 
+        foreach (object obj in chowCombos) {
+            Debug.LogError(obj);
+        }
+
         if (chowCombos.Count != 0) {
             this.ChowUI(chowCombos);
             return;
@@ -1476,6 +1480,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can chow
     /// </summary>
     public void ChowUI(List<object[]> chowCombos) {
+        Debug.LogError("ChowUI called");
+
         for (int i = 0; i < chowCombos.Count; i++) {
 
             // TODO: Might be better to implement a dictionary
@@ -1591,7 +1597,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             image.sprite = spritesDict[discardTile];
         }
         PongCombo.SetActive(true);
-        Debug.LogError("PongUI called");
     }
 
 
@@ -1650,6 +1655,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             image.sprite = spritesDict[discardTile];
         }
         KongCombo.SetActive(true);
+        Debug.LogError("KongUI called");
     }
 
 

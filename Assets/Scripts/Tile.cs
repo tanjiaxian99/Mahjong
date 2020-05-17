@@ -130,7 +130,7 @@ public class Tile : IEquatable<Tile> {
         object[] combo;
 
         // Only Character, Dot and Bamboo suits can chow
-        if (this.suit != Suit.Character || this.suit != Suit.Dot || this.suit != Suit.Bamboo) {
+        if (this.suit != Suit.Character && this.suit != Suit.Dot && this.suit != Suit.Bamboo) {
             return combinations;
         }
 
