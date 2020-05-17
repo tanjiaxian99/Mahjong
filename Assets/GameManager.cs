@@ -902,7 +902,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
-                this.PlayerStartTurn();
+                this.PlayerStartNormalTurn();
                 break;
 
             case EvPongKongUpdate:
@@ -1129,9 +1129,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     /// <summary>
     /// Called immediately when myTurn is set to true. The only times it is not called is when the East Wind makes the first move, or
-    /// when the player Chow/Pong/Kong
+    /// when the player Pong or Kong
     /// </summary>
-    public void PlayerStartTurn() {
+    public void PlayerStartNormalTurn() {
         if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
             // TODO: South Wind has to increase turn number so Turn doesn't stay at 1.
             return;
@@ -1588,7 +1588,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can Pong
     /// </summary>
     public void PongUI(Tile discardTile) {
-        Transform spritesPanel = PongCombo.transform.GetChild(0);
+        Transform spritesPanel = KongCombo.transform.GetChild(0);
 
         // Instantiate the tile sprites
         for (int i = 0; i < 3; i++) {
@@ -1596,29 +1596,31 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Image image = imageTransform.GetComponent<Image>();
             image.sprite = spritesDict[discardTile];
         }
-        PongCombo.SetActive(true);
+        KongCombo.SetActive(true);
     }
 
 
     /// <summary>
     /// Called when "Ok" is clicked for Pong Combo
     /// </summary>
-    public void PongOk() {
+    public void OnPongOk() {
         // Update MasterClient that the player want to Pong
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
-        PongCombo.SetActive(false);
+        KongCombo.SetActive(false);
 
         // Update discard tile properties to indicate to all players to remove the latest discard tile
         Hashtable ht = new Hashtable();
         ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
-        // Update both the player's hand and the combo tiles list
+        // Update both the player's hand and the combo tiles list. 2 tiles are removed from the player's hand and 3 tiles are
+        // added to bonus tiles.
         for (int i = 0; i < 2; i++) {
             playerManager.hand.Remove(latestDiscardTile);
             playerManager.bonusTiles.Add(latestDiscardTile);
         }
+        playerManager.bonusTiles.Add(latestDiscardTile);
 
         playerManager.UpdateOpenTiles();
         this.InstantiateLocalHand();
@@ -1632,11 +1634,74 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Called when "Skip" button is clicked for Pong Combo
     /// </summary>
-    public void PongSkip() {
+    public void OnPongSkip() {
+        // Update MasterClient that the player doesn't want to Pong
+        PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+
+        KongCombo.SetActive(false);
+    }
+
+
+    /// <summary>
+    /// Called when the player can Kong
+    /// </summary>
+    public void KongUI(Tile discardTile) {
+        // Display the Pong UI as well
+        this.PongUI(discardTile);
+
+        Transform spritesPanel = KongCombo.transform.GetChild(0);
+
+        // Instantiate the tile sprites
+        for (int i = 0; i < 4; i++) {
+            Transform imageTransform = spritesPanel.GetChild(i);
+            Image image = imageTransform.GetComponent<Image>();
+            image.sprite = spritesDict[discardTile];
+        }
+        KongCombo.SetActive(true);
+    }
+
+
+    /// <summary>
+    /// Called when "Ok" is clicked for Kong Combo
+    /// </summary>
+    public void OnKongOk() {
+        // Update MasterClient that the player want to Pong
+        PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+
+        PongCombo.SetActive(false);
+        KongCombo.SetActive(false);
+
+        // Update discard tile properties to indicate to all players to remove the latest discard tile
+        Hashtable ht = new Hashtable();
+        ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        // Update both the player's hand and the combo tiles list. 3 tiles are removed from the player's hand and 4 tiles are
+        // added to bonus tiles.
+        for (int i = 0; i < 3; i++) {
+            playerManager.hand.Remove(latestDiscardTile);
+            playerManager.bonusTiles.Add(latestDiscardTile);
+        }
+        playerManager.bonusTiles.Add(latestDiscardTile);
+
+        playerManager.UpdateOpenTiles();
+        this.InstantiateLocalHand();
+        this.InstantiateLocalOpenTiles();
+
+        // The local player automatically update that it is his turn
+        playerManager.myTurn = true;
+    }
+
+
+    /// <summary>
+    /// Called when "Skip" button is clicked for Kong Combo
+    /// </summary>
+    public void OnKongSkip() {
         // Update MasterClient that the player doesn't want to Pong
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
         PongCombo.SetActive(false);
+        KongCombo.SetActive(false);
     }
 
     #endregion
