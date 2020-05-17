@@ -647,14 +647,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         Player firstPlayer = playOrder[0];
         PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { firstPlayer.ActorNumber } }, SendOptions.SendReliable);
-
-        //// Update Room Custom Properties with the next player
-        //Hashtable ht = new Hashtable();
-        //ht.Add(NextPlayerPropKey, playOrder[0]);
-        //PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
     public void OnTurnCompleted(int turn) {
+        Debug.LogError("turn completed");
         this.StartTurn();
     }
 
@@ -921,7 +917,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     }
 
                     if (allFalse) {
-                        Debug.LogError("called second");
                         Player nextPlayer = (Player)PhotonNetwork.CurrentRoom.CustomProperties[NextPlayerPropKey];
                         PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { nextPlayer.ActorNumber } }, SendOptions.SendReliable);
                     }
@@ -1130,9 +1125,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void OnPlayerTurn() {
         if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
-            // TODO: South Wind has to increase turn number so Turn doesn't stay at 1.
             return;
         }
+
+        // Ensure turnManager.Turn is greater than 1 when the East Wind calls OnPlayerTurn() again.
+        this.StartTurn();
 
         List<Tile> hand = playerManager.hand;
 
@@ -1465,7 +1462,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             nextPlayer = playOrder[localPlayerPos + 1];
         }
 
-        Debug.LogError("called first");
         // Update Room Custom Properties with the next player
         Hashtable ht = new Hashtable();
         ht.Add(NextPlayerPropKey, nextPlayer);
