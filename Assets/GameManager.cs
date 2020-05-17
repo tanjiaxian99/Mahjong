@@ -831,7 +831,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// while the rest receives 13
     /// </summary>
     public void DistributeTiles() {
-        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
+        List<Tile> tiles = (List<Tile>) PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
         foreach (Tile tile in tiles) {
         }
@@ -846,7 +846,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 tiles.Remove(tiles[randomIndex]);
 
                 // Don't give the 14th tile if the player is not the East Wind
-                if (i == 12 && (PlayerManager.Wind)player.CustomProperties[PlayerWindPropKey] != PlayerManager.Wind.EAST) {
+                if (i == 12 && (PlayerManager.Wind) windsDict[player.ActorNumber] != PlayerManager.Wind.EAST) {
                     break;
                 }
             }
@@ -1582,7 +1582,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can Pong
     /// </summary>
     public void PongUI(Tile discardTile) {
-        Transform spritesPanel = KongCombo.transform.GetChild(0);
+        Transform spritesPanel = PongCombo.transform.GetChild(0);
 
         // Instantiate the tile sprites
         for (int i = 0; i < 3; i++) {
@@ -1590,7 +1590,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Image image = imageTransform.GetComponent<Image>();
             image.sprite = spritesDict[discardTile];
         }
-        KongCombo.SetActive(true);
+        PongCombo.SetActive(true);
+        Debug.LogError("PongUI called");
     }
 
 
@@ -1601,7 +1602,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Update MasterClient that the player want to Pong
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
-        KongCombo.SetActive(false);
+        PongCombo.SetActive(false);
 
         // Update discard tile properties to indicate to all players to remove the latest discard tile
         Hashtable ht = new Hashtable();
@@ -1632,7 +1633,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Update MasterClient that the player doesn't want to Pong
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
-        KongCombo.SetActive(false);
+        PongCombo.SetActive(false);
     }
 
 

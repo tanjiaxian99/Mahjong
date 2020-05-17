@@ -5313,7 +5313,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 896224813}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1994596580}
+        m_MethodName: OnOk
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &896224813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11027,7 +11038,7 @@ MonoBehaviour:
   ChowComboOne: {fileID: 1452043091}
   ChowComboTwo: {fileID: 188117493}
   ChowComboThree: {fileID: 638154850}
-  tileSprite: {fileID: 21300000, guid: ddc19321f201c424daf67c1a44522026, type: 3}
+  tileSprite: {fileID: 21300000, guid: 3f348d2a54775884ca0dfcc3d473b075, type: 3}
 --- !u!1 &2014854035
 GameObject:
   m_ObjectHideFlags: 0

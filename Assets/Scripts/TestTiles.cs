@@ -58,8 +58,10 @@ public class TestTiles : MonoBehaviour {
 
         ChowComboOne.SetActive(true);
 
+    }
 
-
+    public void OnOk() {
+        ChowComboOne.SetActive(false);
     }
 }
 
