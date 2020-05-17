@@ -581,7 +581,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             playerManager.PlayerWind = wind;
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
-            Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>) PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
+            Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
 
             // Item1 is set to -1 by a player to inform all players to remove the last discard tile. See OnChowOk
             if (discardTileInfo.Item1 == -1) {
@@ -615,13 +615,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
 
             // Inform Master Client that the local player can't Pong/Kong
-            PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient}, SendOptions.SendReliable);
-            
-
-        } else if (propertiesThatChanged.ContainsKey(NextPlayerPropKey)) {
-            GameObject lastDiscardTile = GameObject.FindGameObjectWithTag("Discard");
-            Player nextPlayer = (Player) PhotonNetwork.CurrentRoom.CustomProperties[NextPlayerPropKey];
-
+            PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
         }
     } 
 
@@ -914,8 +908,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     return;
                 }
 
-                bool PongKongUpdate = (bool)photonEvent.CustomData;
-                PongKongUpdateList.Add(PongKongUpdate);
+                bool pongKongUpdate = (bool)photonEvent.CustomData;
+                PongKongUpdateList.Add(pongKongUpdate);
 
                 // If none of the players can/wants to Pong/Kong, start the next player's turn.
                 bool allFalse = true;
@@ -926,15 +920,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                         }
                     }
 
+                    if (allFalse) {
+                        Debug.LogError("called second");
+                        Player nextPlayer = (Player)PhotonNetwork.CurrentRoom.CustomProperties[NextPlayerPropKey];
+                        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { nextPlayer.ActorNumber } }, SendOptions.SendReliable);
+                    }
+
                     PongKongUpdateList.Clear();
                 }
-
-                if (allFalse) {
-                    Player nextPlayer = (Player) PhotonNetwork.CurrentRoom.CustomProperties[NextPlayerPropKey];
-                    PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { nextPlayer.ActorNumber } }, SendOptions.SendReliable);
-                }
-                allFalse = true;
-
                 break;
         }
     }
@@ -1202,10 +1195,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     
                     this.InstantiateLocalHand();
                     this.DiscardTile(tile, hitObject.transform.position.x);
-
-                    // TODO: Integrate more turnManager.SendMove
-                    turnManager.SendMove(null, true);
                     this.nextPlayersTurn();
+                    // TODO: Integrate turnManager.SendMove?
                 }
             }
         }
@@ -1474,6 +1465,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             nextPlayer = playOrder[localPlayerPos + 1];
         }
 
+        Debug.LogError("called first");
         // Update Room Custom Properties with the next player
         Hashtable ht = new Hashtable();
         ht.Add(NextPlayerPropKey, nextPlayer);
@@ -1642,7 +1634,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void OnPongSkip() {
         // Update MasterClient that the player doesn't want to Pong
-        PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+        PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
         KongCombo.SetActive(false);
     }
@@ -1729,7 +1721,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void OnKongSkip() {
         if (!playerManager.myTurn) {
             // Update MasterClient that the player doesn't want to Pong. Only applicable for 3 concealed tiles Kong.
-            PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
         }
 
         PongCombo.SetActive(false);
