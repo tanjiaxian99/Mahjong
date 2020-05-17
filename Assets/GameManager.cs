@@ -1136,6 +1136,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void OnChowOk() {
         GameObject button = EventSystem.current.currentSelectedGameObject;
         GameObject chowComboGameObject = button.transform.parent.parent.gameObject;
+        chowComboGameObject.SetActive(false);
         object[] tileAndStringArray;
 
         // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
@@ -1184,7 +1185,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when "Skip" button is clicked for Chow Combo
     /// </summary>
     public void OnChowSkip() {
-      
+        GameObject button = EventSystem.current.currentSelectedGameObject;
+        GameObject chowComboGameObject = button.transform.parent.parent.gameObject;
+        chowComboGameObject.SetActive(false);
+
+        playerManager.hand.Add(this.DrawTile());
+        this.ConvertLocalBonusTiles();
+
+        this.InstantiateLocalHand();
+        this.InstantiateLocalOpenTiles();
     }
 
 
@@ -1248,11 +1257,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
         
         playerManager.UpdateOpenTiles();
-
-        // Update the list of open tiles on the local player's custom properties
-        Hashtable ht = new Hashtable();
-        ht.Add(OpenTilesPropKey, playerManager.openTiles);
-        PhotonNetwork.SetPlayerCustomProperties(ht);
     }
 
 
@@ -1393,6 +1397,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Instantiate the open tiles of the local player. Called when there is an update to the bonusTiles/comboTiles list.
     /// </summary>
     public void InstantiateLocalOpenTiles() {
+        // Update the list of open tiles on the local player's custom properties
+        Hashtable ht = new Hashtable();
+        ht.Add(OpenTilesPropKey, playerManager.openTiles);
+        PhotonNetwork.SetPlayerCustomProperties(ht);
+
         int openSize = playerManager.openTiles.Count;
         float xSepOpen = 0.83f * 0.5f;
         float xPosOpen = -(openSize - 1) / 2f * xSepOpen;
