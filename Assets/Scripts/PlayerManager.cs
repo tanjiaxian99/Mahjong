@@ -27,6 +27,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public bool myTurn = false;
 
+    public bool canTouchHandTiles = false;
+
     #endregion
 
     #region MonoBehaviour Callbacks

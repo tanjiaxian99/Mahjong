@@ -484,8 +484,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
     void Update() {
-        // The local player has done a move only when it is his turn and he clicked the left mouse button.
-        if (playerManager.myTurn && Input.GetMouseButtonDown(0)) {
+        if (playerManager.myTurn && playerManager.canTouchHandTiles && Input.GetMouseButtonDown(0)) {
             this.OnLocalPlayerMove();
         }
         
@@ -896,6 +895,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
+                playerManager.canTouchHandTiles = true;
                 this.OnPlayerTurn();
                 break;
 
@@ -1138,25 +1138,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Tile tile = discardTileInfo.Item2;
         chowCombos = tile.ChowCombinations(hand);
 
-        foreach (object obj in chowCombos) {
-            Debug.LogError(obj);
-        }
-
         if (chowCombos.Count != 0) {
             this.ChowUI(chowCombos);
             return;
         }
 
-
         hand.Add(this.DrawTile());
         this.ConvertLocalBonusTiles();
+        this.InstantiateLocalHand();
+        this.InstantiateLocalOpenTiles();
 
         if (hand[hand.Count - 1].CanKong(hand)) {
+            Debug.LogError("Hand can kong");
             this.KongUI(hand[hand.Count - 1]);
             return;
         }
 
         if (hand[hand.Count - 1].CanKong(playerManager.openTiles)) {
+            Debug.LogError("Open tiles can kong");
             this.KongUI(hand[hand.Count - 1]);
             return;
         }
@@ -1192,6 +1191,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 if (playerManager.hand.Contains(tile)) {
                     playerManager.myTurn = false;
+                    playerManager.canTouchHandTiles = false;
                     playerManager.hand.Remove(tile);
                     
                     this.InstantiateLocalHand();
@@ -1480,8 +1480,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can chow
     /// </summary>
     public void ChowUI(List<object[]> chowCombos) {
-        Debug.LogError("ChowUI called");
-
         for (int i = 0; i < chowCombos.Count; i++) {
 
             // TODO: Might be better to implement a dictionary
@@ -1511,6 +1509,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
             ChowComboZero.SetActive(true);
         }
+
+        // Disable the ability to interact with hand tiles
+        playerManager.canTouchHandTiles = false;
     }
 
 
@@ -1565,6 +1566,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         playerManager.UpdateOpenTiles();
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
+
+        // Return the ability to interact with hand tiles
+        playerManager.canTouchHandTiles = true;
     }
 
 
@@ -1581,6 +1585,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
+
+        // Return the ability to interact with hand tiles
+        playerManager.canTouchHandTiles = true;
     }
 
 
@@ -1627,7 +1634,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalOpenTiles();
 
         // The local player automatically update that it is his turn
-        playerManager.myTurn = true;
+        playerManager.canTouchHandTiles = true;
     }
 
 
@@ -1655,7 +1662,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             image.sprite = spritesDict[discardTile];
         }
         KongCombo.SetActive(true);
-        Debug.LogError("KongUI called");
+
+        // Disable the ability to interact with hand tiles
+        playerManager.canTouchHandTiles = false;
     }
 
 
@@ -1665,6 +1674,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void OnKongOk() {
         PongCombo.SetActive(false);
         KongCombo.SetActive(false);
+
         List<Tile> hand = playerManager.hand;
         List<Tile> openTiles = playerManager.openTiles;
         Tile drawnTile = hand[hand.Count - 1];
@@ -1688,9 +1698,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
             playerManager.comboTiles.Add(latestDiscardTile);
 
-            // The local player automatically update that it is his turn
-            playerManager.myTurn = true;
-
         } else if (drawnTile.CanKong(hand)) {
             // 4 concealed tiles Kong. TODO: Different type of tile instantiation.
 
@@ -1708,13 +1715,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // added to combo tiles.
             hand.Remove(drawnTile);
             playerManager.comboTiles.Add(drawnTile);
-        }
-        
+        } 
+
         // Always draw a tile regardless of Kong type
         hand.Add(this.DrawTile());
         this.ConvertLocalBonusTiles();
         this.InstantiateLocalHand();
-        this.InstantiateLocalOpenTiles();        
+        this.InstantiateLocalOpenTiles();
+
+        // Return the ability to interact with hand tiles
+        playerManager.canTouchHandTiles = true;
     }
 
 
@@ -1722,6 +1732,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when "Skip" button is clicked for Kong Combo
     /// </summary>
     public void OnKongSkip() {
+        List<Tile> hand = playerManager.hand;
+        List<Tile> openTiles = playerManager.openTiles;
+        Tile drawnTile = hand[hand.Count - 1];
+
         if (!playerManager.myTurn) {
             // Update MasterClient that the player doesn't want to Pong. Only applicable for 3 concealed tiles Kong.
             PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
@@ -1729,6 +1743,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         PongCombo.SetActive(false);
         KongCombo.SetActive(false);
+
+        // Return the ability to interact with hand tiles only for 1 and 4 concealed tiles Kong.
+        if (drawnTile.CanKong(hand) || drawnTile.CanKong(openTiles)) {
+            playerManager.canTouchHandTiles = true;
+        }
     }
 
     #endregion
