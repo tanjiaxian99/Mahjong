@@ -1559,7 +1559,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Update both the player's hand and the combo tiles list
         foreach (Tile tile in handTile) {
             playerManager.hand.Remove(tile);
-            playerManager.comboTiles.Add(tile);
+        }
+
+        for (int i = 0; i < 3; i++) {
+            playerManager.comboTiles.Add((Tile) tileAndStringArray[i]);
         }
 
         playerManager.UpdateOpenTiles();
