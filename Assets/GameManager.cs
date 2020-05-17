@@ -68,6 +68,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     private List<object[]> chowCombos;
 
+    /// <summary>
+    /// A list used by MasterClient to track whether players can/want to Pong/Kong
+    /// </summary>
+    public List<bool> PongKongUpdateList = new List<bool>();
+
     #endregion
 
     #region OnEvent Fields
@@ -89,11 +94,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public const byte EvInitialInstantiation = 6;
 
-
     /// <summary>
-    /// The Player Turn event message byte. Used internally to track if it is the local player's turn.
+    /// The Player Turn event message byte. Used internally by MasterClient to update the next player on his turn.
     /// </summary>
     public const byte EvPlayerTurn = 11;
+
+    /// <summary>
+    /// The Pong Kong Update event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
+    /// the latest discard tile.
+    /// </summary>
+    public const byte EvPongKongUpdate = 12;
+
+
 
 
     /// <summary>
@@ -130,6 +142,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// The local player's open tiles
     /// </summary>
     public static readonly string OpenTilesPropKey = "ot";
+
+    /// <summary>
+    /// The next player to play
+    /// </summary>
+    public static readonly string NextPlayerPropKey = "np";
 
     #endregion
 
@@ -548,7 +565,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) {
         if (propertiesThatChanged.ContainsKey(WindDictPropKey)) {
-            windsDict = (Dictionary<int, int>) PhotonNetwork.CurrentRoom.CustomProperties[WindDictPropKey];
+            windsDict = (Dictionary<int, int>)PhotonNetwork.CurrentRoom.CustomProperties[WindDictPropKey];
             PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[PhotonNetwork.LocalPlayer.ActorNumber];
 
             // Update local player's custom properties
@@ -579,8 +596,28 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
 
             this.InstantiateRemoteDiscardTile(player, tile, hPos);
+
+            // Check for Pong/Kong against discard tile
+            if (tile.CanPong(playerManager.hand)) {
+                this.PongUI();
+                return;
+            }
+
+            if (tile.CanKong(playerManager.hand)) {
+                this.KongUI();
+                return;
+            }
+
+            // Inform Master Client that the local player can't Pong/Kong
+            PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient}, SendOptions.SendReliable);
+            
+
+        } else if (propertiesThatChanged.ContainsKey(NextPlayerPropKey)) {
+            GameObject lastDiscardTile = GameObject.FindGameObjectWithTag("Discard");
+            Player nextPlayer = (Player) PhotonNetwork.CurrentRoom.CustomProperties[NextPlayerPropKey];
+
         }
-    }
+    } 
 
 
     /// <summary>
@@ -607,7 +644,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Debug.LogFormat("Turn {0} has begun", turn);
 
         Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
-        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { playOrder[0].ActorNumber } }, SendOptions.SendReliable);
+
+        // Update Room Custom Properties with the next player
+        Hashtable ht = new Hashtable();
+        ht.Add(NextPlayerPropKey, playOrder[0]);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
     public void OnTurnCompleted(int turn) {
@@ -857,6 +898,34 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
                 this.PlayerStartTurn();
+                break;
+
+            case EvPongKongUpdate:
+                if (!PhotonNetwork.IsMasterClient) {
+                    return;
+                }
+
+                bool PongKongUpdate = (bool)photonEvent.CustomData;
+                PongKongUpdateList.Add(PongKongUpdate);
+
+                // If none of the players can/wants to Pong/Kong, start the next player's turn.
+                bool allFalse = true;
+                if (PongKongUpdateList.Count == 3) {
+                    foreach (bool update in PongKongUpdateList) {
+                        if (update) {
+                            allFalse = false;
+                        }
+                    }
+
+                    PongKongUpdateList.Clear();
+                }
+
+                if (allFalse) {
+                    Player nextPlayer = (Player) PhotonNetwork.CurrentRoom.CustomProperties[NextPlayerPropKey];
+                    PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { nextPlayer.ActorNumber } }, SendOptions.SendReliable);
+                }
+                allFalse = true;
+
                 break;
         }
     }
@@ -1136,8 +1205,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void OnChowOk() {
         GameObject button = EventSystem.current.currentSelectedGameObject;
         GameObject chowComboGameObject = button.transform.parent.parent.gameObject;
-        chowComboGameObject.SetActive(false);
         object[] tileAndStringArray;
+
+        ChowComboOne.SetActive(false);
+        ChowComboTwo.SetActive(false);
+        ChowComboThree.SetActive(false);
 
         // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
         // chowCombo list. This was set up in ChowUI.
@@ -1187,7 +1259,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void OnChowSkip() {
         GameObject button = EventSystem.current.currentSelectedGameObject;
         GameObject chowComboGameObject = button.transform.parent.parent.gameObject;
-        chowComboGameObject.SetActive(false);
+
+        ChowComboOne.SetActive(false);
+        ChowComboTwo.SetActive(false);
+        ChowComboThree.SetActive(false);
 
         playerManager.hand.Add(this.DrawTile());
         this.ConvertLocalBonusTiles();
@@ -1497,7 +1572,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             nextPlayer = playOrder[localPlayerPos + 1];
         }
 
-        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { nextPlayer.ActorNumber } }, SendOptions.SendReliable);
+        // Update Room Custom Properties with the next player
+        Hashtable ht = new Hashtable();
+        ht.Add(NextPlayerPropKey, nextPlayer);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
     #endregion
