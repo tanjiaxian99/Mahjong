@@ -563,7 +563,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             // Item1 is set to -1 by a player to inform all players to remove the last discard tile. See OnChowOk
             if (discardTile.Item1 == -1) {
-                this.RemoveDiscardTile();
+                // Remove the last discard tile
+                GameObject lastDiscardTile = GameObject.FindGameObjectWithTag("Discard");
+                Destroy(lastDiscardTile);
                 return;
             }
 
@@ -1417,11 +1419,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     // TODO: detect changes in CustomProperties which contains the word discardtilepropkey
     public void DiscardTile(Tile tile, float xPos) {
-        // Add the discarded tile to the DiscardTileList
+        // Update the properties of the discard tile
         Hashtable ht = new Hashtable();
         Tuple<int, Tile, float> tuple = new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, tile, xPos);
         ht.Add(DiscardTilePropKey, tuple);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        // Remove the tag of the tile discarded before the current tile
+        GameObject previousDiscard = GameObject.FindGameObjectWithTag("Discard");
+        previousDiscard.tag = "Untagged";
 
         GameObject tileGameObject;
         // For the edge case where the local client aspect ratio is 4:3 and the 14th tile is discarded
@@ -1432,6 +1438,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
         
         tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        // Tagging is necessary to reference the last tile discarded when Chow/Pong/Kong is called
+        tileGameObject.tag = "Discard";
 
         foreach (Transform child in tileGameObject.transform) {
             child.GetComponent<MeshCollider>().convex = true;
@@ -1723,8 +1731,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         }
 
+        // Remove the tag of the tile discarded before the current tile
+        GameObject previousDiscard = GameObject.FindGameObjectWithTag("Discard");
+        previousDiscard.tag = "Untagged";
+
         GameObject tileGameObject = Instantiate(tilesDict[discardedTile], position, rotation);
         tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        // Tagging is necessary to reference the last tile discarded when Chow/Pong/Kong is called
+        tileGameObject.tag = "Discard";
 
         foreach (Transform child in tileGameObject.transform) {
             child.GetComponent<MeshCollider>().convex = true;
