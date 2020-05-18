@@ -1502,10 +1502,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Image image = imageTransform.GetComponent<Image>();
                 image.sprite = spritesDict[(Tile)tileAndStringArray[j]];
 
-                // The drawn/discarded tile is painted yellow
+                // The drawn/discarded tile is painted yellow. The other tiles are updated with white.
                 if (j == 0 && ((string)tileAndStringArray[3]).Equals("First") || j == 1 && ((string)tileAndStringArray[3]).Equals("Second") || j == 2 && ((string)tileAndStringArray[3]).Equals("Third")) {
                     image.color = new Color(1f, 1f, 0f);
-                    Debug.LogError(image.sprite.name);
+                } else {
+                    image.color = new Color(1f, 1f, 1f);
                 }
 
             }
