@@ -158,21 +158,18 @@ public class Tile : IEquatable<Tile> {
         // The tile forms a sequence as the first tile
         if (hand.Contains(tilePlusOne) && hand.Contains(tilePlusTwo)) {
             combo = new object[] { this, tilePlusOne, tilePlusTwo, "First"};
-            Debug.LogError("Chow combo first");
             combinations.Add(combo);
         }
 
         // The tile forms a sequence as the middle tile
         if (hand.Contains(tileMinusOne) && hand.Contains(tilePlusOne)) {
             combo = new object[] { tileMinusOne, this, tilePlusOne, "Second" };
-            Debug.LogError("Chow combo second");
             combinations.Add(combo);
         }
 
         // The tile forms a sequence as the last tile
         if (hand.Contains(tileMinusTwo) && hand.Contains(tileMinusOne)) {
             combo = new object[] { tileMinusTwo, tileMinusOne, this, "Third" };
-            Debug.LogError("Chow combo third");
             combinations.Add(combo);
         }
 
