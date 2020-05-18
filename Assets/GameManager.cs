@@ -832,26 +832,59 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void DistributeTiles() {
         List<Tile> tiles = (List<Tile>) PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
-        foreach (Tile tile in tiles) {
-        }
-
+        // DEBUG
         foreach (Player player in PhotonNetwork.PlayerList) {
-            List<Tile> playerTiles = new List<Tile>();
+            if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.EAST) {
+                List<Tile> playerTiles = new List<Tile>();
 
-            for (int i = 0; i < 14; i++) {
-                // Choose a tile randomly from the complete tiles list and add it to the player's tiles
-                int randomIndex = RandomNumber(tiles.Count());
-                playerTiles.Add(tiles[randomIndex]);
-                tiles.Remove(tiles[randomIndex]);
-
-                // Don't give the 14th tile if the player is not the East Wind
-                if (i == 12 && (PlayerManager.Wind) windsDict[player.ActorNumber] != PlayerManager.Wind.EAST) {
-                    break;
+                for (int i = 0; i < 3; i++) {
+                    playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                    playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                    playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+                    playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 }
-            }
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
 
-            PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+            
+            } else {
+                List<Tile> playerTiles = new List<Tile>();
+                for (int i = 0; i < 14; i++) {
+                    // Choose a tile randomly from the complete tiles list and add it to the player's tiles
+                    int randomIndex = RandomNumber(tiles.Count());
+                    playerTiles.Add(tiles[randomIndex]);
+                    tiles.Remove(tiles[randomIndex]);
+
+                    // Don't give the 14th tile if the player is not the East Wind
+                    if (i == 12 && (PlayerManager.Wind)windsDict[player.ActorNumber] != PlayerManager.Wind.EAST) {
+                        break;
+                    }
+                }
+
+                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+            }
         }
+
+            
+
+        //foreach (Player player in PhotonNetwork.PlayerList) {
+        //    List<Tile> playerTiles = new List<Tile>();
+
+        //    for (int i = 0; i < 14; i++) {
+        //        // Choose a tile randomly from the complete tiles list and add it to the player's tiles
+        //        int randomIndex = RandomNumber(tiles.Count());
+        //        playerTiles.Add(tiles[randomIndex]);
+        //        tiles.Remove(tiles[randomIndex]);
+
+        //        // Don't give the 14th tile if the player is not the East Wind
+        //        if (i == 12 && (PlayerManager.Wind) windsDict[player.ActorNumber] != PlayerManager.Wind.EAST) {
+        //            break;
+        //        }
+        //    }
+
+        //    PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+        //}
 
         // Reinsert updated tiles list into Room Custom Properties
         Hashtable ht = new Hashtable();
@@ -1150,10 +1183,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalOpenTiles();
 
         if (hand[hand.Count - 1].CanConcealedKong(hand)) {
-            Debug.LogError("Hand can kong. Here are the tiles in the player's hand:");
-            foreach (Tile tiled in hand) {
-                Debug.LogError(tiled);
-            }
             this.KongUI(hand[hand.Count - 1]);
             return;
         }
@@ -1244,7 +1273,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht.Add(WallTileListPropKey, tiles);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
-        return tile;
+        // DEBUG
+        return new Tile(Tile.Suit.Character, Tile.Rank.One);
+
+        //return tile;
     }
 
 
@@ -1734,6 +1766,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Return the ability to interact with hand tiles
         playerManager.canTouchHandTiles = true;
+        playerManager.myTurn = true;
     }
 
 
