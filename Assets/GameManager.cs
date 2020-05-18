@@ -1508,7 +1508,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 }
 
             }
-            ChowComboZero.SetActive(true);
+            chowComboGameObject.SetActive(true);
         }
 
         // Disable the ability to interact with hand tiles

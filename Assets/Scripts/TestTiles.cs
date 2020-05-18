@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun.Demo.PunBasics;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -39,13 +40,16 @@ public class TestTiles : MonoBehaviour {
             Instantiate(tile, new Vector3(xPos, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
             xPos += xSep;
         }
-        this.ShowChow();
+        //this.ShowChow();
+        this.TestChowCombinations();
     }
+
 
     // Update is called once per frame
     void Update() {
 
     }
+
 
     public void ShowChow() {
         Transform spritesPanel = ChowComboOne.transform.GetChild(0);
@@ -60,8 +64,21 @@ public class TestTiles : MonoBehaviour {
 
     }
 
+
     public void OnOk() {
         ChowComboOne.SetActive(false);
+    }
+
+
+    public void TestChowCombinations() {
+        PlayerManager playerManager = new PlayerManager();
+
+        playerManager.hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+        playerManager.hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+        Tile discardTile = new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine);
+
+        List<object[]> chowCombos = discardTile.ChowCombinations(playerManager.hand);
+        Debug.Log(chowCombos);
     }
 }
 

@@ -212,7 +212,6 @@ public class Tile : IEquatable<Tile> {
     /// <summary>
     /// Returns true if the player can perform 4 concealed tiles Kong
     /// </summary>
-
     public bool CanConcealedKong(List<Tile> tiles) {
         return SameNumberOfTiles(tiles, 4);
     }
