@@ -80,7 +80,7 @@ public class Tile : IEquatable<Tile> {
         }
 
         if (rank < Rank.One || rank > Rank.Nine) {
-            Debug.LogError("The tile's rank is less than one or greater than nine");
+            //Debug.LogError("The tile's rank is less than one or greater than nine");
             return;
         }
 
