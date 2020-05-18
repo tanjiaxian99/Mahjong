@@ -155,18 +155,21 @@ public class Tile : IEquatable<Tile> {
         // The tile forms a sequence as the first tile
         if (hand.Contains(tilePlusOne) && hand.Contains(tilePlusTwo)) {
             combo = new object[] { this, tilePlusOne, tilePlusTwo, "First"};
+            Debug.LogError("Chow combo first");
             combinations.Add(combo);
         }
 
         // The tile forms a sequence as the middle tile
         if (hand.Contains(tileMinusOne) && hand.Contains(tilePlusOne)) {
             combo = new object[] { tileMinusOne, this, tilePlusOne, "Second" };
+            Debug.LogError("Chow combo second");
             combinations.Add(combo);
         }
 
         // The tile forms a sequence as the last tile
         if (hand.Contains(tileMinusTwo) && hand.Contains(tileMinusOne)) {
             combo = new object[] { tileMinusTwo, tileMinusOne, this, "Third" };
+            Debug.LogError("Chow combo third");
             combinations.Add(combo);
         }
 
@@ -175,34 +178,43 @@ public class Tile : IEquatable<Tile> {
 
 
     /// <summary>
-    /// Returns true if the discard tile can be ponged, contingent on the player's hand.
+    /// Helper function. Returns true if the number of the object tile matches numberOfTiles. Used for Pong and Kong.
     /// </summary>
-    public bool CanPong(List<Tile> hand) {
+    public bool SameNumberOfTiles(List<Tile> tiles, int numberOfTiles) {
         int equalCount = 0;
 
-        foreach (Tile tile in hand) {
+        foreach (Tile tile in tiles) {
             if (this.Equals(tile)) {
                 equalCount++;
             }
         }
 
-        return equalCount == 2;
+        return equalCount == numberOfTiles;
     }
 
 
     /// <summary>
-    /// Returns true if the drawn/discard tile can be konged
+    /// Returns true if the player can Pong
     /// </summary>
-    public bool CanKong(List<Tile> tileList) {
-        int equalCount = 0;
+    public bool CanPong(List<Tile> hand) {
+        return SameNumberOfTiles(hand, 2);
+    }
 
-        foreach (Tile tile in tileList) {
-            if (this.Equals(tile)) {
-                equalCount++;
-            }
-        }
 
-        return equalCount == 3;
+    /// <summary>
+    /// Returns true if the player can perform 1 or 3 concealed tiles Kong
+    /// </summary>
+    public bool CanNormalKong(List<Tile> tiles) {
+        return SameNumberOfTiles(tiles, 3);
+    }
+
+
+    /// <summary>
+    /// Returns true if the player can perform 4 concealed tiles Kong
+    /// </summary>
+
+    public bool CanConcealedKong(List<Tile> tiles) {
+        return SameNumberOfTiles(tiles, 4);
     }
 
 

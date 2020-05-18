@@ -607,7 +607,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 return;
             }
 
-            if (latestDiscardTile.CanKong(playerManager.hand)) {
+            if (latestDiscardTile.CanNormalKong(playerManager.hand)) {
                 this.PongUI(latestDiscardTile);
                 this.KongUI(latestDiscardTile);
                 return;
@@ -1137,8 +1137,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
         Tile tile = discardTileInfo.Item2;
         chowCombos = tile.ChowCombinations(hand);
-
+        
         if (chowCombos.Count != 0) {
+            Debug.LogErrorFormat("There are {0} chow combinations.", chowCombos.Count);
             this.ChowUI(chowCombos);
             return;
         }
@@ -1148,13 +1149,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
-        if (hand[hand.Count - 1].CanKong(hand)) {
-            Debug.LogError("Hand can kong");
+        if (hand[hand.Count - 1].CanConcealedKong(hand)) {
+            Debug.LogError("Hand can kong. Here are the tiles in the player's hand:");
+            foreach (Tile tiled in hand) {
+                Debug.LogError(tiled);
+            }
             this.KongUI(hand[hand.Count - 1]);
             return;
         }
 
-        if (hand[hand.Count - 1].CanKong(playerManager.openTiles)) {
+        if (hand[hand.Count - 1].CanNormalKong(playerManager.openTiles)) {
             Debug.LogError("Open tiles can kong");
             this.KongUI(hand[hand.Count - 1]);
             return;
@@ -1527,8 +1531,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
         // chowCombo list. This was set up in ChowUI.
         int index = (int)Char.GetNumericValue(chowComboGameObject.name[11]);
-        Debug.LogError(index);
-        Debug.LogError(chowCombos.Count);
+        //Debug.LogError(index);
+        //Debug.LogError(chowCombos.Count);
         tileAndStringArray = chowCombos[index];
 
         Tile otherTile;
@@ -1701,7 +1705,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
             playerManager.comboTiles.Add(latestDiscardTile);
 
-        } else if (drawnTile.CanKong(hand)) {
+        } else if (drawnTile.CanConcealedKong(hand)) {
             // 4 concealed tiles Kong. TODO: Different type of tile instantiation.
 
             // Update both the player's hand and the combo tiles list. 4 tiles are removed from the player's hand and 4 tiles are
@@ -1711,7 +1715,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerManager.comboTiles.Add(drawnTile);
             }
 
-        } else if (drawnTile.CanKong(openTiles)) {
+        } else if (drawnTile.CanNormalKong(openTiles)) {
             // 1 concealed tile Kong
 
             // Update both the player's hand and the combo tiles list. 1 tile is removed from the player's hand and 1 tile is
@@ -1748,7 +1752,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         KongCombo.SetActive(false);
 
         // Return the ability to interact with hand tiles only for 1 and 4 concealed tiles Kong.
-        if (drawnTile.CanKong(hand) || drawnTile.CanKong(openTiles)) {
+        if (drawnTile.CanConcealedKong(hand) || drawnTile.CanNormalKong(openTiles)) {
             playerManager.canTouchHandTiles = true;
         }
     }
@@ -1763,7 +1767,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InstantiateRemoteHand(Player remotePlayer) {
         int remoteHandSize = (int)remotePlayer.CustomProperties[HandTilesCountPropKey];
         PlayerManager.Wind wind = (PlayerManager.Wind) windsDict[remotePlayer.ActorNumber];
-
+        Debug.LogFormat("The remoteHandSize is {0}", remoteHandSize);
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag(wind + "_" + "Hand");
         // Destroy the remote player's hand tiles
