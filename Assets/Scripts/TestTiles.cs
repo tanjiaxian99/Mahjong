@@ -75,10 +75,23 @@ public class TestTiles : MonoBehaviour {
 
         playerManager.hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
         playerManager.hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+        playerManager.hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+        playerManager.hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
         Tile discardTile = new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine);
 
         List<object[]> chowCombos = discardTile.ChowCombinations(playerManager.hand);
-        Debug.Log(chowCombos);
+
+        Debug.Log(chowCombos.Count);
+        foreach (object[] objArray in chowCombos) {
+
+            foreach (object obj in objArray) {
+                Debug.Log(obj);
+            }
+        }
+
+        //Tile newTile = new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine);
+        //Tile anotherTile = new Tile(Tile.Suit.Animal, Tile.Rank.Eight);
+        //Debug.LogError(anotherTile == null);
     }
 }
 

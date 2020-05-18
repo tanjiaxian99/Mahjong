@@ -12,8 +12,8 @@ using UnityEngine;
 /// Animal: Cat, Rat, Rooster, Centipede.
 /// </summary>
 public class Tile : IEquatable<Tile> {
-    public Suit suit { get; set; }
-    public Rank rank { get; set; }
+    public Suit? suit { get; set; }
+    public Rank? rank { get; set; }
 
     public enum Suit {
         Character,
@@ -54,7 +54,7 @@ public class Tile : IEquatable<Tile> {
     /// <summary>
     /// Default constructor. Calls Initialize, which is shared with the secondary constructor.
     /// </summary>
-    public Tile(Suit suit, Rank rank) {
+    public Tile(Suit? suit, Rank? rank) {
         this.Initialize(suit, rank);
     }
 
@@ -73,9 +73,7 @@ public class Tile : IEquatable<Tile> {
     /// <summary>
     /// Initialize a new Tile object. Called by both constructors.
     /// </summary>
-    /// <param name="suit"></param>
-    /// <param name="rank"></param>
-    public void Initialize(Suit suit, Rank rank) {
+    public void Initialize(Suit? suit, Rank? rank) {
         if (suit < Suit.Character || suit > Suit.Animal) {
             Debug.LogError("The tile has an invalid suit");
             return;
@@ -116,6 +114,9 @@ public class Tile : IEquatable<Tile> {
     }
 
 
+    /// <summary>
+    /// Returns true if the tile is a bonus tile
+    /// </summary>
     public bool IsBonus() {
         return suit == Suit.Season || suit == Suit.Flower || suit == Suit.Animal;
     }
@@ -151,6 +152,8 @@ public class Tile : IEquatable<Tile> {
         Tile tileMinusOne = new Tile(this.suit, this.rank - 1);
         Tile tilePlusOne = new Tile(this.suit, this.rank + 1);
         Tile tilePlusTwo = new Tile(this.suit, this.rank + 2);
+
+        Debug.LogFormat("{0}, {1}, {2}, {3}", tileMinusTwo, tileMinusOne, tilePlusOne, tilePlusTwo);
 
         // The tile forms a sequence as the first tile
         if (hand.Contains(tilePlusOne) && hand.Contains(tilePlusTwo)) {
