@@ -210,10 +210,16 @@ public class Tile : IEquatable<Tile> {
 
 
     /// <summary>
-    /// Returns true if the player can perform 4 concealed tiles Kong
+    /// Returns the tile which the player can perform 4 concealed tiles Kong with
     /// </summary>
-    public bool CanConcealedKong(List<Tile> tiles) {
-        return SameNumberOfTiles(tiles, 4);
+    public static Tile ConcealKongTile(List<Tile> hand) {
+        foreach (Tile handTile in hand) {
+            if (handTile.SameNumberOfTiles(hand, 4)) {
+                return handTile;
+            }
+        }
+
+        return null;
     }
 
 
