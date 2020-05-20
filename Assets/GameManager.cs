@@ -1147,13 +1147,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
         }
 
-        playerManager.UpdateOpenTiles();
-
-        // Add the local player's open tiles to custom properties
-        Hashtable ht = new Hashtable();
-        ht.Add(OpenTilesPropKey, playerManager.openTiles);
-        PhotonNetwork.SetPlayerCustomProperties(ht);
-
         // Initial sort. Afterwards, hand will only be sorted after discarding a tile.
         playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
 
@@ -1263,8 +1256,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             playerManager.bonusTiles.Add(tile);
             hand[hand.Count - 1] = this.DrawTile();
         }
-
-        playerManager.UpdateOpenTiles();
     }
 
 
@@ -1343,6 +1334,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Instantiate the open tiles of the local player. Called when there is an update to the bonusTiles/comboTiles list.
     /// </summary>
     public void InstantiateLocalOpenTiles() {
+        playerManager.UpdateOpenTiles();
+
         // Update the list of open tiles on the local player's custom properties
         Hashtable ht = new Hashtable();
         ht.Add(OpenTilesPropKey, playerManager.openTiles);
@@ -1549,7 +1542,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
         playerManager.comboTiles.Add(pongTiles);
 
-        playerManager.UpdateOpenTiles();
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
@@ -1627,7 +1619,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
         playerManager.comboTiles.Add(pongTiles);
 
-        playerManager.UpdateOpenTiles();
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
