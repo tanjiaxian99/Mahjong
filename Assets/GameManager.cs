@@ -1313,10 +1313,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         if ((handSize + 1) % 3 == 0) {
-            xPosHand = -(handSize - 2) / 2 * xSepHand;
-        } else {
-            xPosHand = -(handSize - 1) / 2 * xSepHand;
+            xPosHand = -(handSize - 2) / 2f * xSepHand;
 
+        } else {
+            xPosHand = -(handSize - 1) / 2f * xSepHand;
             // Sort the player's hand after discarding a tile
             playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
         }
