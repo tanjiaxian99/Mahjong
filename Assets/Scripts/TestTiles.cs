@@ -82,15 +82,15 @@ public class TestTiles : MonoBehaviour {
         playerManager.hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
         Tile discardTile = new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine);
 
-        List<object[]> chowCombos = ChowPongKong.ChowCombinations(discardTile);
+        //List<object[]> chowCombos = ChowPongKong.Instance.ChowCombinations(discardTile);
 
-        Debug.Log(chowCombos.Count);
-        foreach (object[] objArray in chowCombos) {
+        //Debug.Log(chowCombos.Count);
+        //foreach (object[] objArray in chowCombos) {
 
-            foreach (object obj in objArray) {
-                Debug.Log(obj);
-            }
-        }
+        //    foreach (object obj in objArray) {
+        //        Debug.Log(obj);
+        //    }
+        //}
 
         //Tile newTile = new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine);
         //Tile anotherTile = new Tile(Tile.Suit.Animal, Tile.Rank.Eight);

@@ -4,28 +4,28 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public static class ChowPongKong {
+public class ChowPongKong : MonoBehaviour {
     [SerializeField]
-    private static GameObject playerPrefab;
+    private GameObject playerPrefab;
 
-    private static PlayerManager playerManager;
+    private PlayerManager playerManager;
 
-    private static List<Tile> hand;
+    private List<Tile> hand;
 
-    private static List<List<Tile>> comboTiles;
+    private List<List<Tile>> comboTiles;
 
-    static ChowPongKong() {
+    void Awake() {
+        Debug.LogError("called");
         playerManager = playerPrefab.GetComponent<PlayerManager>();
         hand = playerManager.hand;
         comboTiles = playerManager.comboTiles;
     }
 
-
     /// <summary>
     /// Returns a list of chow combinations for the tile, contingent on the player's hand. Last item in the object array specifies
     /// which tile is the drawn/discard tile.
     /// </summary>
-    public static List<object[]> ChowCombinations(Tile discardTile) {
+    public List<object[]> ChowCombinations(Tile discardTile) {
         List<object[]> combinations = new List<object[]>();
         object[] combo;
 
@@ -77,7 +77,7 @@ public static class ChowPongKong {
     /// <summary>
     /// Helper function. Returns true if the number of the object tile matches numberOfTiles. Used for Pong and Kong.
     /// </summary>
-    private static bool SameNumberOfTiles(Tile discardTile, List<Tile> tiles, int numberOfTiles) {
+    private bool SameNumberOfTiles(Tile discardTile, List<Tile> tiles, int numberOfTiles) {
         int equalCount = 0;
 
         foreach (Tile tile in tiles) {
@@ -93,7 +93,7 @@ public static class ChowPongKong {
     /// <summary>
     /// Returns true if the player can Pong
     /// </summary>
-    public static bool CanPong(Tile discardTile) {
+    public bool CanPong(Tile discardTile) {
         return SameNumberOfTiles(discardTile, hand, 2);
     }
 
@@ -101,7 +101,7 @@ public static class ChowPongKong {
     /// <summary>
     /// Returns true if the player can execute a Discard Kong
     /// </summary>
-    public static bool CanDiscardKong(Tile discardTile) {
+    public bool CanDiscardKong(Tile discardTile) {
         return SameNumberOfTiles(discardTile, hand, 3);
     }
 
@@ -109,7 +109,7 @@ public static class ChowPongKong {
     /// <summary>
     /// Returns the tiles which the player could execute a Exposed Kong with
     /// </summary>
-    public static List<Tile> ExposedKongTiles() {
+    public List<Tile> ExposedKongTiles() {
         List<Tile> exposedKongTiles = new List<Tile>();
 
         foreach (List<Tile> combo in comboTiles) {
@@ -128,7 +128,7 @@ public static class ChowPongKong {
     /// <summary>
     /// Returns the tiles which the player could execute a Concealed Kong with
     /// </summary>
-    public static List<Tile> ConcealedKongTiles() {
+    public List<Tile> ConcealedKongTiles() {
         HashSet<Tile> concealedKongTiles = new HashSet<Tile>();
 
         foreach (Tile handTile in hand) {
@@ -144,7 +144,7 @@ public static class ChowPongKong {
     /// <summary>
     /// Returns the combo types of Chow, Pong or Kong
     /// </summary>
-    public static string ComboType(List<Tile> tiles) {
+    public string ComboType(List<Tile> tiles) {
         if (tiles.Count == 4) {
             return "Kong";
         }
