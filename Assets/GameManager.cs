@@ -524,6 +524,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public override void OnJoinedRoom() {
         // Initialize PlayerManager for local player
         playerManager = playerPrefab.GetComponent<PlayerManager>();
+        chowPongKong.hand = playerManager.hand;
+        chowPongKong.comboTiles = playerManager.comboTiles;
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             // Players that disconnect and reconnect won't start the game at turn 0
@@ -650,6 +652,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (turn > 1) {
             return;
         }
+
+        if (!PhotonNetwork.IsMasterClient) {
+            return;
+        }
+
         Debug.LogFormat("Turn {0} has begun", turn);
 
         Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
@@ -1168,7 +1175,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
             // Ensure turnManager.Turn is greater than 1 when the East Wind calls OnPlayerTurn() again.
             this.StartTurn();
-
+            Debug.LogError(playerManager.hand.Count);
             if (chowPongKong.ConcealedKongTiles().Count != 0) {
                 this.KongUI(chowPongKong.ConcealedKongTiles());
             }
@@ -1806,7 +1813,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InstantiateRemoteHand(Player remotePlayer) {
         int remoteHandSize = (int)remotePlayer.CustomProperties[HandTilesCountPropKey];
         PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
-        Debug.LogFormat("The remoteHandSize is {0}", remoteHandSize);
+
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag(wind + "_" + "Hand");
         // Destroy the remote player's hand tiles

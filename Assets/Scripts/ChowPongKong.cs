@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Realtime;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -8,18 +9,12 @@ public class ChowPongKong : MonoBehaviour {
     [SerializeField]
     private GameObject playerPrefab;
 
-    private PlayerManager playerManager;
+    public PlayerManager playerManager { get; set; }
 
-    private List<Tile> hand;
+    public List<Tile> hand { get; set; }
 
-    private List<List<Tile>> comboTiles;
+    public List<List<Tile>> comboTiles { get; set; }
 
-    void Awake() {
-        Debug.LogError("called");
-        playerManager = playerPrefab.GetComponent<PlayerManager>();
-        hand = playerManager.hand;
-        comboTiles = playerManager.comboTiles;
-    }
 
     /// <summary>
     /// Returns a list of chow combinations for the tile, contingent on the player's hand. Last item in the object array specifies
@@ -130,7 +125,7 @@ public class ChowPongKong : MonoBehaviour {
     /// </summary>
     public List<Tile> ConcealedKongTiles() {
         HashSet<Tile> concealedKongTiles = new HashSet<Tile>();
-
+        Debug.Log(hand.Count);
         foreach (Tile handTile in hand) {
             if (SameNumberOfTiles(handTile, hand, 4)) {
                 concealedKongTiles.Add(handTile);
