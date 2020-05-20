@@ -1345,6 +1345,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         float xSepOpen = 0.83f * 0.5f;
         float xPosOpen = -(openSize - 1) / 2f * xSepOpen;
 
+        foreach (Tile tile in playerManager.openTiles) {
+            if (tile.isConcealedKongTile) {
+                openSize -= 1;
+            }
+        }
+
         // taggedOpen represents the tiles currently on the GameTable. It represents the hand one move prior to the current hand.
         GameObject[] taggedOpen = GameObject.FindGameObjectsWithTag("Open");
 
@@ -1353,10 +1359,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         foreach (Tile tile in playerManager.openTiles) {
-            GameObject newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            GameObject newTile;
+
+            // Instantiate the last Concealed Kong tile one tile above the other 3 Concealed Kong tiles.
+            if (tile.isConcealedKongTile) {
+                xPosOpen -= xSepOpen;
+                newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f + 0.3f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            } else {
+                newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            }
+            
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
             newTile.tag = "Open";
-
             xPosOpen += xSepOpen;
         }
     }
@@ -1726,12 +1740,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             hand.Remove(drawnTile);
 
         } else if (ChowPongKong.ConcealedKongTiles().Contains(kongTile)) {
-            // TODO: Different type of tile instantiation.
-
+            // The second-last tile will be instantiated above the 3 other Kong tiles
+            Tile kongTileSpecial = new Tile(spriteName);
+            kongTileSpecial.isConcealedKongTile = true;
             List<Tile> combo = new List<Tile>();
-            for (int i = 0; i < 4; i++) {
-                combo.Add(kongTile);
-            }
+
+            combo.Add(kongTile);
+            combo.Add(kongTile);
+            combo.Add(kongTileSpecial);
+            combo.Add(kongTile);
+
             playerManager.comboTiles.Add(combo);
         } 
 
@@ -1852,6 +1870,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
 
+        foreach (Tile tile in remoteTiles) {
+            if (tile.isConcealedKongTile) {
+                remoteTilesSize -= 1;
+            }
+        }
+        
+
         // Calculating the position of the first tile
         if (tileType.Equals("Hand") && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize)) {
             pos = negativeConversion * 0.83f * 0.5f * (remoteTilesSize - 2) / 2;
@@ -1886,16 +1911,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 }
 
             } else if (tileType.Equals("Open")) {
+                float yPos = 1f;
+                if (remoteTiles[i].isConcealedKongTile) {
+                    pos -= -negativeConversion * sep;
+                    yPos = 1f + 0.3f;
+                }
+
                 if (remotePosition.Equals("Left")) {
-                    position = new Vector3(-tableWidth / 2 + 0.5f + 0.7f, 1f, pos);
+                    position = new Vector3(-tableWidth / 2 + 0.5f + 0.7f, yPos, pos);
                     rotation = Quaternion.Euler(-90f, -90f, 0f);
 
                 } else if (remotePosition.Equals("Right")) {
-                    position = new Vector3(tableWidth / 2 - 0.5f - 0.7f, 1f, pos);
+                    position = new Vector3(tableWidth / 2 - 0.5f - 0.7f, yPos, pos);
                     rotation = Quaternion.Euler(-90f, 90f, 0f);
 
                 } else if (remotePosition.Equals("Opposite")) {
-                    position = new Vector3(pos, 1f, 4.4f - 0.7f);
+                    position = new Vector3(pos, yPos, 4.4f - 0.7f);
                     rotation = Quaternion.Euler(-90f, 0f, 0f);
                 }
 
@@ -1903,7 +1934,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Debug.LogError("Invalid tile type. Only accepted tile types are 'Hand' and 'Open'");
                 return;
             }
-
 
             GameObject newTile = Instantiate(tilesDict[remoteTiles[i]], position, rotation);
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);

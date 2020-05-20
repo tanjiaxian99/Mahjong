@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -15,6 +16,8 @@ using UnityEngine;
 public class Tile : IEquatable<Tile> {
     public Suit? suit { get; set; }
     public Rank? rank { get; set; }
+    public bool isConcealedKongTile { get; set; } = false;
+
 
     public enum Suit {
         Character,
@@ -27,6 +30,7 @@ public class Tile : IEquatable<Tile> {
         Animal
     }
 
+
     public enum Rank {
         One,
         Two,
@@ -38,6 +42,7 @@ public class Tile : IEquatable<Tile> {
         Eight,
         Nine,
     }
+
 
     /// <summary>
     /// The Id of each tile is a 2-digit number: the first digit represents the suit while the second represents the rank.
