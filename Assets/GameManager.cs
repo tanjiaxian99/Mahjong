@@ -24,9 +24,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     private PlayerManager playerManager;
 
-    [SerializeField]
-    private ChowPongKong chowPongKong;
-
     [Tooltip("The GameObject used to represent a physical Mahjong table")]
     [SerializeField]
     private GameObject gameTable;
@@ -524,9 +521,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public override void OnJoinedRoom() {
         // Initialize PlayerManager for local player
         playerManager = playerPrefab.GetComponent<PlayerManager>();
-        chowPongKong.hand = playerManager.hand;
-        chowPongKong.comboTiles = playerManager.comboTiles;
-
+        
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             // Players that disconnect and reconnect won't start the game at turn 0
             // Game is initialized by MasterClient
@@ -614,12 +609,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             this.InstantiateRemoteDiscardTile(player, latestDiscardTile, hPos);
 
             // Check for Pong/Kong against discard tile
-            if (chowPongKong.CanPong(latestDiscardTile)) {
+            if (playerManager.CanPong(latestDiscardTile)) {
                 this.PongUI(latestDiscardTile);
                 return;
             }
 
-            if (chowPongKong.CanDiscardKong(latestDiscardTile)) {
+            if (playerManager.CanDiscardKong(latestDiscardTile)) {
                 this.PongUI(latestDiscardTile);
                 this.KongUI(new List<Tile>() { latestDiscardTile });
                 return;
@@ -1131,6 +1126,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// player's hand and open tiles are instantiated.
     /// </summary>
     public void InitialLocalInstantiation() {
+        
         if (playerManager.hand == null) {
             Debug.LogError("The player's hand is empty.");
         }
@@ -1159,7 +1155,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Initial sort. Afterwards, hand will only be sorted after discarding a tile.
         playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
-
+        
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
     }
@@ -1176,8 +1172,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Ensure turnManager.Turn is greater than 1 when the East Wind calls OnPlayerTurn() again.
             this.StartTurn();
             Debug.LogError(playerManager.hand.Count);
-            if (chowPongKong.ConcealedKongTiles().Count != 0) {
-                this.KongUI(chowPongKong.ConcealedKongTiles());
+            if (playerManager.ConcealedKongTiles().Count != 0) {
+                this.KongUI(playerManager.ConcealedKongTiles());
             }
 
             return;
@@ -1186,7 +1182,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Check if the discarded tile could be Chow/Ponged/Konged
         Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
         Tile tile = discardTileInfo.Item2;
-        chowTiles = chowPongKong.ChowCombinations(tile);
+        chowTiles = playerManager.ChowCombinations(tile);
 
         if (chowTiles.Count != 0) {
             this.ChowUI(chowTiles);
@@ -1198,12 +1194,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
-        if (chowPongKong.ExposedKongTiles().Count != 0) {
-            this.KongUI(chowPongKong.ExposedKongTiles());
+        if (playerManager.ExposedKongTiles().Count != 0) {
+            this.KongUI(playerManager.ExposedKongTiles());
         }
 
-        if (chowPongKong.ConcealedKongTiles().Count != 0) {
-            this.KongUI(chowPongKong.ConcealedKongTiles());
+        if (playerManager.ConcealedKongTiles().Count != 0) {
+            this.KongUI(playerManager.ConcealedKongTiles());
         }
 
     }
@@ -1588,8 +1584,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
-        if (chowPongKong.ConcealedKongTiles().Count != 0) {
-            this.KongUI(chowPongKong.ConcealedKongTiles());
+        if (playerManager.ConcealedKongTiles().Count != 0) {
+            this.KongUI(playerManager.ConcealedKongTiles());
             return;
         }
 
@@ -1721,7 +1717,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Tile kongTile = new Tile(spriteName);
 
         // Going through possibilities of Discard Kong, Exposed Kong and Concealed Kong
-        if (chowPongKong.CanDiscardKong(kongTile)) {
+        if (playerManager.CanDiscardKong(kongTile)) {
 
             // Update MasterClient that the player wants to Kong the discard tile
             PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
@@ -1741,7 +1737,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
             playerManager.comboTiles.Add(combo);
 
-        } else if (chowPongKong.ExposedKongTiles().Contains(kongTile)) {
+        } else if (playerManager.ExposedKongTiles().Contains(kongTile)) {
             foreach (List<Tile> tilesList in playerManager.comboTiles) {
                 if (tilesList.Contains(drawnTile)) {
                     tilesList.Add(drawnTile);
@@ -1749,7 +1745,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
             hand.Remove(drawnTile);
 
-        } else if (chowPongKong.ConcealedKongTiles().Contains(kongTile)) {
+        } else if (playerManager.ConcealedKongTiles().Contains(kongTile)) {
             // The second-last tile will be instantiated above the 3 other Kong tiles
             Tile kongTileSpecial = new Tile(spriteName);
             kongTileSpecial.isConcealedKongTile = true;
@@ -1769,7 +1765,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
-        if (chowPongKong.ExposedKongTiles().Count != 0 || chowPongKong.ConcealedKongTiles().Count != 0) {
+        if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
             this.KongUI(new List<Tile>() { hand[hand.Count - 1] });
         }
 
@@ -1798,7 +1794,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         KongComboTwo.SetActive(false);
 
         // Return the ability to interact with hand tiles only for 1 and 4 concealed tiles Kong.
-        if (chowPongKong.ExposedKongTiles().Count != 0 || chowPongKong.ConcealedKongTiles().Count != 0) {
+        if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
             playerManager.canTouchHandTiles = true;
         }
     }
