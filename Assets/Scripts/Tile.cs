@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 
@@ -119,107 +120,6 @@ public class Tile : IEquatable<Tile> {
     /// </summary>
     public bool IsBonus() {
         return suit == Suit.Season || suit == Suit.Flower || suit == Suit.Animal;
-    }
-
-
-    /// <summary>
-    /// Returns a list of chow combinations for the tile, contingent on the player's hand. Last item in the object array specifies
-    /// which tile is the drawn/discard tile.
-    /// </summary>
-    public List<object[]> ChowCombinations(List<Tile> hand) {
-        List<object[]> combinations = new List<object[]>();
-        object[] combo;
-
-        // Only Character, Dot and Bamboo suits can chow
-        if (this.suit != Suit.Character && this.suit != Suit.Dot && this.suit != Suit.Bamboo) {
-            return combinations;
-        }
-
-        // Chow can only happen between tiles of the same suit
-        List<Tile> sameSuit = new List<Tile>();
-        foreach (Tile tile in hand) {
-            if (tile.suit == this.suit) {
-                sameSuit.Add(tile);
-            }
-        }
-
-        // Can't chow if there is only one tile from the same suit
-        if (sameSuit.Count <= 1) {
-            return combinations;
-        }
-
-        Tile tileMinusTwo = new Tile(this.suit, this.rank - 2);
-        Tile tileMinusOne = new Tile(this.suit, this.rank - 1);
-        Tile tilePlusOne = new Tile(this.suit, this.rank + 1);
-        Tile tilePlusTwo = new Tile(this.suit, this.rank + 2);
-
-        Debug.LogFormat("{0}, {1}, {2}, {3}", tileMinusTwo, tileMinusOne, tilePlusOne, tilePlusTwo);
-
-        // The tile forms a sequence as the first tile
-        if (hand.Contains(tilePlusOne) && hand.Contains(tilePlusTwo)) {
-            combo = new object[] { this, tilePlusOne, tilePlusTwo, "First"};
-            combinations.Add(combo);
-        }
-
-        // The tile forms a sequence as the middle tile
-        if (hand.Contains(tileMinusOne) && hand.Contains(tilePlusOne)) {
-            combo = new object[] { tileMinusOne, this, tilePlusOne, "Second" };
-            combinations.Add(combo);
-        }
-
-        // The tile forms a sequence as the last tile
-        if (hand.Contains(tileMinusTwo) && hand.Contains(tileMinusOne)) {
-            combo = new object[] { tileMinusTwo, tileMinusOne, this, "Third" };
-            combinations.Add(combo);
-        }
-
-        return combinations;
-    }
-
-
-    /// <summary>
-    /// Helper function. Returns true if the number of the object tile matches numberOfTiles. Used for Pong and Kong.
-    /// </summary>
-    public bool SameNumberOfTiles(List<Tile> tiles, int numberOfTiles) {
-        int equalCount = 0;
-
-        foreach (Tile tile in tiles) {
-            if (this.Equals(tile)) {
-                equalCount++;
-            }
-        }
-
-        return equalCount == numberOfTiles;
-    }
-
-
-    /// <summary>
-    /// Returns true if the player can Pong
-    /// </summary>
-    public bool CanPong(List<Tile> hand) {
-        return SameNumberOfTiles(hand, 2);
-    }
-
-
-    /// <summary>
-    /// Returns true if the player can perform 1 or 3 concealed tiles Kong
-    /// </summary>
-    public bool CanNormalKong(List<Tile> tiles) {
-        return SameNumberOfTiles(tiles, 3);
-    }
-
-
-    /// <summary>
-    /// Returns the tile which the player can perform 4 concealed tiles Kong with
-    /// </summary>
-    public static Tile ConcealKongTile(List<Tile> hand) {
-        foreach (Tile handTile in hand) {
-            if (handTile.SameNumberOfTiles(hand, 4)) {
-                return handTile;
-            }
-        }
-
-        return null;
     }
 
 

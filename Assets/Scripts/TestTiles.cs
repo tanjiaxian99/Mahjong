@@ -40,8 +40,8 @@ public class TestTiles : MonoBehaviour {
             Instantiate(tile, new Vector3(xPos, 1f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
             xPos += xSep;
         }
-        //this.ShowChow();
-        this.TestChowCombinations();
+        this.ShowChow();
+        //this.TestChowCombinations();
     }
 
 
@@ -58,6 +58,9 @@ public class TestTiles : MonoBehaviour {
             Image image = imageTransform.GetComponent<Image>();
             image.sprite = tileSprite;
             image.color = new Color(1f, 1f, 0f);
+
+            Debug.Log(image.sprite.name);
+
         }
 
         ChowComboOne.SetActive(true);
@@ -79,7 +82,7 @@ public class TestTiles : MonoBehaviour {
         playerManager.hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
         Tile discardTile = new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine);
 
-        List<object[]> chowCombos = discardTile.ChowCombinations(playerManager.hand);
+        List<object[]> chowCombos = ChowPongKong.ChowCombinations(discardTile);
 
         Debug.Log(chowCombos.Count);
         foreach (object[] objArray in chowCombos) {

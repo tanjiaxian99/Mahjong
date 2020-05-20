@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Cache for Chow Combinations return value
     /// </summary>
-    private List<object[]> chowCombos;
+    private List<object[]> chowTiles;
 
     /// <summary>
     /// A list used by MasterClient to track whether players can/want to Pong/Kong
@@ -454,7 +454,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     private GameObject PongCombo;
 
     [SerializeField]
-    private GameObject KongCombo;
+    private GameObject KongComboZero;
+
+    [SerializeField]
+    private GameObject KongComboOne;
+
+    [SerializeField]
+    private GameObject KongComboTwo;
 
     #endregion
 
@@ -465,7 +471,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
         } else {
             Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManager.GetActiveScene().name);
-            
+
             // PunTurnManager settings
             turnManager = this.gameObject.AddComponent<PunTurnManager>();
             turnManager.TurnManagerListener = this;
@@ -488,7 +494,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (playerManager.myTurn && playerManager.canTouchHandTiles && Input.GetMouseButtonDown(0)) {
             this.OnLocalPlayerMove();
         }
-        
+
     }
 
     #endregion
@@ -603,21 +609,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             this.InstantiateRemoteDiscardTile(player, latestDiscardTile, hPos);
 
             // Check for Pong/Kong against discard tile
-            if (latestDiscardTile.CanPong(playerManager.hand)) {
+            if (ChowPongKong.CanPong(latestDiscardTile)) {
                 this.PongUI(latestDiscardTile);
                 return;
             }
 
-            if (latestDiscardTile.CanNormalKong(playerManager.hand)) {
+            if (ChowPongKong.CanDiscardKong(latestDiscardTile)) {
                 this.PongUI(latestDiscardTile);
-                this.KongUI(latestDiscardTile);
+                this.KongUI(new List<Tile>() { latestDiscardTile });
                 return;
             }
 
             // Inform Master Client that the local player can't Pong/Kong
             PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
         }
-    } 
+    }
 
 
     /// <summary>
@@ -661,7 +667,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     // What the local client does when a remote player finishes a move
     public void OnPlayerFinished(Player player, int turn, object move) {
-        
+
     }
 
     // TODO: Does time refers to time of a single player's turn?
@@ -720,14 +726,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind playerWind;
 
         foreach (Player player in PhotonNetwork.PlayerList) {
-            int randomIndex = (int) PlayerManager.Wind.EAST;
+            int randomIndex = (int)PlayerManager.Wind.EAST;
             if (numberOfPlayersToStart > 1) {
                 randomIndex = RandomNumber(winds.Count());
             }
 
             playerWind = winds[randomIndex];
             winds.Remove(winds[randomIndex]);
-            windsDict.Add(player.ActorNumber, (int) playerWind);
+            windsDict.Add(player.ActorNumber, (int)playerWind);
         }
 
         Hashtable ht = new Hashtable();
@@ -762,7 +768,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Raise an event telling all players to point their camera towards the GameTable and stretch the GameTable
     /// </summary>
     public void ScreenViewAdjustment() {
-        PhotonNetwork.RaiseEvent(EvScreenViewAdjustment, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All}, SendOptions.SendReliable);
+        PhotonNetwork.RaiseEvent(EvScreenViewAdjustment, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
     }
 
 
@@ -831,7 +837,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// while the rest receives 13
     /// </summary>
     public void DistributeTiles() {
-        List<Tile> tiles = (List<Tile>) PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
+        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
         // DEBUG
         foreach (Player player in PhotonNetwork.PlayerList) {
@@ -848,7 +854,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-            
+
             } else {
                 List<Tile> playerTiles = new List<Tile>();
                 for (int i = 0; i < 14; i++) {
@@ -867,7 +873,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
         }
 
-            
+
 
         //foreach (Player player in PhotonNetwork.PlayerList) {
         //    List<Tile> playerTiles = new List<Tile>();
@@ -900,7 +906,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Convert the bonus tiles to normal tiles and instantiate the local player's hand and open tiles. Done in playOrder sequence.
     /// </summary>
     IEnumerator InitialInstantiation() {
-        foreach (Player player in (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey]) {
+        foreach (Player player in (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey]) {
             PhotonNetwork.RaiseEvent(EvInitialInstantiation, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             yield return new WaitForSeconds(0.2f);
         }
@@ -1140,7 +1146,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
             }
         }
-        
+
         playerManager.UpdateOpenTiles();
 
         // Add the local player's open tiles to custom properties
@@ -1167,20 +1173,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Ensure turnManager.Turn is greater than 1 when the East Wind calls OnPlayerTurn() again.
             this.StartTurn();
 
-            if (Tile.ConcealKongTile(hand) != null) {
-                this.KongUI(Tile.ConcealKongTile(hand));
+            if (ChowPongKong.ConcealedKongTiles().Count != 0) {
+                this.KongUI(ChowPongKong.ConcealedKongTiles());
             }
 
             return;
         }
-        
+
         // Check if the discarded tile could be Chow/Ponged/Konged
         Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
         Tile tile = discardTileInfo.Item2;
-        chowCombos = tile.ChowCombinations(hand);
-        
-        if (chowCombos.Count != 0) {
-            this.ChowUI(chowCombos);
+        chowTiles = ChowPongKong.ChowCombinations(tile);
+
+        if (chowTiles.Count != 0) {
+            this.ChowUI(chowTiles);
             return;
         }
 
@@ -1189,29 +1195,27 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
-        if (Tile.ConcealKongTile(hand) != null) {
-            this.KongUI(Tile.ConcealKongTile(hand));
-            return;
+        if (ChowPongKong.ExposedKongTiles().Count != 0) {
+            this.KongUI(ChowPongKong.ExposedKongTiles());
         }
 
-
-        if (hand[hand.Count - 1].CanNormalKong(playerManager.openTiles)) {
-            this.KongUI(hand[hand.Count - 1]);
-            return;
+        if (ChowPongKong.ConcealedKongTiles().Count != 0) {
+            this.KongUI(ChowPongKong.ConcealedKongTiles());
         }
+
     }
-    
+
 
     /// <summary>
     /// Called when the local player wants to select a tile
     /// </summary>
     public void OnLocalPlayerMove() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;        
+        RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit)) {
             GameObject hitObject = hit.transform.gameObject;
-            
+
             if (hitObject.transform.parent == null) {
                 return;
             }
@@ -1230,7 +1234,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     playerManager.myTurn = false;
                     playerManager.canTouchHandTiles = false;
                     playerManager.hand.Remove(tile);
-                    
+
                     this.InstantiateLocalHand();
                     this.DiscardTile(tile, hitObject.transform.position.x);
                     this.nextPlayersTurn();
@@ -1248,7 +1252,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void ConvertLocalBonusTiles() {
         List<Tile> hand = playerManager.hand;
-        
+
         while (true) {
             Tile tile = hand[hand.Count - 1];
 
@@ -1259,7 +1263,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             playerManager.bonusTiles.Add(tile);
             hand[hand.Count - 1] = this.DrawTile();
         }
-        
+
         playerManager.UpdateOpenTiles();
     }
 
@@ -1330,11 +1334,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             newTile.tag = "Hand";
 
             xPosHand += xSepHand;
-        } 
+        }
 
     }
 
-    
+
     /// <summary>
     /// Instantiate the open tiles of the local player. Called when there is an update to the bonusTiles/comboTiles list.
     /// </summary>
@@ -1347,7 +1351,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         int openSize = playerManager.openTiles.Count;
         float xSepOpen = 0.83f * 0.5f;
         float xPosOpen = -(openSize - 1) / 2f * xSepOpen;
-        
+
         // taggedOpen represents the tiles currently on the GameTable. It represents the hand one move prior to the current hand.
         GameObject[] taggedOpen = GameObject.FindGameObjectsWithTag("Open");
 
@@ -1389,7 +1393,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else {
             tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.65f, -2.8f), Quaternion.Euler(270f, 180f, 0f));
         }
-        
+
         tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         // Tagging is necessary to reference the last tile discarded when Chow/Pong/Kong is called
         tileGameObject.tag = "Discard";
@@ -1412,15 +1416,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         Rigidbody rb = tileGameObject.AddComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezePositionY;
-        rb.AddForce(new Vector3((float) xForce, 0f, (float) zForce), ForceMode.VelocityChange);
+        rb.AddForce(new Vector3((float)xForce, 0f, (float)zForce), ForceMode.VelocityChange);
     }
 
-   
+
     /// <summary>
     /// Called by the local player to inform the next player that it is his turn
     /// </summary>
     public void nextPlayersTurn() {
-        Player[] playOrder = (Player[]) PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
+        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
         int localPlayerPos = 0;
         Player nextPlayer;
 
@@ -1507,7 +1511,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
         // chowCombo list. This was set up in ChowUI.
         int index = (int)Char.GetNumericValue(chowComboGameObject.name[11]);
-        tileAndStringArray = chowCombos[index];
+        tileAndStringArray = chowTiles[index];
 
         Tile otherTile;
         Tile[] handTile = new Tile[2];
@@ -1539,9 +1543,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             playerManager.hand.Remove(tile);
         }
 
+        List<Tile> pongTiles = new List<Tile>();
         for (int i = 0; i < 3; i++) {
-            playerManager.comboTiles.Add((Tile) tileAndStringArray[i]);
+            pongTiles.Add((Tile)tileAndStringArray[i]);
         }
+        playerManager.comboTiles.Add(pongTiles);
 
         playerManager.UpdateOpenTiles();
         this.InstantiateLocalHand();
@@ -1565,6 +1571,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
+
+        if (ChowPongKong.ConcealedKongTiles().Count != 0) {
+            this.KongUI(ChowPongKong.ConcealedKongTiles());
+            return;
+        }
 
         // Return the ability to interact with hand tiles
         playerManager.canTouchHandTiles = true;
@@ -1595,7 +1606,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
         PongCombo.SetActive(false);
-        KongCombo.SetActive(false);
+        KongComboZero.SetActive(false);
+        KongComboOne.SetActive(false);
+        KongComboTwo.SetActive(false);
 
         // Update discard tile properties to indicate to all players to remove the latest discard tile
         Hashtable ht = new Hashtable();
@@ -1604,11 +1617,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Update both the player's hand and the combo tiles list. 2 tiles are removed from the player's hand and 3 tiles are
         // added to combo tiles.
-        for (int i = 0; i < 2; i++) {
-            playerManager.hand.Remove(latestDiscardTile);
-            playerManager.comboTiles.Add(latestDiscardTile);
+        List<Tile> pongTiles = new List<Tile>();
+        for (int i = 0; i < 3; i++) {
+            pongTiles.Add(latestDiscardTile);
+
+            if (i < 2) {
+                playerManager.hand.Remove(latestDiscardTile);
+            }
         }
-        playerManager.comboTiles.Add(latestDiscardTile);
+        playerManager.comboTiles.Add(pongTiles);
 
         playerManager.UpdateOpenTiles();
         this.InstantiateLocalHand();
@@ -1628,23 +1645,39 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
         PongCombo.SetActive(false);
-        KongCombo.SetActive(false);
+        KongComboZero.SetActive(false);
+        KongComboOne.SetActive(false);
+        KongComboTwo.SetActive(false);
     }
 
 
     /// <summary>
     /// Called when the player can Kong
     /// </summary>
-    public void KongUI(Tile discardTile) {
-        Transform spritesPanel = KongCombo.transform.GetChild(0);
+    public void KongUI(List<Tile> kongTiles) {
 
-        // Instantiate the tile sprites
-        for (int i = 0; i < 4; i++) {
-            Transform imageTransform = spritesPanel.GetChild(i);
-            Image image = imageTransform.GetComponent<Image>();
-            image.sprite = spritesDict[discardTile];
+        for (int i = 0; i < kongTiles.Count; i++) {
+
+            // TODO: Might be better to implement a dictionary
+            GameObject kongComboGameObject;
+            if (i == 0) {
+                kongComboGameObject = KongComboZero;
+            } else if (i == 1) {
+                kongComboGameObject = KongComboOne;
+            } else {
+                kongComboGameObject = KongComboTwo;
+            }
+
+            Transform spritesPanel = kongComboGameObject.transform.GetChild(0);
+
+            // Instantiate the tile sprites
+            for (int j = 0; j < 4; j++) {
+                Transform imageTransform = spritesPanel.GetChild(j);
+                Image image = imageTransform.GetComponent<Image>();
+                image.sprite = spritesDict[kongTiles[i]];
+            }
+            kongComboGameObject.SetActive(true);
         }
-        KongCombo.SetActive(true);
 
         // Disable the ability to interact with hand tiles
         playerManager.canTouchHandTiles = false;
@@ -1656,16 +1689,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void OnKongOk() {
         PongCombo.SetActive(false);
-        KongCombo.SetActive(false);
+        KongComboZero.SetActive(false);
+        KongComboOne.SetActive(false);
+        KongComboTwo.SetActive(false);
 
         List<Tile> hand = playerManager.hand;
         List<Tile> openTiles = playerManager.openTiles;
         Tile drawnTile = hand[hand.Count - 1];
 
-        if (!playerManager.myTurn) {
-            // 3 concealed tiles Kong
+        GameObject button = EventSystem.current.currentSelectedGameObject;
+        GameObject kongComboGameObject = button.transform.parent.parent.gameObject;
+        Transform spritesPanel = kongComboGameObject.transform.GetChild(0);
+        Transform imageTransform = spritesPanel.GetChild(0);
+        Image image = imageTransform.GetComponent<Image>();
+        string spriteName = image.sprite.name;
+        Tile kongTile = new Tile(spriteName);
 
-            // Update MasterClient that the player want to Kong the discard tile
+        // Going through possibilities of Discard Kong, Exposed Kong and Concealed Kong
+        if (ChowPongKong.CanDiscardKong(kongTile)) {
+
+            // Update MasterClient that the player wants to Kong the discard tile
             PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
             // Update discard tile properties to indicate to all players to remove the latest discard tile
@@ -1673,32 +1716,32 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
             PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
-            // Update both the player's hand and the combo tiles list. 3 tiles are removed from the player's hand and 4 tiles are
-            // added to combo tiles.
-            for (int i = 0; i < 3; i++) {
-                hand.Remove(latestDiscardTile);
-                playerManager.comboTiles.Add(latestDiscardTile);
-            }
-            playerManager.comboTiles.Add(latestDiscardTile);
-
-        } else if (Tile.ConcealKongTile(hand) != null) {
-            // 4 concealed tiles Kong. TODO: Different type of tile instantiation.
-            Tile handTile = Tile.ConcealKongTile(hand);
-
-            // Update both the player's hand and the combo tiles list. 4 tiles are removed from the player's hand and 4 tiles are
-            // added to combo tiles.
+            List<Tile> combo = new List<Tile>();
             for (int i = 0; i < 4; i++) {
-                hand.Remove(handTile);
-                playerManager.comboTiles.Add(handTile);
+                combo.Add(kongTile);
+
+                if (i < 3) {
+                    playerManager.hand.Remove(kongTile);
+                }
             }
+            playerManager.comboTiles.Add(combo);
 
-        } else if (drawnTile.CanNormalKong(openTiles)) {
-            // 1 concealed tile Kong
-
-            // Update both the player's hand and the combo tiles list. 1 tile is removed from the player's hand and 1 tile is
-            // added to combo tiles.
+        } else if (ChowPongKong.ExposedKongTiles().Contains(kongTile)) {
+            foreach (List<Tile> tilesList in playerManager.comboTiles) {
+                if (tilesList.Contains(drawnTile)) {
+                    tilesList.Add(drawnTile);
+                }
+            }
             hand.Remove(drawnTile);
-            playerManager.comboTiles.Add(drawnTile);
+
+        } else if (ChowPongKong.ConcealedKongTiles().Contains(kongTile)) {
+            // TODO: Different type of tile instantiation.
+
+            List<Tile> combo = new List<Tile>();
+            for (int i = 0; i < 4; i++) {
+                combo.Add(kongTile);
+            }
+            playerManager.comboTiles.Add(combo);
         } 
 
         // Always draw a tile regardless of Kong type
@@ -1706,6 +1749,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.ConvertLocalBonusTiles();
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
+
+        if (ChowPongKong.ExposedKongTiles().Count != 0 || ChowPongKong.ConcealedKongTiles().Count != 0) {
+            this.KongUI(new List<Tile>() { hand[hand.Count - 1] });
+        }
 
         // Return the ability to interact with hand tiles
         playerManager.canTouchHandTiles = true;
@@ -1727,10 +1774,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         PongCombo.SetActive(false);
-        KongCombo.SetActive(false);
+        KongComboZero.SetActive(false);
+        KongComboOne.SetActive(false);
+        KongComboTwo.SetActive(false);
 
         // Return the ability to interact with hand tiles only for 1 and 4 concealed tiles Kong.
-        if (Tile.ConcealKongTile(hand) != null || drawnTile.CanNormalKong(openTiles)) {
+        if (ChowPongKong.ExposedKongTiles().Count != 0 || ChowPongKong.ConcealedKongTiles().Count != 0) {
             playerManager.canTouchHandTiles = true;
         }
     }
@@ -1744,7 +1793,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateRemoteHand(Player remotePlayer) {
         int remoteHandSize = (int)remotePlayer.CustomProperties[HandTilesCountPropKey];
-        PlayerManager.Wind wind = (PlayerManager.Wind) windsDict[remotePlayer.ActorNumber];
+        PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
         Debug.LogFormat("The remoteHandSize is {0}", remoteHandSize);
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag(wind + "_" + "Hand");
@@ -1765,8 +1814,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the remote player to instantiate the hand of remotePlayer on the local client.
     /// </summary>
     public void InstantiateRemoteOpenTiles(Player remotePlayer) {
-        List<Tile> remoteOpenTiles = (List<Tile>) remotePlayer.CustomProperties[OpenTilesPropKey];
-        PlayerManager.Wind wind = (PlayerManager.Wind) windsDict[remotePlayer.ActorNumber];
+        List<Tile> remoteOpenTiles = (List<Tile>)remotePlayer.CustomProperties[OpenTilesPropKey];
+        PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(wind + "_" + "Open");
@@ -1796,7 +1845,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Vector3 position = Vector3.zero;
         Quaternion rotation = Quaternion.identity;
 
-        int negativeConversion; 
+        int negativeConversion;
         int remoteTilesSize = remoteTiles.Count;
 
 
@@ -1951,14 +2000,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Instantiation position and rotation depends on where the remote player is sitting relative to the local player
         if (RelativePlayerPosition(remotePlayer).Equals("Left")) {
-            position = new Vector3((float) -vPos, 0.65f, (float) -hPos);
+            position = new Vector3((float)-vPos, 0.65f, (float)-hPos);
             rotation = Quaternion.Euler(-90f, -90f, 0f);
             if (hPos < 0) {
                 hForce = -hForce;
             }
 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Right")) {
-            position = new Vector3((float) vPos, 0.65f, (float) hPos);
+            position = new Vector3((float)vPos, 0.65f, (float)hPos);
             rotation = Quaternion.Euler(-90f, 90f, 0f);
             vForce = -vForce;
             if (hPos > 0) {
@@ -1966,7 +2015,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
-            position = new Vector3((float) -hPos, 0.65f, 4.4f - 0.7f - 0.6f);
+            position = new Vector3((float)-hPos, 0.65f, 4.4f - 0.7f - 0.6f);
             rotation = Quaternion.Euler(-90f, 0f, 0f);
             vForce = -vForce;
             if (hPos < 0) {
@@ -1980,7 +2029,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (previousDiscard != null) {
             previousDiscard.tag = "Untagged";
         }
-        
+
 
         GameObject tileGameObject = Instantiate(tilesDict[discardedTile], position, rotation);
         tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -1996,10 +2045,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // The application of hForce and VForce on the x-z axes depends on the remote player's position
         if (RelativePlayerPosition(remotePlayer).Equals("Left") || RelativePlayerPosition(remotePlayer).Equals("Right")) {
-            rb.AddForce(new Vector3((float) vForce, 0f, (float) hForce), ForceMode.VelocityChange);
+            rb.AddForce(new Vector3((float)vForce, 0f, (float)hForce), ForceMode.VelocityChange);
 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
-            rb.AddForce(new Vector3((float) hForce, 0f, (float) vForce), ForceMode.VelocityChange);
+            rb.AddForce(new Vector3((float)hForce, 0f, (float)vForce), ForceMode.VelocityChange);
         }
     }
 
@@ -2026,7 +2075,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public static object DeserializeTilesList(byte[] data) {
         List<Tile> tilesList = new List<Tile>();
-        
+
         foreach (byte tileByte in data) {
             Tile tile = new Tile(0, 0);
             tile.Id = tileByte;
@@ -2041,9 +2090,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Serialize Tuple<int, Tile, float> into a byteStream. sizeof(memTuple) = sizeof(int) + sizeof(short) + sizeof(int)
     /// </summary>
     public static readonly byte[] memTuple = new byte[10];
-    public static short SerializeTuple (StreamBuffer outStream, object customobject) {
-        var tuple = (Tuple<int, Tile, float>) customobject;
-        
+    public static short SerializeTuple(StreamBuffer outStream, object customobject) {
+        var tuple = (Tuple<int, Tile, float>)customobject;
+
         lock (memTuple) {
             byte[] bytes = memTuple;
             int index = 0;
@@ -2061,23 +2110,23 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Deserialize the byteStream into a Tuple<int, Tile, float>
     /// </summary>
-    private static object DeserializeTuple (StreamBuffer inStream, short length) {
+    private static object DeserializeTuple(StreamBuffer inStream, short length) {
         Tuple<int, Tile, float> tuple = new Tuple<int, Tile, float>(0, new Tile(0, 0), 0f);
         int actorNumber;
         short tileId;
         Tile tile = new Tile(0, 0);
         float pos;
-        
+
         lock (memTuple) {
             inStream.Read(memTuple, 0, 10);
             int index = 0;
-            
+
             Protocol.Deserialize(out actorNumber, memTuple, ref index);
             Protocol.Deserialize(out tileId, memTuple, ref index);
             Protocol.Deserialize(out pos, memTuple, ref index);
 
-            
-            tile.Id = (byte) tileId;
+
+            tile.Id = (byte)tileId;
         }
         return new Tuple<int, Tile, float>(actorNumber, tile, pos);
     }

@@ -1,8 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
 using System.Collections.Generic;
-using UnityEngine;
-
-using Photon.Pun;
 
 public class PlayerManager : MonoBehaviourPunCallbacks {
     #region Private Fields
@@ -21,7 +18,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public List<Tile> bonusTiles { get; set; } = new List<Tile>();
 
-    public List<Tile> comboTiles { get; set; } = new List<Tile>();
+    public List<List<Tile>> comboTiles { get; set; } = new List<List<Tile>>();
 
     public List<Tile> openTiles { get; set; } = new List<Tile>();
 
@@ -48,10 +45,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
             openTiles.Add(tile);
         }
         
-        foreach (Tile tile in comboTiles) {
-            openTiles.Add(tile);
+        foreach (List<Tile> tilesList in comboTiles) {
+            foreach (Tile tile in tilesList) {
+                openTiles.Add(tile);
+            }
         }
     }
-    
+
     #endregion
+
 }
+
+
