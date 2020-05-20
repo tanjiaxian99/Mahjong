@@ -1171,7 +1171,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
             // Ensure turnManager.Turn is greater than 1 when the East Wind calls OnPlayerTurn() again.
             this.StartTurn();
-            Debug.LogError(playerManager.hand.Count);
+
             if (playerManager.ConcealedKongTiles().Count != 0) {
                 this.KongUI(playerManager.ConcealedKongTiles());
             }
@@ -1755,6 +1755,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             combo.Add(kongTile);
             combo.Add(kongTileSpecial);
             combo.Add(kongTile);
+
+            for (int i = 0; i < 4; i++) {
+                playerManager.hand.Remove(kongTile);
+            }
 
             playerManager.comboTiles.Add(combo);
         } 
