@@ -1348,14 +1348,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.SetPlayerCustomProperties(ht);
 
         int openSize = playerManager.openTiles.Count;
-        float xSepOpen = 0.83f * 0.5f;
-        float xPosOpen = -(openSize - 1) / 2f * xSepOpen;
-
         foreach (Tile tile in playerManager.openTiles) {
             if (tile.isConcealedKongTile) {
                 openSize -= 1;
             }
         }
+
+        float xSepOpen = 0.83f * 0.5f;
+        float xPosOpen = -(openSize - 1) / 2f * xSepOpen;
 
         // taggedOpen represents the tiles currently on the GameTable. It represents the hand one move prior to the current hand.
         GameObject[] taggedOpen = GameObject.FindGameObjectsWithTag("Open");
