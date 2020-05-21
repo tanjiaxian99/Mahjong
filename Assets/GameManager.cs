@@ -849,11 +849,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.EAST) {
                 List<Tile> playerTiles = new List<Tile>();
 
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < 4; i++) {
                     playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                     playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                     playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
-                    playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 }
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
@@ -1773,8 +1772,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         playerManager.canTouchHandTiles = true;
         playerManager.myTurn = true;
 
-        if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
-            this.KongUI(new List<Tile>() { hand[hand.Count - 1] });
+        if (playerManager.ExposedKongTiles().Count != 0) {
+            this.KongUI(playerManager.ExposedKongTiles());
+        }
+
+        if (playerManager.ConcealedKongTiles().Count != 0) {
+            this.KongUI(playerManager.ConcealedKongTiles());
         }
     }
 
