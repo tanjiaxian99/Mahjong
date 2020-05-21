@@ -849,14 +849,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.EAST) {
                 List<Tile> playerTiles = new List<Tile>();
 
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < 2; i++) {
                     playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                    playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
                     playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                    playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
-                }
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
+                    playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                    playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
 
+                    playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                    playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                }
+                                
+                
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
 
             } else {
@@ -1193,12 +1197,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
-        if (playerManager.ExposedKongTiles().Count != 0) {
-            this.KongUI(playerManager.ExposedKongTiles());
-        }
-
-        if (playerManager.ConcealedKongTiles().Count != 0) {
-            this.KongUI(playerManager.ConcealedKongTiles());
+        if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
+            this.KongUI(playerManager.ExposedKongTiles().Concat(playerManager.ConcealedKongTiles()).ToList());
         }
 
     }
@@ -1772,12 +1772,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         playerManager.canTouchHandTiles = true;
         playerManager.myTurn = true;
 
-        if (playerManager.ExposedKongTiles().Count != 0) {
-            this.KongUI(playerManager.ExposedKongTiles());
-        }
-
-        if (playerManager.ConcealedKongTiles().Count != 0) {
-            this.KongUI(playerManager.ConcealedKongTiles());
+        if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
+            this.KongUI(playerManager.ExposedKongTiles().Concat(playerManager.ConcealedKongTiles()).ToList());
         }
     }
 
