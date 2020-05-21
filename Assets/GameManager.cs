@@ -1868,7 +1868,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         int remoteTilesSize = remoteTiles.Count;
 
 
-
         // Determine whether negativeConversion is -1 or 1
         if (remotePosition.Equals("Left") || remotePosition.Equals("Opposite")) {
             negativeConversion = 1;
@@ -1883,9 +1882,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         foreach (Tile tile in remoteTiles) {
             if (tile.isConcealedKongTile) {
                 remoteTilesSize -= 1;
+                Debug.Log("isConcealedKongTile");
             }
         }
-        
+        Debug.Log(remoteTilesSize);
 
         // Calculating the position of the first tile
         if (tileType.Equals("Hand") && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize)) {

@@ -49,8 +49,12 @@ public class Tile : IEquatable<Tile> {
     /// </summary>
     public byte Id {
         get {
-            return (byte) ((int)suit * 10 + (int)rank);
+            int isConcealedKongTileInt = isConcealedKongTile ? 1 : 0;
+            return (byte) (isConcealedKongTileInt * 100 + (int)suit * 10 + (int)rank);
         } set {
+            int isConcealedKongTileInt = value / 100;
+            isConcealedKongTile = isConcealedKongTileInt != 0;
+            value %= 100;
             suit = (Suit) (value / 10);
             rank = (Rank) (value % 10);
         }
