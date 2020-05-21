@@ -1769,13 +1769,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
-        if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
-            this.KongUI(new List<Tile>() { hand[hand.Count - 1] });
-        }
-
         // Return the ability to interact with hand tiles
         playerManager.canTouchHandTiles = true;
         playerManager.myTurn = true;
+
+        if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
+            this.KongUI(new List<Tile>() { hand[hand.Count - 1] });
+        }
     }
 
 

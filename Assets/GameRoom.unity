@@ -9050,7 +9050,7 @@ PrefabInstance:
     - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
         type: 3}
       propertyPath: numberOfPlayersToStart
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5609154119533805065, guid: 015276895ad00c942b8b856802f75876,
         type: 3}
