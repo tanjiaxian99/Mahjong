@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+
 /// <summary>
 /// Class for all tiles. Rank sequence is as follows:
 /// Character, Dot, Bamboo, Season and Flower: the number on the tile;
@@ -10,8 +14,10 @@ using UnityEngine;
 /// Animal: Cat, Rat, Rooster, Centipede.
 /// </summary>
 public class Tile : IEquatable<Tile> {
-    public Suit suit { get; set; }
-    public Rank rank { get; set; }
+    public Suit? suit { get; set; }
+    public Rank? rank { get; set; }
+    public bool isConcealedKongTile { get; set; } = false;
+
 
     public enum Suit {
         Character,
@@ -23,6 +29,7 @@ public class Tile : IEquatable<Tile> {
         Flower,
         Animal
     }
+
 
     public enum Rank {
         One,
@@ -36,13 +43,18 @@ public class Tile : IEquatable<Tile> {
         Nine,
     }
 
+
     /// <summary>
     /// The Id of each tile is a 2-digit number: the first digit represents the suit while the second represents the rank.
     /// </summary>
     public byte Id {
         get {
-            return (byte) ((int)suit * 10 + (int)rank);
+            int isConcealedKongTileInt = isConcealedKongTile ? 1 : 0;
+            return (byte) (isConcealedKongTileInt * 100 + (int)suit * 10 + (int)rank);
         } set {
+            int isConcealedKongTileInt = value / 100;
+            isConcealedKongTile = isConcealedKongTileInt != 0;
+            value %= 100;
             suit = (Suit) (value / 10);
             rank = (Rank) (value % 10);
         }
@@ -52,7 +64,7 @@ public class Tile : IEquatable<Tile> {
     /// <summary>
     /// Default constructor. Calls Initialize, which is shared with the secondary constructor.
     /// </summary>
-    public Tile(Suit suit, Rank rank) {
+    public Tile(Suit? suit, Rank? rank) {
         this.Initialize(suit, rank);
     }
 
@@ -71,16 +83,14 @@ public class Tile : IEquatable<Tile> {
     /// <summary>
     /// Initialize a new Tile object. Called by both constructors.
     /// </summary>
-    /// <param name="suit"></param>
-    /// <param name="rank"></param>
-    public void Initialize(Suit suit, Rank rank) {
+    public void Initialize(Suit? suit, Rank? rank) {
         if (suit < Suit.Character || suit > Suit.Animal) {
             Debug.LogError("The tile has an invalid suit");
             return;
         }
 
         if (rank < Rank.One || rank > Rank.Nine) {
-            Debug.LogError("The tile's rank is less than one or greater than nine");
+            //Debug.LogError("The tile's rank is less than one or greater than nine");
             return;
         }
 
@@ -113,13 +123,19 @@ public class Tile : IEquatable<Tile> {
         this.rank = rank;
     }
 
+
+    /// <summary>
+    /// Returns true if the tile is a bonus tile
+    /// </summary>
     public bool IsBonus() {
         return suit == Suit.Season || suit == Suit.Flower || suit == Suit.Animal;
     }
 
+
     public override string ToString() {
         return suit + "_" + rank;
     }
+
 
     /// <summary>
     /// If 2 tiles have the same suit and rank, they are equal, regardless of reference.
@@ -129,6 +145,7 @@ public class Tile : IEquatable<Tile> {
                rank == tile.rank;
     }
     
+
     public override int GetHashCode() {
         int hashCode = 39855015;
         hashCode = hashCode * -1521134295 + suit.GetHashCode();
