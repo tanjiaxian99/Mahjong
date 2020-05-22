@@ -1,4 +1,5 @@
-﻿using Photon.Pun.UtilityScripts;
+﻿using Photon.Pun.Demo.Cockpit;
+using Photon.Pun.UtilityScripts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,102 +11,126 @@ using UnityEngine;
 public class WinConditions : MonoBehaviour {
     public void CheckWin(List<Tile> hand) {
         foreach (Tile tile in hand) {
-            tile.isVisted = false;
+            tile.isVisited = false;
             tile.isWinning = false;
         }
 
-        Backtracking(hand);
+        Debug.Log(Backtracking(hand));
     }
 
 
     public string Backtracking(List<Tile> hand) {
-
-        FindCombos(hand);
-
+        // Base case
+        bool allWinning = true;
         foreach (Tile tile in hand) {
             if (!tile.isWinning) {
-                return "NONWINNING";
-            }
-        }
-        return "WINNING";
-    }
-
-
-    /// <summary>
-    /// Helper function that returns one Chow/Pong/Eye combo, if found
-    /// </summary>
-    private List<Tile> FindCombos(List<Tile> hand) {
-        // Retrieve the first unvisited tile
-        Tile firstTile = null;
-        List<Tile> winningPotential = new List<Tile>();
-
-        foreach (Tile tile in hand) {
-            if (!tile.isVisted) {
-                firstTile = tile;
-                tile.isVisted = true;
+                allWinning = false;
                 break;
             }
         }
 
-        if (firstTile == null) {
-            return null;
+        if (allWinning) {
+            return "Winning";
         }
+
+
+        // Retrieve the first unvisited tile
+        Tile firstUnvisitedTile = null;
+        List<Tile> winningPotential = new List<Tile>();
+        foreach (Tile tile in hand) {
+            if (!tile.isVisited) {
+                firstUnvisitedTile = tile;
+                break;
+            }
+        }
+
 
         // Check for Pong
         foreach (Tile tile in hand) {
-            if (tile.isVisted) {
-                continue;
+            if (tile.Equals(firstUnvisitedTile)) {
+                winningPotential.Add(tile);
+            } 
+        }
+
+        if (winningPotential.Count >= 3) {
+            for (int i = 0; i < 3; i++) {
+                winningPotential[i].isVisited = true;
+                winningPotential[i].isWinning = true;
             }
 
-            if (tile == firstTile) {
+            if (Backtracking(hand) == "Winning") {
+                return "Winning";
+            } else {
+                foreach (Tile tile in winningPotential) {
+                    tile.isVisited = false;
+                    tile.isWinning = false;
+                }
+            }
+            winningPotential.Clear();
+        }
+
+
+        // Check for Chow
+        Tile tilePlusOne = new Tile(firstUnvisitedTile.suit, firstUnvisitedTile.rank + 1);
+        Tile tilePlusTwo = new Tile(firstUnvisitedTile.suit, firstUnvisitedTile.rank + 2);
+
+        foreach (Tile tile in hand) {
+            if (!tile.isVisited && tile.Equals(firstUnvisitedTile) && !winningPotential.Contains(firstUnvisitedTile)) {
+                winningPotential.Add(tile);
+            }
+
+            if (!tile.isVisited && tile.Equals(tilePlusOne) && !winningPotential.Contains(tile)) {
+                winningPotential.Add(tile);
+            }
+
+            if (!tile.isVisited && tile.Equals(tilePlusTwo) && !winningPotential.Contains(tile)) {
                 winningPotential.Add(tile);
             }
         }
-        
-        if (winningPotential.Count == 2) {
-            firstTile.isWinning = true;
+
+        if (winningPotential.Count == 3) {
             foreach (Tile tile in winningPotential) {
-                tile.isVisted = true;
+                tile.isVisited = true;
                 tile.isWinning = true;
             }
             
+            if (Backtracking(hand) == "Winning") {
+                return "Winning";
+            } else {
+                foreach (Tile tile in winningPotential) {
+                    tile.isVisited = false;
+                    tile.isWinning = false;
+                }
+            }
             winningPotential.Clear();
-            Backtracking(hand);
-        }
-
-        // Check for Chow
-        Tile tileMinusTwo = new Tile(firstTile.suit, firstTile.rank - 2);
-        Tile tileMinusOne = new Tile(firstTile.suit, firstTile.rank - 1);
-        Tile tilePlusOne = new Tile(firstTile.suit, firstTile.rank + 1);
-        Tile tilePlusTwo = new Tile(firstTile.suit, firstTile.rank + 2);
-
-        if (hand.Contains(tileMinusTwo) && hand.Contains(tileMinusOne)) {
-
         }
 
 
         // Check for Eye
         foreach (Tile tile in hand) {
-            if (tile.isVisted) {
-                continue;
-            }
-
-            if (tile == firstTile) {
+            if (tile.Equals(firstUnvisitedTile)) {
                 winningPotential.Add(tile);
             }
         }
 
-        if (winningPotential.Count == 1) {
-            firstTile.isWinning = true;
-            foreach (Tile tile in winningPotential) {
-                tile.isVisted = true;
-                tile.isWinning = true;
+        if (winningPotential.Count >= 2) {
+            for (int i = 0; i < 2; i++) {
+                winningPotential[i].isVisited = true;
+                winningPotential[i].isWinning = true;
             }
 
+            if (Backtracking(hand) == "Winning") {
+                return "Winning";
+            } else {
+                foreach (Tile tile in winningPotential) {
+                    tile.isVisited = false;
+                    tile.isWinning = false;
+                }
+            }
             winningPotential.Clear();
-            Backtracking(hand);
         }
 
-        return null;
+        return "Nonwinning";
     }
+
 }
