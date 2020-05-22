@@ -123,6 +123,20 @@ public class WinConditions : MonoBehaviour {
         }
         winningPotential.Clear();
 
+        
+        // The number of winning tiles is always divisible by 3, unless an eye is part of the winning tiles. In which case,
+        // don't consider the possibility of an eye
+        int numberOfWinningTiles = 0;
+        foreach (Tile tile in hand) {
+            if (tile.isWinning) {
+                numberOfWinningTiles += 1;
+            }
+        }
+
+        if (numberOfWinningTiles % 3 != 0) {
+            return "Nonwinning";
+        }
+
 
         // Check for Eye
         foreach (Tile tile in hand) {

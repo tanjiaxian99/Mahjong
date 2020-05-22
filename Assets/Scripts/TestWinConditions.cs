@@ -23,7 +23,8 @@ public class TestWinConditions : MonoBehaviour {
         hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
 
         hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
-        hand.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+        hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+
         //hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
 
         WinConditions testWin = new WinConditions();
