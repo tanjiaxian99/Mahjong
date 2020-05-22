@@ -16,7 +16,10 @@ using UnityEngine;
 public class Tile : IEquatable<Tile> {
     public Suit? suit { get; set; }
     public Rank? rank { get; set; }
+
     public bool isConcealedKongTile { get; set; } = false;
+    public bool isVisted { get; set; } = false;
+    public bool isWinning { get; set; } = false;
 
 
     public enum Suit {
