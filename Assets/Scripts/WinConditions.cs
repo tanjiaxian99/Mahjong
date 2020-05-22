@@ -15,7 +15,7 @@ public class WinConditions : MonoBehaviour {
             tile.isWinning = false;
         }
 
-        Debug.Log(Backtracking(hand));
+        UnityEngine.Debug.Log(Backtracking(hand));
     }
 
 
@@ -47,7 +47,7 @@ public class WinConditions : MonoBehaviour {
 
         // Check for Pong
         foreach (Tile tile in hand) {
-            if (tile.Equals(firstUnvisitedTile)) {
+            if (!tile.isVisited && tile.Equals(firstUnvisitedTile)) {
                 winningPotential.Add(tile);
             } 
         }
@@ -58,6 +58,15 @@ public class WinConditions : MonoBehaviour {
                 winningPotential[i].isWinning = true;
             }
 
+            // DEBUG
+            int winningTiles = 0;
+            foreach (Tile tile in hand) {
+                if (tile.isWinning) {
+                    winningTiles += 1;
+                }
+            }
+            Debug.LogFormat("New Pong Combo. There are now {0} winning tiles", winningTiles);
+
             if (Backtracking(hand) == "Winning") {
                 return "Winning";
             } else {
@@ -66,8 +75,8 @@ public class WinConditions : MonoBehaviour {
                     tile.isWinning = false;
                 }
             }
-            winningPotential.Clear();
         }
+        winningPotential.Clear();
 
 
         // Check for Chow
@@ -93,7 +102,16 @@ public class WinConditions : MonoBehaviour {
                 tile.isVisited = true;
                 tile.isWinning = true;
             }
-            
+
+            // DEBUG
+            int winningTiles = 0;
+            foreach (Tile tile in hand) {
+                if (tile.isWinning) {
+                    winningTiles += 1;
+                }
+            }
+            Debug.LogFormat("New Chow Combo. There are now {0} winning tiles", winningTiles);
+
             if (Backtracking(hand) == "Winning") {
                 return "Winning";
             } else {
@@ -102,13 +120,13 @@ public class WinConditions : MonoBehaviour {
                     tile.isWinning = false;
                 }
             }
-            winningPotential.Clear();
         }
+        winningPotential.Clear();
 
 
         // Check for Eye
         foreach (Tile tile in hand) {
-            if (tile.Equals(firstUnvisitedTile)) {
+            if (!tile.isVisited && tile.Equals(firstUnvisitedTile)) {
                 winningPotential.Add(tile);
             }
         }
@@ -118,6 +136,15 @@ public class WinConditions : MonoBehaviour {
                 winningPotential[i].isVisited = true;
                 winningPotential[i].isWinning = true;
             }
+
+            // DEBUG
+            int winningTiles = 0;
+            foreach (Tile tile in hand) {
+                if (tile.isWinning) {
+                    winningTiles += 1;
+                }
+            }
+            Debug.LogFormat("New Eye Combo. There are now {0} winning tiles", winningTiles);
 
             if (Backtracking(hand) == "Winning") {
                 return "Winning";
