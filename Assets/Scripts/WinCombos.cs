@@ -26,6 +26,10 @@ public class WinCombos {
 
         Backtracking(hand, new List<string>());
 
+        if (listOfCombos.Count == 0) {
+            return listOfCombos;
+        }
+
         List<string> referenceSolution = listOfCombos[0].OrderBy(x => x).ToList();
         reducedListOfCombos.Add(referenceSolution);
 
