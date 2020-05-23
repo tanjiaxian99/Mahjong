@@ -10,10 +10,11 @@ namespace Tests {
 
     public class WinCombosTest {
         WinCombos testWin = new WinCombos();
+        List<Tile> hand;
 
         [Test]
         public void TestNineGatesOne() {
-            List<Tile> hand = new List<Tile>();
+            hand = new List<Tile>();
 
             hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
             hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
@@ -36,9 +37,96 @@ namespace Tests {
 
             List<List<string>> expected = new List<List<string>>() { new List<string>() { "Chow", "Chow", "Chow", "Eye", "Pong" } };
             List<List<string>> actual = testWin.CheckWin(hand);
-            
-            Assert.AreEqual(expected, actual, "Failed NineGatesOne Test");
+
+            Assert.AreEqual(expected, actual);
         }
+
+        [Test]
+        public void TestNineGatesTwo() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+
+            List<List<string>> expected = new List<List<string>>() { new List<string>() { "Chow", "Chow", "Eye", "Pong", "Pong" } };
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void TestNineGatesThree() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+
+            List<List<string>> expected = new List<List<string>>() { new List<string>() { "Chow", "Chow", "Chow", "Eye", "Pong" } };
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        //[Test]
+        //public void TestNineGatesFour() {
+        //    hand = new List<Tile>();
+
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+        //    hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+
+        //    List<List<string>> expected = new List<List<string>>() { new List<string>() { "Chow", "Chow", "Chow", "Eye", "Pong" } };
+        //    List<List<string>> actual = testWin.CheckWin(hand);
+
+        //    Assert.AreEqual(expected, actual);
+        ////}
 
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         // `yield return null;` to skip a frame.

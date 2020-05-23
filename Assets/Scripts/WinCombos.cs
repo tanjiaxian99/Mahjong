@@ -10,28 +10,32 @@ using UnityEngine;
 /// </summary>
 // https://stackoverflow.com/questions/4937771/mahjong-winning-hand-algorithm
 public class WinCombos {
-    private List<List<string>> listOfCombos = new List<List<string>>();
-    private List<List<string>> reducedListOfCombos = new List<List<string>>();
+    private List<List<string>> listOfCombos;
+    private List<List<string>> reducedListOfCombos;
 
     /// <summary>
     /// Returns a list of solutions which the hand allows. Each solution consists of a list of combo types. 
     /// </summary>
     public List<List<string>> CheckWin(List<Tile> hand) {
+        listOfCombos = new List<List<string>>();
+        reducedListOfCombos = new List<List<string>>();
+
         foreach (Tile tile in hand) {
             tile.isWinning = false;
         }
 
         Backtracking(hand, new List<string>());
 
-        // Remove solutions which contain the same combo types
-        if (listOfCombos.Count == 1) {
-            return listOfCombos;
-        }
-
         List<string> referenceSolution = listOfCombos[0].OrderBy(x => x).ToList();
         reducedListOfCombos.Add(referenceSolution);
 
-        foreach (List<string> solution in listOfCombos) {
+        // Remove solutions which contain the same combo types
+        if (listOfCombos.Count == 1) {
+            //return reducedListOfCombos;
+            return new List<List<string>>() { listOfCombos[0].OrderBy(x => x).ToList() };
+        }
+
+                foreach (List<string> solution in listOfCombos) {
             if (!Enumerable.SequenceEqual(referenceSolution, solution.OrderBy(x => x).ToList())) {
                 reducedListOfCombos.Add(solution);
             }
