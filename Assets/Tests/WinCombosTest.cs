@@ -13,6 +13,222 @@ namespace Tests {
         List<Tile> hand;
 
         [Test]
+        public void OneUniqueSolutionOne() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+
+            List<List<string>> expected = new List<List<string>>() { new List<string>() { "Chow", "Chow", "Chow", "Chow", "Eye" } };
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void OneUniqueSolutionTwo() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+
+            List<List<string>> expected = new List<List<string>>() { new List<string>() { "Chow", "Eye", "Pong", "Pong", "Pong" }};
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void OneUniqueSolutionThree() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+
+            List<List<string>> expected = new List<List<string>>() { new List<string>() { "Chow", "Eye", "Pong", "Pong", "Pong" } };
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void TwoDifferentSolutionsOne() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+
+            List<List<string>> expected = new List<List<string>>() {
+                new List<string>() { "Chow", "Eye", "Pong", "Pong", "Pong" },
+                new List<string>() { "Chow", "Chow", "Chow", "Chow", "Eye" }
+            };
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void TwoDifferentSolutionsTwo() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+
+            List<List<string>> expected = new List<List<string>>() {
+                new List<string>() { "Eye", "Pong", "Pong", "Pong", "Pong" },
+                new List<string>() { "Chow", "Chow", "Chow", "Eye", "Pong" }
+            };
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void TwoDifferentSolutionsThree() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+
+            List<List<string>> expected = new List<List<string>>() {
+                new List<string>() { "Chow", "Eye", "Pong", "Pong", "Pong" },
+                new List<string>() { "Chow", "Chow", "Chow", "Chow", "Eye" }
+            };
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void TwoDifferentSolutionsFour() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+
+            List<List<string>> expected = new List<List<string>>() {
+                new List<string>() { "Eye", "Pong", "Pong", "Pong", "Pong" },
+                new List<string>() { "Chow", "Chow", "Chow", "Eye", "Pong" }
+            };
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
         public void TwoSolutionsFail() {
             hand = new List<Tile>();
 
@@ -36,38 +252,6 @@ namespace Tests {
             hand.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
 
             List<List<string>> expected = new List<List<string>>();
-            List<List<string>> actual = testWin.CheckWin(hand);
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test]
-        public void TwoSolutions() {
-            hand = new List<Tile>();
-
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
-
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-
-            List<List<string>> expected = new List<List<string>>() { 
-                new List<string>() { "Chow", "Eye", "Pong", "Pong", "Pong" },
-                new List<string>() { "Chow", "Chow", "Chow", "Chow", "Eye" }
-            };
             List<List<string>> actual = testWin.CheckWin(hand);
 
             Assert.AreEqual(expected, actual);

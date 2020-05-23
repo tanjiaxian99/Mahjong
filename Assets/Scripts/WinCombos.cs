@@ -39,7 +39,7 @@ public class WinCombos {
             return new List<List<string>>() { listOfCombos[0].OrderBy(x => x).ToList() };
         }
 
-                foreach (List<string> solution in listOfCombos) {
+        foreach (List<string> solution in listOfCombos) {
             if (!Enumerable.SequenceEqual(referenceSolution, solution.OrderBy(x => x).ToList())) {
                 reducedListOfCombos.Add(solution);
             }
