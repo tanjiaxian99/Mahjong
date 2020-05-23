@@ -6,7 +6,7 @@ public class TestWinConditions : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         List<Tile> hand = new List<Tile>();
-        WinConditions testWin = new WinConditions();
+        WinCombos testWin = new WinCombos();
 
         //// Nine Gates
         //hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));

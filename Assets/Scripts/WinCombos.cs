@@ -1,6 +1,4 @@
-﻿using Photon.Pun.Demo.Cockpit;
-using Photon.Pun.UtilityScripts;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +6,7 @@ using UnityEngine;
 /// Checks how many Fan the local hand can win.
 /// </summary>
 // https://stackoverflow.com/questions/4937771/mahjong-winning-hand-algorithm
-public class WinConditions {
+public class WinCombos {
     List<List<string>> listOfCombos = new List<List<string>>();
 
     public void CheckWin(List<Tile> hand) {
