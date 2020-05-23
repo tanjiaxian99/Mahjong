@@ -18,7 +18,6 @@ public class Tile : IEquatable<Tile> {
     public Rank? rank { get; set; }
 
     public bool isConcealedKongTile { get; set; } = false;
-    public bool isVisited { get; set; } = false;
     public bool isWinning { get; set; } = false;
 
 

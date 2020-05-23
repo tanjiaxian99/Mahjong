@@ -13,7 +13,6 @@ public class WinConditions {
 
     public void CheckWin(List<Tile> hand) {
         foreach (Tile tile in hand) {
-            tile.isVisited = false;
             tile.isWinning = false;
         }
 
@@ -22,7 +21,12 @@ public class WinConditions {
     }
 
 
+    /// <summary>
+    /// Recursive function that solves a Backtracking Enumeration Problem. 
+    /// When the function finds a combo amongst unmarked tiles, those tiles get marked. The function is then called recursively.
+    /// </summary>
     public void Backtracking(List<Tile> hand, List<string> comboListInput) {
+        // Avoid removing comboTypes from listOfCombos
         List<string> comboTypeList = new List<string>(comboListInput);
 
         // Base case
@@ -41,11 +45,11 @@ public class WinConditions {
 
 
         // Retrieve the first unvisited tile
-        Tile firstUnvisitedTile = null;
+        Tile firstNonWinningTile = null;
         List<Tile> winningPotential = new List<Tile>();
         foreach (Tile tile in hand) {
-            if (!tile.isVisited) {
-                firstUnvisitedTile = tile;
+            if (!tile.isWinning) {
+                firstNonWinningTile = tile;
                 break;
             }
         }
@@ -53,14 +57,13 @@ public class WinConditions {
 
         // Check for Pong
         foreach (Tile tile in hand) {
-            if (!tile.isVisited && tile.Equals(firstUnvisitedTile)) {
+            if (!tile.isWinning && tile.Equals(firstNonWinningTile)) {
                 winningPotential.Add(tile);
             } 
         }
 
         if (winningPotential.Count >= 3) {
             for (int i = 0; i < 3; i++) {
-                winningPotential[i].isVisited = true;
                 winningPotential[i].isWinning = true;
             }
 
@@ -80,7 +83,6 @@ public class WinConditions {
             comboTypeList.Remove(comboType);
 
             foreach (Tile tile in winningPotential) {
-                tile.isVisited = false;
                 tile.isWinning = false;
             }
         }
@@ -88,26 +90,25 @@ public class WinConditions {
 
 
         // Check for Chow
-        Tile tilePlusOne = new Tile(firstUnvisitedTile.suit, firstUnvisitedTile.rank + 1);
-        Tile tilePlusTwo = new Tile(firstUnvisitedTile.suit, firstUnvisitedTile.rank + 2);
+        Tile tilePlusOne = new Tile(firstNonWinningTile.suit, firstNonWinningTile.rank + 1);
+        Tile tilePlusTwo = new Tile(firstNonWinningTile.suit, firstNonWinningTile.rank + 2);
 
         foreach (Tile tile in hand) {
-            if (!tile.isVisited && tile.Equals(firstUnvisitedTile) && !winningPotential.Contains(firstUnvisitedTile)) {
+            if (!tile.isWinning && tile.Equals(firstNonWinningTile) && !winningPotential.Contains(firstNonWinningTile)) {
                 winningPotential.Add(tile);
             }
 
-            if (!tile.isVisited && tile.Equals(tilePlusOne) && !winningPotential.Contains(tile)) {
+            if (!tile.isWinning && tile.Equals(tilePlusOne) && !winningPotential.Contains(tile)) {
                 winningPotential.Add(tile);
             }
 
-            if (!tile.isVisited && tile.Equals(tilePlusTwo) && !winningPotential.Contains(tile)) {
+            if (!tile.isWinning && tile.Equals(tilePlusTwo) && !winningPotential.Contains(tile)) {
                 winningPotential.Add(tile);
             }
         }
 
         if (winningPotential.Count == 3) {
             foreach (Tile tile in winningPotential) {
-                tile.isVisited = true;
                 tile.isWinning = true;
             }
 
@@ -127,7 +128,6 @@ public class WinConditions {
             comboTypeList.Remove(comboType);
 
             foreach (Tile tile in winningPotential) {
-                tile.isVisited = false;
                 tile.isWinning = false;
             }
         }
@@ -150,14 +150,13 @@ public class WinConditions {
 
         // Check for Eye
         foreach (Tile tile in hand) {
-            if (!tile.isVisited && tile.Equals(firstUnvisitedTile)) {
+            if (!tile.isWinning && tile.Equals(firstNonWinningTile)) {
                 winningPotential.Add(tile);
             }
         }
 
         if (winningPotential.Count >= 2) {
             for (int i = 0; i < 2; i++) {
-                winningPotential[i].isVisited = true;
                 winningPotential[i].isWinning = true;
             }
 
@@ -177,7 +176,6 @@ public class WinConditions {
             comboTypeList.Remove(comboType);
 
             foreach (Tile tile in winningPotential) {
-                tile.isVisited = false;
                 tile.isWinning = false;
             }
             winningPotential.Clear();
