@@ -9,7 +9,7 @@ using UnityEngine;
 /// </summary>
 // https://stackoverflow.com/questions/4937771/mahjong-winning-hand-algorithm
 public class WinConditions {
-    List<List<List<Tile>>> listOfCombos = new List<List<List<Tile>>>();
+    List<List<string>> listOfCombos = new List<List<string>>();
 
     public void CheckWin(List<Tile> hand) {
         foreach (Tile tile in hand) {
@@ -17,13 +17,13 @@ public class WinConditions {
             tile.isWinning = false;
         }
 
-        Backtracking(hand, new List<List<Tile>>());
+        Backtracking(hand, new List<string>());
         Debug.Log(listOfCombos);
     }
 
 
-    public void Backtracking(List<Tile> hand, List<List<Tile>> comboListInput) {
-        List<List<Tile>> comboList = new List<List<Tile>>(comboListInput);
+    public void Backtracking(List<Tile> hand, List<string> comboListInput) {
+        List<string> comboTypeList = new List<string>(comboListInput);
 
         // Base case
         bool allWinning = true;
@@ -35,7 +35,7 @@ public class WinConditions {
         }
 
         if (allWinning) {
-            listOfCombos.Add(comboList);
+            listOfCombos.Add(comboTypeList);
             return;
         }
 
@@ -64,8 +64,8 @@ public class WinConditions {
                 winningPotential[i].isWinning = true;
             }
 
-            List<Tile> newList = new List<Tile>(winningPotential);
-            comboList.Add(newList);
+            string comboType = "Pong";
+            comboTypeList.Add(comboType);
 
             // DEBUG
             int winningTiles = 0;
@@ -76,8 +76,8 @@ public class WinConditions {
             }
             Debug.LogFormat("New Pong Combo. There are now {0} winning tiles", winningTiles);
 
-            Backtracking(hand, comboList);
-            comboList.Remove(newList);
+            Backtracking(hand, comboTypeList);
+            comboTypeList.Remove(comboType);
 
             foreach (Tile tile in winningPotential) {
                 tile.isVisited = false;
@@ -111,8 +111,8 @@ public class WinConditions {
                 tile.isWinning = true;
             }
 
-            List<Tile> newList = new List<Tile>(winningPotential);
-            comboList.Add(newList);
+            string comboType = "Chow";
+            comboTypeList.Add(comboType);
 
             // DEBUG
             int winningTiles = 0;
@@ -123,8 +123,8 @@ public class WinConditions {
             }
             Debug.LogFormat("New Chow Combo. There are now {0} winning tiles", winningTiles);
 
-            Backtracking(hand, comboList);
-            comboList.Remove(newList);
+            Backtracking(hand, comboTypeList);
+            comboTypeList.Remove(comboType);
 
             foreach (Tile tile in winningPotential) {
                 tile.isVisited = false;
@@ -161,8 +161,8 @@ public class WinConditions {
                 winningPotential[i].isWinning = true;
             }
 
-            List<Tile> newList = new List<Tile>(winningPotential);
-            comboList.Add(newList);
+            string comboType = "Eye";
+            comboTypeList.Add(comboType);
 
             // DEBUG
             int winningTiles = 0;
@@ -173,8 +173,8 @@ public class WinConditions {
             }
             Debug.LogFormat("New Eye Combo. There are now {0} winning tiles", winningTiles);
 
-            Backtracking(hand, comboList);
-            comboList.Remove(newList);
+            Backtracking(hand, comboTypeList);
+            comboTypeList.Remove(comboType);
 
             foreach (Tile tile in winningPotential) {
                 tile.isVisited = false;
