@@ -11,14 +11,14 @@ using UnityEngine;
 // https://stackoverflow.com/questions/4937771/mahjong-winning-hand-algorithm
 public class WinCombos {
     private List<List<string>> listOfCombos;
-    private List<List<string>> reducedListOfCombos;
+    private List<List<string>> confirmedListOfCombos;
 
     /// <summary>
     /// Returns a list of solutions which the hand allows. Each solution consists of a list of combo types. 
     /// </summary>
     public List<List<string>> CheckWin(List<Tile> hand) {
         listOfCombos = new List<List<string>>();
-        reducedListOfCombos = new List<List<string>>();
+        confirmedListOfCombos = new List<List<string>>();
 
         foreach (Tile tile in hand) {
             tile.isWinning = false;
@@ -30,22 +30,29 @@ public class WinCombos {
             return listOfCombos;
         }
 
-        List<string> referenceSolution = listOfCombos[0].OrderBy(x => x).ToList();
-        reducedListOfCombos.Add(referenceSolution);
-
-        // Remove solutions which contain the same combo types
+        confirmedListOfCombos.Add(listOfCombos[0].OrderBy(x => x).ToList());        
         if (listOfCombos.Count == 1) {
-            //return reducedListOfCombos;
-            return new List<List<string>>() { listOfCombos[0].OrderBy(x => x).ToList() };
+            return confirmedListOfCombos;
         }
 
-        foreach (List<string> solution in listOfCombos) {
-            if (!Enumerable.SequenceEqual(referenceSolution, solution.OrderBy(x => x).ToList())) {
-                reducedListOfCombos.Add(solution);
+        // Remove solutions which contain the same combo types
+        foreach (List<string> pendingSolution in listOfCombos.Skip(1)) {
+
+            List<string> pendingBecomeConfirmedSolution = pendingSolution.OrderBy(x => x).ToList();
+            foreach (List<string> confirmedSolution in confirmedListOfCombos) {
+
+                if (Enumerable.SequenceEqual(confirmedSolution, pendingSolution.OrderBy(x => x).ToList())) {
+                    pendingBecomeConfirmedSolution = null;
+                    break;
+                }
+            }
+
+            if (pendingBecomeConfirmedSolution != null) {
+                confirmedListOfCombos.Add(pendingBecomeConfirmedSolution);
             }
         }
 
-        return reducedListOfCombos;
+        return confirmedListOfCombos;
     }
 
 

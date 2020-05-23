@@ -160,6 +160,8 @@ namespace Tests {
                 new List<string>() { "Eye", "Pong", "Pong", "Pong", "Pong" },
                 new List<string>() { "Chow", "Chow", "Chow", "Eye", "Pong" }
             };
+            testWin.CheckWin(hand);
+
             List<List<string>> actual = testWin.CheckWin(hand);
 
             Assert.AreEqual(expected, actual);
