@@ -152,6 +152,8 @@ public class FanCalculator {
         // Three Lesser Scholars and Three Great Scholars check
         winningCombos.Add(this.ThreeScholarsCheck(combinedHand));
 
+        // Four Lesser Blessing and Four Great Blessings check
+        winningCombos.Add(this.FourBlessingsCheck(combinedHand));
     }
 
     #region Winning Hands
@@ -351,6 +353,35 @@ public class FanCalculator {
     }
 
 
+    /// <summary>
+    /// Determine if the hand is Four Lesser Blessings or Four Great Blessings Hand
+    /// </summary>
+    private string FourBlessingsCheck(List<Tile> combinedHand) {
+        int windTilesCount = 0;
+        foreach (Tile tile in combinedHand) {
+            if (tile.suit == Tile.Suit.Wind) {
+                windTilesCount++;
+            }
+        }
+
+        if (windTilesCount == 11) {
+            return "Four Lesser Blessings";
+        }
+
+        if (windTilesCount == 12) {
+            return "Four Great Blessings";
+        }
+
+        return null;
+    }
+
+
+    /// <summary>
+    /// Determine if the hand is Thirteen Wonder Hand
+    /// </summary>
+    private string ThirteenWondersCheck(List<Tile> hand) {
+
+    }
 
     #endregion
 
