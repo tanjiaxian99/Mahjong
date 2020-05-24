@@ -134,7 +134,6 @@ public class Tile : IEquatable<Tile> {
     }
 
 
-
     public override string ToString() {
         return suit + "_" + rank;
     }
