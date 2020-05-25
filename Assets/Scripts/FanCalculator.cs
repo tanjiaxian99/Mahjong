@@ -87,7 +87,6 @@ public class FanCalculator {
             return fanTotal;
         }
 
-
         if (listOfCombos.Count == 1) {
 
         }
@@ -681,7 +680,7 @@ public class FanCalculator {
                     continue;
                 }
 
-                if (!tile.isConcealedKongTile) {
+                if (!tile.kongType) {
                     return null;
                 }
             }
