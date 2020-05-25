@@ -88,16 +88,14 @@ public class FanCalculator {
         }
 
 
-        this.FanInBonusTiles(bonusTiles, playerWind);
+        this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
 
         this.WinningOnReplacementTile(numberOfReplacementTiles, numberOfKong);
         // TODO: Robbing the Kong
         this.WinningOnTheLastAvailableTile(numberOfReplacementTiles, numberOfTilesLeft);
 
         this.FirstRoundHands(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, turn);
-        // TODO: Heavenly Hand
-        // TODO: Earthly Hand
-        // TODO: Humanly Hand
+  
         // TODO: Robbing the Eight
         // TODO: Paying for all players
         // TODO: Fresh tile discard
@@ -109,39 +107,52 @@ public class FanCalculator {
     /// <summary>
     /// Calculates the number of Fan in bonus tiles
     /// </summary>
-    private void FanInBonusTiles(List<Tile> bonusTiles, PlayerManager.Wind playerWind) {
+    private void FanInBonusTiles(List<Tile> bonusTiles, PlayerManager.Wind playerWind, List<Tile> allPlayersOpenTiles) {
         int numberOfSeasonTiles = 0;
         int numberOfFlowerTiles = 0;
 
         foreach (Tile bonusTile in bonusTiles) {
             if (bonusTileToWindDict.ContainsKey(bonusTile)) {
                 if (bonusTileToWindDict[bonusTile] == playerWind) {
-                    fanTotal += 1;
+                    winningCombos.Add("Bonus Tile Match Seat Wind");
                 }
 
                 if (bonusTile.suit == Tile.Suit.Season) {
                     numberOfSeasonTiles += 1;
+
                 } else {
                     numberOfFlowerTiles += 1;
                 }
 
             } else {
-                // Add 1 Fan for each Animal tile
-                fanTotal += 1;
+                winningCombos.Add("Animal");
             }
         }
 
+        // Complete Season Group
         if (numberOfSeasonTiles == 4) {
-            fanTotal += 1;
+            winningCombos.Add("Complete Season Group");
         }
 
+        // Complete Flower Group
         if (numberOfFlowerTiles == 4) {
-            fanTotal += 1;
+            winningCombos.Add("Complete Flower Group");
         }
 
-        if (numberOfSeasonTiles + numberOfFlowerTiles == 8) {
-            fanTotal = fanLimit;
+        // Robbing the Eighth
+        if (numberOfSeasonTiles + numberOfFlowerTiles == 7) {
+            foreach (Tile tile in allPlayersOpenTiles) {
+                if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
+                    winningCombos.Add("Robbing the Eighth");
+                }
+            }
         }
+
+        // All Flowers and Seasons
+        if (numberOfSeasonTiles + numberOfFlowerTiles == 8) {
+            winningCombos.Add("All Flowers and Seasons");
+        }
+        
     }
 
 
@@ -228,6 +239,13 @@ public class FanCalculator {
         
     }
 
+
+    /// <summary>
+    /// Calculate the number of Fan in the player's hand due to honour tiles
+    /// </summary>
+    private void FanInHonourTiles() {
+
+    }
 
     /// <summary>
     /// Container for Replacement Tile Win checks
