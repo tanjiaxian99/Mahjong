@@ -27,6 +27,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public bool canTouchHandTiles = false;
 
+    public int numberOfReplacementTiles { get; set; }
+
     #endregion
 
     #region MonoBehaviour Callbacks

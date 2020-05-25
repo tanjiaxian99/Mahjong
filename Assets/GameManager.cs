@@ -1229,6 +1229,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 if (playerManager.hand.Contains(tile)) {
                     playerManager.myTurn = false;
                     playerManager.canTouchHandTiles = false;
+                    playerManager.numberOfReplacementTiles = 0;
                     playerManager.hand.Remove(tile);
 
                     this.InstantiateLocalHand();
@@ -1258,6 +1259,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
             playerManager.bonusTiles.Add(tile);
             hand[hand.Count - 1] = this.DrawTile();
+            playerManager.numberOfReplacementTiles++;
         }
     }
 
