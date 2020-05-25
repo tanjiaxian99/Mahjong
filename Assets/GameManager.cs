@@ -587,7 +587,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             ht.Add(PlayerWindPropKey, wind);
             PhotonNetwork.SetPlayerCustomProperties(ht);
             // Update local player's playerManager
-            playerManager.PlayerWind = wind;
+            playerManager.playerWind = wind;
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
@@ -1172,16 +1172,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void OnPlayerTurn() {
         List<Tile> hand = playerManager.hand;
 
-        if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
-            // Ensure turnManager.Turn is greater than 1 when the East Wind calls OnPlayerTurn() again.
-            this.StartTurn();
+        if (playerManager.playerWind == PlayerManager.Wind.EAST) {
+            if (turnManager.Turn == 1) {
+                if (playerManager.ConcealedKongTiles().Count != 0) {
+                    this.KongUI(playerManager.ConcealedKongTiles());
+                }
+                return;
 
-            if (playerManager.ConcealedKongTiles().Count != 0) {
-                this.KongUI(playerManager.ConcealedKongTiles());
+            } else {
+                this.StartTurn();
             }
-
-            return;
         }
+
 
         // Check if the discarded tile could be Chow/Ponged/Konged
         Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];

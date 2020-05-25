@@ -41,10 +41,13 @@ public class FanCalculator {
     /// Calculates the number of Fan the player has
     /// </summary>
     /// <param name="discardTile">The latest discard tile. Null if the tile is self-picked</param>
-    public int CalculateFan(
-        List<Tile> hand, List<Tile> bonusTiles, List<List<Tile>> comboTiles, Tile discardTile, 
-        PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind, int numberOfReplacementTiles, 
-        int numberOfKong, int numberOfTilesLeft) {
+    public int CalculateFan(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
+        List<Tile> hand = playerManager.hand;
+        List<Tile> bonusTiles = playerManager.bonusTiles;
+        List<List<Tile>> comboTiles = playerManager.comboTiles;
+        PlayerManager.Wind playerWind = playerManager.playerWind;
+        int numberOfReplacementTiles = playerManager.numberOfReplacementTiles;
+        int numberOfKong = playerManager.numberOfKong;
 
         fanTotal = 0;
 
@@ -91,6 +94,7 @@ public class FanCalculator {
         // TODO: Robbing the Kong
         this.WinningOnTheLastAvailableTile(numberOfReplacementTiles, numberOfTilesLeft);
 
+        this.FirstRoundHands(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, turn);
         // TODO: Heavenly Hand
         // TODO: Earthly Hand
         // TODO: Humanly Hand
@@ -225,6 +229,9 @@ public class FanCalculator {
     }
 
 
+    /// <summary>
+    /// Container for Replacement Tile Win checks
+    /// </summary>
     private void WinningOnReplacementTile(int numberOfReplacementTiles, int numberOfKong) {
         if (handsToCheck["Winning on Replacement Tile For Flower"] > 0) {
             winningCombos.Add(WinningOnReplacementTileForFlower(numberOfReplacementTiles));
@@ -237,6 +244,25 @@ public class FanCalculator {
         if (handsToCheck["Kong on Kong"] > 0) {
             winningCombos.Add(KongOnKong(numberOfKong));
         }
+    }
+
+
+    /// <summary>
+    /// Container for Heavenly, Earthly and Humanly Hands
+    /// </summary>
+    private void FirstRoundHands(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
+        if (handsToCheck["Heavenly Hand"] > 0) {
+            winningCombos.Add(HeavenlyHandCheck(playerWind, turn));
+        }
+
+        if (handsToCheck["Earthly Hand"] > 0) {
+            winningCombos.Add(EarthlyHandCheck(discardPlayerWind, discardTile, turn));
+        }
+
+        if (handsToCheck["Humanly Hand"] > 0) {
+            winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, turn));
+        }
+
     }
 
     #region Winning Hands
@@ -548,6 +574,58 @@ public class FanCalculator {
     private string KongOnKong(int numberOfKong) {
         if (numberOfKong == 2) {
             return "Kong on Kong";
+        }
+        return null;
+    }
+
+    #endregion
+
+    #region FirstRoundHands
+
+    /// <summary>
+    /// Determine if the hand is a Heavenly Hand
+    /// </summary>
+    /// <returns></returns>
+    private string HeavenlyHandCheck(PlayerManager.Wind playerWind, int turn) {
+        if (playerWind == PlayerManager.Wind.EAST && turn == 1) {
+            return "Heavenly Hand";
+        }
+        return null;
+    }
+
+
+    /// <summary>
+    /// Determine if the hand is a Earthly Hand
+    /// </summary>
+    private string EarthlyHandCheck(PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
+        if (turn == 1 && discardPlayerWind == PlayerManager.Wind.EAST && discardTile != null) {
+            return "Earthly Hand";
+        }
+
+        //// TODO: "Non-dealer wins upon drawing the first card in the game" So Chow/Pong/Kong are allowed before this happens?
+        //if (turn == 1 && playerWind != PlayerManager.Wind.EAST && discardTile == null) {
+        //    return "Earthly Hand";
+        //}
+        
+        return null;
+    }
+
+
+    /// <summary>
+    /// Determine if the hand is a Humanly Hand
+    /// </summary>
+    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
+        if (turn == 1 && playerWind != PlayerManager.Wind.EAST && discardTile != null) {
+            foreach (Tile tile in allPlayersOpenTiles) {
+                if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower || tile.suit == Tile.Suit.Animal) {
+                    continue;
+                }
+
+                if (!tile.isConcealedKongTile) {
+                    return null;
+                }
+            }
+            return "Humanly Hand";
         }
         return null;
     }

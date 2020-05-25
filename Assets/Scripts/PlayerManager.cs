@@ -13,7 +13,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
         SOUTH
     }
 
-    public Wind PlayerWind { get; set; }
+    public Wind playerWind { get; set; }
 
     public List<Tile> hand { get; set; } = new List<Tile>() ;
 
