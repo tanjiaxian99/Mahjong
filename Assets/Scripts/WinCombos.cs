@@ -17,6 +17,11 @@ public class WinCombos {
     /// Returns a list of solutions which the hand allows. Each solution consists of a list of combo types. 
     /// </summary>
     public List<List<string>> CheckWin(List<Tile> hand) {
+        if (hand.Count != 14) {
+            Debug.LogErrorFormat("The player's hand only contains {0} tiles", hand.Count);
+            return null;
+        }
+
         listOfCombos = new List<List<string>>();
         confirmedListOfCombos = new List<List<string>>();
 

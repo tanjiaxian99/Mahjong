@@ -12,8 +12,9 @@ public class FanCalculator {
     private WinCombos winCombos = new WinCombos();
     private Dictionary<Tile, PlayerManager.Wind> bonusTileToWindDict = new Dictionary<Tile, PlayerManager.Wind>();
     private Dictionary<Tile, int> nineGatesDict;
+    private Dictionary<string, bool> handsToCheck = new Dictionary<string, bool>();
 
-    public FanCalculator() {
+    public FanCalculator(Dictionary<string, bool> handsToCheck) {
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.One), PlayerManager.Wind.EAST);
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Two), PlayerManager.Wind.NORTH);
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Three), PlayerManager.Wind.WEST);
@@ -22,11 +23,17 @@ public class FanCalculator {
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.One), PlayerManager.Wind.EAST);
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Two), PlayerManager.Wind.NORTH);
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Three), PlayerManager.Wind.WEST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Four), PlayerManager.Wind.SOUTH);        
+        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Four), PlayerManager.Wind.SOUTH);
+
+        this.handsToCheck = handsToCheck;
     }
 
 
-    public void CalculateFan(List<Tile> hand, List<Tile> bonusTiles, List<List<Tile>> comboTiles, Tile discardTile, PlayerManager.Wind playerWind, PlayerManager.Wind tableWind) {
+    /// <summary>
+    /// Calculates the number of Fan the player's hand has
+    /// </summary>
+    /// <param name="discardTile">The latest discard tile. Null if the tile is self-picked</param>
+    public int CalculateFan(List<Tile> hand, List<Tile> bonusTiles, List<List<Tile>> comboTiles, Tile discardTile, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind) {
         fanTotal = 0;
 
         // Combining hand and comboTiles
@@ -38,13 +45,21 @@ public class FanCalculator {
                 combinedHand.Add(comboTile);
             }
         }
+
+        if (combinedHand.Count == 13 && discardTile != null) {
+            combinedHand.Add(discardTile);
+        }
         combinedHand = combinedHand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
 
 
         // Retrieve list of solution(s)
         List<List<string>> listOfCombos = winCombos.CheckWin(combinedHand);
+        if (listOfCombos == null) {
+            return fanTotal;
+        }
+
         if (listOfCombos.Count == 0) {
-            return;
+            return fanTotal;
         }
 
 
@@ -65,6 +80,10 @@ public class FanCalculator {
         // TODO: Robbing the Kong
         // TODO: Winning on the Last Available Tile
 
+        // Heavenly Hand
+        // Earthly Hand
+        // Humanly Hand
+        return 0;
     }
 
 
@@ -107,33 +126,43 @@ public class FanCalculator {
     /// <summary>
     /// Calculates the number of Fan in the hand type (e.g. Half Flush, Sequence Hand, etc.). Excludes Fan from Honour Tiles (Dragon and Wind tiles).
     /// </summary>
-    private void FanInHand (List<string> comboList, List<Tile> combinedHand, List<Tile> originalHand, List<Tile> bonusTiles, Tile discardTile) {
+    private void FanInHand(List<string> comboList, List<Tile> combinedHand, List<Tile> originalHand, List<Tile> bonusTiles, List<List<Tile>> comboTiles, Tile discardTile) {
         HashSet<string> comboListNoDuplicate = new HashSet<string>(comboList);
         List<string> winningCombos = new List<string>();
 
+        // Fully Concealed Hand check
+        if (handsToCheck["Fully Concealed"]) {
+            winningCombos.Add(this.FullyConcealedHandCheck(comboTiles, discardTile));
+        }
+        
         // Triplets Hand check
-        winningCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
-
-
+        if (handsToCheck["Fully Concealed"]) {
+            winningCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
+        }
+        
         // TODO: Hidden Treasure check
-
+        if (handsToCheck["Hidden Treasure"]) {
+            winningCombos.Add(this.HiddenTreasureCheck(comboListNoDuplicate, comboTiles, discardTile));
+        }
 
         // Half Flush & Full Flush check
-        winningCombos.Add(this.FlushHandCheck(combinedHand));
+        if (handsToCheck["Flush"]) {
+            winningCombos.Add(this.FlushHandCheck(combinedHand));
+        }
 
         // Only check Nine Gates if there is a Full Flush
-        if (winningCombos.Contains("Full Flush")) {
+        if (handsToCheck["Nine Gates"] && handsToCheck["Flush"] && winningCombos.Contains("Full Flush")) {
             winningCombos.Add(this.NineGatesCheck(combinedHand));
         }
 
         // Mixed and Pure Terminals check
-        if (winningCombos.Contains("Triplets")) {
-            winningCombos.Add(this.TerminalsHandCheck(combinedHand));
+        if (handsToCheck["Terminals"] && handsToCheck["Triplets"] && winningCombos.Contains("Triplets")) {
+            winningCombos.Add(this.NineGatesCheck(combinedHand));
         }
 
         // All Honour check
-        if (winningCombos.Contains("Triplets")) {
-            winningCombos.Add(this.AllHonourCheck(combinedHand));
+        if (handsToCheck["All Honour"] && handsToCheck["All Honour"] && winningCombos.Contains("Triplets")) {
+            winningCombos.Add(this.NineGatesCheck(combinedHand));
         }
 
         // Sequence Hand check. 
@@ -154,6 +183,10 @@ public class FanCalculator {
 
         // Four Lesser Blessing and Four Great Blessings check
         winningCombos.Add(this.FourBlessingsCheck(combinedHand));
+
+        // Eighteen Arhats check
+        winningCombos.Add(this.EighteenArhatsCheck(combinedHand));
+
     }
 
     #region Winning Hands
@@ -166,6 +199,17 @@ public class FanCalculator {
             return "Triplets";
         }
 
+        return null;
+    }
+
+
+    /// <summary>
+    /// Determine if the hand is a Hidden Treasure Hand
+    /// </summary>
+    private string HiddenTreasureCheck(HashSet<string> comboListNoDuplicate, List<List<Tile>> comboTiles, Tile discardTile) {
+        if (TripletsHandCheck(comboListNoDuplicate) == "Triplet" && FullyConcealedHandCheck(comboTiles, discardTile) == "Fully Concealed") {
+            return "Hidden Treasure";
+        }
         return null;
     }
 
@@ -354,7 +398,7 @@ public class FanCalculator {
 
 
     /// <summary>
-    /// Determine if the hand is Four Lesser Blessings or Four Great Blessings Hand
+    /// Determine if the hand is a Four Lesser Blessings or Four Great Blessings Hand
     /// </summary>
     private string FourBlessingsCheck(List<Tile> combinedHand) {
         int windTilesCount = 0;
@@ -377,10 +421,60 @@ public class FanCalculator {
 
 
     /// <summary>
-    /// Determine if the hand is Thirteen Wonder Hand
+    /// Determine if the hand is a Thirteen Wonders Hand
     /// </summary>
     private string ThirteenWondersCheck(List<Tile> hand) {
+        List<Tile> thirteenWondersTiles = new List<Tile>() { 
+            new Tile(Tile.Suit.Character, Tile.Rank.One),
+            new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+            new Tile(Tile.Suit.Dot, Tile.Rank.One),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+            new Tile(Tile.Suit.Wind, Tile.Rank.One),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
+        };
 
+        HashSet<Tile> noDuplicateHand = new HashSet<Tile>(hand);
+        foreach (Tile tile in noDuplicateHand) {
+            if (!thirteenWondersTiles.Contains(tile)) {
+                return null;
+            }
+        }
+
+        return "Thirteen Wonders";
+    }
+
+
+    /// <summary>
+    /// Determine if the hand is an Eighteen Arhats Hand
+    /// </summary>
+    private string EighteenArhatsCheck(List<Tile> comboTiles) {
+        if (comboTiles.Count == 18) {
+            return "Eighteen Arhats";
+        }
+
+        return null;
+    }
+
+
+    /// <summary>
+    /// Determine if the hand is a Fully Concealed Hand
+    /// </summary>
+    private string FullyConcealedHandCheck(List<List<Tile>> comboTiles, Tile discardTile) {
+        int comboTilesCount = 0;
+        foreach (List<Tile> combo in comboTiles) {
+            comboTilesCount += combo.Count;
+        }
+        
+        if (comboTilesCount == 0 && discardTile == null) {
+            return "Fully Concealed";
+        }
+        return null;
     }
 
     #endregion
