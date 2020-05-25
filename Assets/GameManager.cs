@@ -79,6 +79,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public Tile latestDiscardTile;
 
+    /// <summary>
+    /// The number of tiles left in the wall
+    /// </summary>
+    public int numberOfTilesLeft;
+
     #endregion
 
     #region OnEvent Fields
@@ -110,8 +115,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// the latest discard tile.
     /// </summary>
     public const byte EvPongKongUpdate = 12;
-
-
 
 
     /// <summary>
@@ -1269,13 +1272,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Draw a new tile. No distinction made between front end or back end of Wall Tiles.
     /// </summary>
-    // TODO: To be called when converting bonus tiles
     public Tile DrawTile() {
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
         int randomIndex = RandomNumber(tiles.Count());
         Tile tile = tiles[randomIndex];
         tiles.Remove(tiles[randomIndex]);
+
+        numberOfTilesLeft = tiles.Count;
 
         // Reinsert updated tiles list into Room Custom Properties
         Hashtable ht = new Hashtable();

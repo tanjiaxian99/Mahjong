@@ -41,7 +41,11 @@ public class FanCalculator {
     /// Calculates the number of Fan the player has
     /// </summary>
     /// <param name="discardTile">The latest discard tile. Null if the tile is self-picked</param>
-    public int CalculateFan(List<Tile> hand, List<Tile> bonusTiles, List<List<Tile>> comboTiles, Tile discardTile, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind, int numberOfReplacementTiles, int numberOfKong) {
+    public int CalculateFan(
+        List<Tile> hand, List<Tile> bonusTiles, List<List<Tile>> comboTiles, Tile discardTile, 
+        PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind, int numberOfReplacementTiles, 
+        int numberOfKong, int numberOfTilesLeft) {
+
         fanTotal = 0;
 
         // Combining hand and comboTiles
@@ -85,7 +89,7 @@ public class FanCalculator {
 
         this.WinningOnReplacementTile(numberOfReplacementTiles, numberOfKong);
         // TODO: Robbing the Kong
-        // TODO: Winning on the Last Available Tile
+        this.WinningOnTheLastAvailableTile(numberOfReplacementTiles, numberOfTilesLeft);
 
         // TODO: Heavenly Hand
         // TODO: Earthly Hand
@@ -545,6 +549,21 @@ public class FanCalculator {
         if (numberOfKong == 2) {
             return "Kong on Kong";
         }
+        return null;
+    }
+
+    #endregion
+
+    #region
+
+    /// <summary>
+    /// Determine if the player won on the last available tile
+    /// </summary>
+    private string WinningOnTheLastAvailableTile(int numberOfReplacementTiles, int numberOfTilesLeft) {
+        if (numberOfReplacementTiles == 0 && numberOfTilesLeft == 15) {
+            return "Winning on Last Available Tile";
+        }
+
         return null;
     }
 
