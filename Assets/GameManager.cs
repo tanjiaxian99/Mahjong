@@ -1227,9 +1227,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Tile tile = new Tile(tileName);
 
                 if (playerManager.hand.Contains(tile)) {
+                    playerManager.numberOfReplacementTiles = 0;
+                    playerManager.numberOfKong = 0;
+
                     playerManager.myTurn = false;
                     playerManager.canTouchHandTiles = false;
-                    playerManager.numberOfReplacementTiles = 0;
                     playerManager.hand.Remove(tile);
 
                     this.InstantiateLocalHand();
@@ -1760,7 +1762,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
 
             playerManager.comboTiles.Add(combo);
-        } 
+        }
+        playerManager.numberOfKong++;
 
         // Always draw a tile regardless of Kong type
         hand.Add(this.DrawTile());

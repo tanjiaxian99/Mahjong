@@ -17,6 +17,7 @@ public class FanCalculator {
     private Dictionary<Tile, PlayerManager.Wind> bonusTileToWindDict = new Dictionary<Tile, PlayerManager.Wind>();
     private Dictionary<Tile, int> nineGatesDict;
     private Dictionary<string, int> handsToCheck = new Dictionary<string, int>();
+    private List<string> winningCombos;
 
 
     /// <param name="handsToCheck">A dictionary containing each hand and the number of Fan it should have</param>
@@ -32,6 +33,7 @@ public class FanCalculator {
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Four), PlayerManager.Wind.SOUTH);
 
         this.handsToCheck = handsToCheck;
+        winningCombos = new List<string>();
     }
 
 
@@ -39,7 +41,7 @@ public class FanCalculator {
     /// Calculates the number of Fan the player has
     /// </summary>
     /// <param name="discardTile">The latest discard tile. Null if the tile is self-picked</param>
-    public int CalculateFan(List<Tile> hand, List<Tile> bonusTiles, List<List<Tile>> comboTiles, Tile discardTile, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind) {
+    public int CalculateFan(List<Tile> hand, List<Tile> bonusTiles, List<List<Tile>> comboTiles, Tile discardTile, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind, int numberOfReplacementTiles, int numberOfKong) {
         fanTotal = 0;
 
         // Combining hand and comboTiles
@@ -79,10 +81,9 @@ public class FanCalculator {
         }
 
 
-        // Calculates number of Fan in bonus tiles
         this.FanInBonusTiles(bonusTiles, playerWind);
 
-        this.WinningOnReplacementTile();
+        this.WinningOnReplacementTile(numberOfReplacementTiles, numberOfKong);
         // TODO: Robbing the Kong
         // TODO: Winning on the Last Available Tile
 
@@ -141,7 +142,6 @@ public class FanCalculator {
     /// </summary>
     private void FanInHand(List<string> comboList, List<Tile> combinedHand, List<Tile> originalHand, List<Tile> bonusTiles, List<List<Tile>> comboTiles, Tile discardTile) {
         HashSet<string> comboListNoDuplicate = new HashSet<string>(comboList);
-        List<string> winningCombos = new List<string>();
 
         // Fully Concealed Hand check
         if (handsToCheck["Fully Concealed"] > 0) {
@@ -221,8 +221,18 @@ public class FanCalculator {
     }
 
 
-    private void WinningOnReplacementTile() {
+    private void WinningOnReplacementTile(int numberOfReplacementTiles, int numberOfKong) {
+        if (handsToCheck["Winning on Replacement Tile For Flower"] > 0) {
+            winningCombos.Add(WinningOnReplacementTileForFlower(numberOfReplacementTiles));
+        }
 
+        if (handsToCheck["Winning on Replacement Tile for Kong"] > 0) {
+            winningCombos.Add(WinningOnReplacementTileForKong(numberOfKong));
+        }
+
+        if (handsToCheck["Kong on Kong"] > 0) {
+            winningCombos.Add(KongOnKong(numberOfKong));
+        }
     }
 
     #region Winning Hands
@@ -498,6 +508,42 @@ public class FanCalculator {
         
         if (comboTilesCount == 0 && discardTile == null) {
             return "Fully Concealed";
+        }
+        return null;
+    }
+
+    #endregion
+
+    #region Winning on Replacement Tile
+
+    /// <summary>
+    /// Determine if the player won with a replacement tile from flower
+    /// </summary>
+    private string WinningOnReplacementTileForFlower(int numberOfReplacementTiles) {
+        if (numberOfReplacementTiles > 0) {
+            return string.Format("Winning on Replacement Tile for Flower {0}", numberOfReplacementTiles);
+        }
+        return null;
+    }
+
+
+    /// <summary>
+    /// Determine if the player won with a replacement tile from Kong
+    /// </summary>
+    private string WinningOnReplacementTileForKong(int numberOfKong) {
+        if (numberOfKong == 1) {
+            return "Winning on Replacement Tile for Kong";
+        }
+        return null;
+    }
+
+
+    /// <summary>
+    /// Determine if the player won with a Kong on Kong
+    /// </summary>
+    private string KongOnKong(int numberOfKong) {
+        if (numberOfKong == 2) {
+            return "Kong on Kong";
         }
         return null;
     }

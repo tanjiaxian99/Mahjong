@@ -29,6 +29,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public int numberOfReplacementTiles { get; set; }
 
+    public int numberOfKong { get; set; }
+
     #endregion
 
     #region MonoBehaviour Callbacks
