@@ -12,10 +12,20 @@ namespace Tests {
         WinCombos testWin = new WinCombos();
         Dictionary<string, int> handsToCheck;
         FanCalculator fanCalculator;
-        
-        #region Instantiate HandsToCheck Dictionary
+
+        PlayerManager playerManager;
+        Tile discardTile;
+        PlayerManager.Wind discardPlayerWind;
+        PlayerManager.Wind prevailingWind;
+        int numberOfTilesLeft;
+        int turn;
+        List<Tile> allPlayersOpenTiles;
+
+        public FanCalculatorTest() {
+            this.TestInitialize();
+        }
+
         public void TestInitialize() {
-            fanCalculator = new FanCalculator(handsToCheck);
             handsToCheck = new Dictionary<string, int>();
 
             handsToCheck.Add("Fan Limit", 50);
@@ -28,7 +38,7 @@ namespace Tests {
             handsToCheck.Add("Animal", 1);
             handsToCheck.Add("Complete Season Group", 2);
             handsToCheck.Add("Complete Flower Group", 2);
-            handsToCheck.Add("Robbing the Eigth", 10);
+            handsToCheck.Add("Robbing the Eighth", 10);
             handsToCheck.Add("All Flowers and Seasons", 10);
 
             handsToCheck.Add("Player Wind Combo", 1);
@@ -62,14 +72,46 @@ namespace Tests {
 
             handsToCheck.Add("Robbing the Kong", 1);
             handsToCheck.Add("Winning on Last Available Tile", 1);
+
+            fanCalculator = new FanCalculator(handsToCheck);
         }
 
-        #endregion
-
-
         [Test]
-        public void ZeroFanHand() {
-            
+        public void HeavenlyHand() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One)};
+
+            playerManager.bonusTiles = new List<Tile>() { };
+            playerManager.comboTiles = new List<List<Tile>>() { };
+            playerManager.playerWind = PlayerManager.Wind.EAST;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.One);
+            discardPlayerWind = PlayerManager.Wind.SOUTH;
+            prevailingWind = PlayerManager.Wind.SOUTH;
+            numberOfTilesLeft = 45;
+            turn = 1;
+            allPlayersOpenTiles = new List<Tile>();
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "hi" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedFan, actualFan);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
         }
 
         //// A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use

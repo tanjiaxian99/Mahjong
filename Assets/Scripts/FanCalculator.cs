@@ -436,6 +436,7 @@ public class FanCalculator {
             if (honourTilesCount[tile] == 3) {
 
                 if (handsToCheck["Player Wind Combo"] > 0) {
+                    Debug.Log(tile);
                     if (tile.suit == Tile.Suit.Wind && bonusTileToWindDict[tile] == playerWind) {
                         winningCombos.Add("Player Wind Combo");
                     }
