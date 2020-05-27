@@ -13,7 +13,7 @@ using UnityEngine.XR;
 /// </summary>
 public class FanCalculator {
     private int fanTotal;
-    private int fanLimit = 5;
+    private int fanLimit;
     private WinCombos winCombos = new WinCombos();
 
     private Dictionary<Tile, PlayerManager.Wind> bonusTileToWindDict = new Dictionary<Tile, PlayerManager.Wind>();
@@ -24,8 +24,10 @@ public class FanCalculator {
 
     private List<string> winningCombos;
     private List<List<string>> listOfWinningCombos;
+    private List<int> fanTotalList;
 
-    /// <param name="handsToCheck">A dictionary containing each hand and the number of Fan it should have</param>
+    /// <param name="handsToCheck">A dictionary containing each Fan-contributing combination and the number of Fan it should have.
+    /// Includes the Fan Limit</param>
     public FanCalculator(Dictionary<string, int> handsToCheck) {
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.One), PlayerManager.Wind.EAST);
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Two), PlayerManager.Wind.NORTH);
@@ -49,13 +51,226 @@ public class FanCalculator {
     /// <summary>
     /// Calculates and returns the number of Fan the player's tiles contain
     /// </summary>
-    public int CalculateFan(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
-        fanTotal = 0;
+    public (int, List<string>) CalculateFan(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
+        fanLimit = handsToCheck["Fan Limit"];
+        fanTotalList = new List<int>();
 
         this.TabulateCombos(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
 
+        foreach (List<string> winningCombos in listOfWinningCombos) {
+            fanTotal = 0;
 
-        return 0;
+            #region Fan in First Round
+
+            if (winningCombos.Contains("Heavenly Hand")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Earthly Hand")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Humanly Hand")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            #endregion
+
+            #region Fan in Bonus Tiles
+
+            if (winningCombos.Contains("Bonus Tile Match Seat Wind")) {
+                foreach (string winCombo in winningCombos) {
+                    if (winCombo == "Bonus Tile Match Seat Wind") {
+                        fanTotal += handsToCheck["Bonus Tile Match Seat Wind"];
+                    }
+                }
+
+            }
+
+            if (winningCombos.Contains("Animal")) {
+                foreach (string winCombo in winningCombos) {
+                    if (winCombo == "Animal") {
+                        fanTotal += handsToCheck["Animal"];
+                    }
+                }
+            }
+
+            if (winningCombos.Contains("Complete Season Group")) {
+                fanTotal += handsToCheck["Complete Season Group"];
+            }
+
+            if (winningCombos.Contains("Complete Flower Group")) {
+                fanTotal += handsToCheck["Complete Flower Group"];
+            }
+
+            if (winningCombos.Contains("Robbing the Eighth")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("All Flowers and Seasons")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            #endregion
+
+            #region Fan in Honour Tiles
+
+            if (winningCombos.Contains("Player Wind Combo")) {
+                fanTotal += handsToCheck["Player Wind Combo"];
+            }
+
+            if (winningCombos.Contains("Prevailing Wind Combo")) {
+                fanTotal += handsToCheck["Prevailing Wind Combo"];
+            }
+
+            foreach (string winCombo in winningCombos) {
+                if (winCombo.Contains("Dragon")) {
+                    fanTotal += handsToCheck["Dragon"];
+                }
+            }
+
+            #endregion
+
+            #region Fan in Hand
+
+            if (winningCombos.Contains("Fully Concealed")) {
+                fanTotal += handsToCheck["Fully Concealed"];
+            }
+
+            if (winningCombos.Contains("Triplets")) {
+                fanTotal += handsToCheck["Triplets"];
+            }
+
+            if (winningCombos.Contains("Half Flush")) {
+                fanTotal += handsToCheck["Half Flush"];
+            }
+
+            if (winningCombos.Contains("Full Flush")) {
+                fanTotal += handsToCheck["Full Flush"];
+            }
+
+            if (winningCombos.Contains("Lesser Sequence")) {
+                fanTotal += handsToCheck["Lesser Sequence"];
+            }
+
+            if (winningCombos.Contains("Full Sequence")) {
+                fanTotal += handsToCheck["Full Sequence"];
+            }
+
+            if (winningCombos.Contains("Mixed Terminals")) {
+                fanTotal += handsToCheck["Mixed Terminals"];
+            }
+
+            if (winningCombos.Contains("Pure Terminals")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("All Honour")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Hidden Treasure")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Full Flush Triplets")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Full Flush Sequence")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Nine Gates")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Four Lesser Blessings")) {
+                fanTotal += 2;
+            }
+
+            if (winningCombos.Contains("Four Great Blessings")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Pure Green Suit")) {
+                fanTotal += 4;
+            }
+
+            if (winningCombos.Contains("Three Lesser Scholars")) {
+                fanTotal += handsToCheck["Three Lesser Scholars"];
+            }
+
+            if (winningCombos.Contains("Three Great Scholars")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Eighteen Arhats")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            if (winningCombos.Contains("Thirteen Wonders")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            #endregion
+
+            #region Fan in Replacement Tile
+
+            if (winningCombos.Contains("Winning on Replacement Tile For Flower")) {
+                foreach (string winCombo in winningCombos) {
+                    if (winCombo == "Winning on Replacement Tile For Flower") {
+                        fanTotal += handsToCheck["Winning on Replacement Tile For Flower"];
+                    }
+                }
+            }
+
+            if (winningCombos.Contains("Winning on Replacement Tile for Kong")) {
+                fanTotal += handsToCheck["Winning on Replacement Tile for Kong"];
+            }
+
+            if (winningCombos.Contains("Kong on Kong")) {
+                fanTotal = fanLimit;
+                continue;
+            }
+
+            #endregion
+
+            if (winningCombos.Contains("Robbing the Kong")) {
+                fanTotal += handsToCheck["Robbing the Kong"];
+            }
+
+            if (winningCombos.Contains("Winning on Last Available Tile")) {
+                fanTotal += handsToCheck["Winning on Last Available Tile"];
+            }
+        }
+
+
+        if (listOfWinningCombos.Count == 1) {
+            return (fanTotalList[0], listOfWinningCombos[0]);
+        }
+
+        if (fanTotalList[0] > fanTotalList[1]) {
+            return (fanTotalList[0], listOfWinningCombos[0]);
+        } else {
+            return (fanTotalList[1], listOfWinningCombos[1]);
+        }
+
     }
 
 
@@ -97,13 +312,14 @@ public class FanCalculator {
 
         if (listOfCombos.Count == 0) {
             this.ThirteenWondersCheck(combinedHand);
+            this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
             return;
         }
 
         for (int i = 0; i < listOfCombos.Count; i++) {
             winningCombos = new List<string>();
 
-            this.FirstRoundHands(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, turn);
+            this.FanInFirstRound(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, turn);
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
             this.FanInHonourTiles(combinedHand, playerWind, prevailingWind);
             this.FanInHand(listOfCombos[i], combinedHand, hand, bonusTiles, comboTiles, playerWind, prevailingWind, discardTile);
@@ -120,7 +336,7 @@ public class FanCalculator {
     /// <summary>
     /// Container for Heavenly, Earthly and Humanly Hands
     /// </summary>
-    private void FirstRoundHands(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
+    private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
         if (handsToCheck["Heavenly Hand"] > 0) {
             winningCombos.Add(HeavenlyHandCheck(playerWind, turn));
         }
@@ -145,46 +361,62 @@ public class FanCalculator {
 
         foreach (Tile bonusTile in bonusTiles) {
             if (bonusTileToWindDict.ContainsKey(bonusTile)) {
-                if (bonusTileToWindDict[bonusTile] == playerWind) {
-                    winningCombos.Add("Bonus Tile Match Seat Wind");
-                }
 
-                if (bonusTile.suit == Tile.Suit.Season) {
-                    numberOfSeasonTiles += 1;
+                if (handsToCheck["Bonus Tile Match Seat Wind"] > 0) {
+                    if (bonusTileToWindDict[bonusTile] == playerWind) {
+                        winningCombos.Add("Bonus Tile Match Seat Wind");
+                    }
 
-                } else {
-                    numberOfFlowerTiles += 1;
+                    if (bonusTile.suit == Tile.Suit.Season) {
+                        numberOfSeasonTiles += 1;
+
+                    } else {
+                        numberOfFlowerTiles += 1;
+                    }
                 }
 
             } else {
-                winningCombos.Add("Animal");
+                if (handsToCheck["Animal"] > 0) {
+                    winningCombos.Add("Animal");
+                }
             }
         }
 
         // Complete Season Group
-        if (numberOfSeasonTiles == 4) {
-            winningCombos.Add("Complete Season Group");
+        if (handsToCheck["Complete Season Group"] > 0) {
+            if (numberOfSeasonTiles == 4) {
+                winningCombos.Add("Complete Season Group");
+                winningCombos.Remove("Bonus Tile Match Seat Wind");
+            }
         }
 
         // Complete Flower Group
-        if (numberOfFlowerTiles == 4) {
-            winningCombos.Add("Complete Flower Group");
-        }
+        if (handsToCheck["Complete Season Group"] > 0) {
+            if (numberOfFlowerTiles == 4) {
+                winningCombos.Add("Complete Flower Group");
+                winningCombos.Remove("Bonus Tile Match Seat Wind");
+            }
+        }            
 
         // Robbing the Eighth
-        if (numberOfSeasonTiles + numberOfFlowerTiles == 7) {
-            foreach (Tile tile in allPlayersOpenTiles) {
-                if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
-                    winningCombos.Add("Robbing the Eighth");
+        if (handsToCheck["Robbing the Eighth"] > 0) {
+            if (numberOfSeasonTiles + numberOfFlowerTiles == 7) {
+                foreach (Tile tile in allPlayersOpenTiles) {
+                    if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
+                        winningCombos.Add("Robbing the Eighth");
+                    }
                 }
             }
         }
 
         // All Flowers and Seasons
-        if (numberOfSeasonTiles + numberOfFlowerTiles == 8) {
-            winningCombos.Add("All Flowers and Seasons");
+        if (handsToCheck["All Flowers and Seasons"] > 0) {
+            if (numberOfSeasonTiles + numberOfFlowerTiles == 8) {
+                winningCombos.Add("All Flowers and Seasons");
+                winningCombos.Remove("Complete Season Group");
+                winningCombos.Remove("Complete Flower Group");
+            }
         }
-        
     }
 
 
@@ -203,16 +435,22 @@ public class FanCalculator {
         foreach (Tile tile in honourTilesCount.Keys) {
             if (honourTilesCount[tile] == 3) {
 
-                if (tile.suit == Tile.Suit.Wind && bonusTileToWindDict[tile] == playerWind) {
-                    winningCombos.Add("Player Wind Set");
+                if (handsToCheck["Player Wind Combo"] > 0) {
+                    if (tile.suit == Tile.Suit.Wind && bonusTileToWindDict[tile] == playerWind) {
+                        winningCombos.Add("Player Wind Combo");
+                    }
                 }
 
-                if (tile.suit == Tile.Suit.Wind && bonusTileToWindDict[tile] == prevailingWind) {
-                    winningCombos.Add("Prevailing Wind Set");
+                if (handsToCheck["Prevailing Wind Combo"] > 0) {
+                    if (tile.suit == Tile.Suit.Wind && bonusTileToWindDict[tile] == prevailingWind) {
+                        winningCombos.Add("Prevailing Wind Combo");
+                    }
                 }
 
-                if (tile.suit == Tile.Suit.Dragon) {
-                    winningCombos.Add(tile.ToString());
+                if (handsToCheck["Dragon"] > 0) {
+                    if (tile.suit == Tile.Suit.Dragon) {
+                        winningCombos.Add(tile.ToString());
+                    }
                 }
             }
         }
@@ -236,24 +474,41 @@ public class FanCalculator {
         }
 
         // Half Flush & Full Flush check
-        if (handsToCheck["Flush"] > 0) {
+        if (handsToCheck["Half Flush"] > 0 || handsToCheck["Full Flush"] > 0) {
             winningCombos.Add(this.FlushHandCheck(combinedHand));
-        }
 
-        // Sequence Hand check. 
-        if (handsToCheck["Sequence Hand"] > 0) {
-            string sequenceHandCheck = this.SequenceHandCheck(comboListNoDuplicate, combinedHand, originalHand, playerWind, prevailingWind, discardTile);
-            if (sequenceHandCheck.Equals("Sequence")) {
-                if (bonusTiles.Count > 0) {
-                    winningCombos.Add("Lesser Sequence");
-                } else {
-                    winningCombos.Add("Sequence");
+            if (winningCombos.Contains("Half Flush")) {
+                if (handsToCheck["Half Flush"] == 0) {
+                    winningCombos.Remove("Half Flush");
+                }
+            }
+
+            if (winningCombos.Contains("Full Flush")) {
+                if (handsToCheck["Full Flush"] == 0) {
+                    winningCombos.Remove("Full Flush");
                 }
             }
         }
 
+        // Sequence Hand check.
+        if (handsToCheck["Full Sequence"] > 0 || handsToCheck["Lesser Sequence"] > 0) {
+            string sequenceHandCheck = this.SequenceHandCheck(comboListNoDuplicate, combinedHand, originalHand, playerWind, prevailingWind, discardTile);
+            if (sequenceHandCheck.Equals("Sequence")) {
+                if (bonusTiles.Count > 0) {
+                    if (handsToCheck["Lesser Sequence"] > 0) {
+                        winningCombos.Add("Lesser Sequence");
+                    }
+                    
+                } else {
+                    if (handsToCheck["Lesser Sequence"] > 0) {
+                        winningCombos.Add("Full Sequence");
+                    }
+                }
+            }
+        }
+        
         // Mixed and Pure Terminals check. Prerequisite: Triplets
-        if (handsToCheck["Terminals"] > 0) {
+        if (handsToCheck["Mixed Terminals"] > 0 || handsToCheck["Pure Terminals"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
             if (handsToCheck["Triplets"] == 0) {
@@ -262,6 +517,19 @@ public class FanCalculator {
 
             if (winCombos.Contains("Triplets")) {
                 winningCombos.Add(this.TerminalsHandCheck(combinedHand));
+                winningCombos.Remove("Triplets");
+            }
+
+            if (winningCombos.Contains("Mixed Terminals")) {
+                if (handsToCheck["Mixed Terminals"] == 0) {
+                    winningCombos.Remove("Mixed Terminals");
+                }
+            }
+
+            if (winningCombos.Contains("Pure Terminals")) {
+                if (handsToCheck["Pure Terminals"] == 0) {
+                    winningCombos.Remove("Pure Terminals");
+                }
             }
         }
 
@@ -292,6 +560,8 @@ public class FanCalculator {
 
             if (winCombos.Contains("Triplets") && winCombos.Contains("Fully Concealed Hand")) {
                 winningCombos.Add("Hidden Treasure");
+                winningCombos.Remove("Triplets");
+                winningCombos.Remove("Fully Concealed Hand");
             }
         }
 
@@ -309,11 +579,13 @@ public class FanCalculator {
 
             if (winCombos.Contains("Full Flush") && winCombos.Contains("Triplets")) {
                 winningCombos.Add("Full Flush Triplets");
+                winningCombos.Remove("Full Flush");
+                winningCombos.Remove("Triplets");
             }
         }
 
         // Full Flush Sequence Hand check. Prerequisite: Full Flush, Sequence Hand
-        if (handsToCheck["Full Flush Sequence Hand"] > 0) {
+        if (handsToCheck["Full Flush Sequence"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
             if (handsToCheck["Full Flush"] == 0) {
@@ -325,7 +597,9 @@ public class FanCalculator {
             }
 
             if (winCombos.Contains("Full Flush") && winCombos.Contains("Sequence Hand")) {
-                winningCombos.Add("Full Flush Sequence Hand");
+                winningCombos.Add("Full Flush Sequence");
+                winningCombos.Remove("Full Flush");
+                winningCombos.Remove("Sequence");
             }
         }
 
@@ -339,19 +613,38 @@ public class FanCalculator {
 
             if (winCombos.Contains("Full Flush")) {
                 winningCombos.Add(this.NineGatesCheck(combinedHand));
+                winningCombos.Remove("Full Flush");
             }
         }
 
-        // Four Lesser Blessings and Four Great Blessings check. Prerequisite: All Honour
-        if (handsToCheck["Four Blessings"] > 0) {
+        // Four Lesser Blessings and Four Great Blessings check. Prerequisite: All Honour, Triplets
+        if (handsToCheck["Four Lesser Blessings"] > 0 || handsToCheck["Four Great Blessings"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
             if (handsToCheck["All Honour"] == 0) {
                 winCombos.Add(this.AllHonourCheck(combinedHand));
             }
 
-            if (winCombos.Contains("Triplets")) {
+            if (handsToCheck["Triplets"] == 0) {
+                winCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
+            }
+
+            if (winningCombos.Contains("All Honour") && winCombos.Contains("Triplets")) {
                 winningCombos.Add(this.FourBlessingsCheck(combinedHand));
+                winningCombos.Remove("All Honour");
+                winningCombos.Remove("Triplets");
+            }
+
+            if (winningCombos.Contains("Four Lesser Blessings")) {
+                if (handsToCheck["Four Lesser Blessings"] == 0) {
+                    winningCombos.Remove("Four Lesser Blessings");
+                }
+            }
+
+            if (winningCombos.Contains("Four Great Blessings")) {
+                if (handsToCheck["Four Great Blessings"] == 0) {
+                    winningCombos.Remove("Four Great Blessings");
+                }
             }
         }
 
@@ -361,8 +654,20 @@ public class FanCalculator {
         }
 
         // Three Lesser Scholars and Three Great Scholars check. 
-        if (handsToCheck["Three Scholars"] > 0) {
+        if (handsToCheck["Three Lesser Scholars"] > 0 || handsToCheck["Three Great Scholars"] > 0) {
             winningCombos.Add(this.ThreeScholarsCheck(combinedHand));
+
+            if (winningCombos.Contains("Three Lesser Scholarsh")) {
+                if (handsToCheck["Three Lesser Scholars"] == 0) {
+                    winningCombos.Remove("Three Lesser Scholars");
+                }
+            }
+
+            if (winningCombos.Contains("Three Great Scholars")) {
+                if (handsToCheck["Three Great Scholars"] == 0) {
+                    winningCombos.Remove("Three Great Scholars");
+                }
+            }
         }
 
         // Eighteen Arhats check
@@ -377,7 +682,9 @@ public class FanCalculator {
     /// </summary>
     private void WinningOnReplacementTile(int numberOfReplacementTiles, int numberOfKong) {
         if (handsToCheck["Winning on Replacement Tile For Flower"] > 0) {
-            winningCombos.Add(WinningOnReplacementTileForFlower(numberOfReplacementTiles));
+            for (int i = 0; i < numberOfReplacementTiles; i++) {
+                winningCombos.Add("Winning on Replacement Tile For Flower");
+            }
         }
 
         if (handsToCheck["Winning on Replacement Tile for Kong"] > 0) {
@@ -717,9 +1024,9 @@ public class FanCalculator {
     /// <summary>
     /// Determine if the player won with a replacement tile from flower
     /// </summary>
-    private string WinningOnReplacementTileForFlower(int numberOfReplacementTiles) {
+    private string WinningOnReplacementTileForFlower(int numberOfReplacementTiles) { 
         if (numberOfReplacementTiles > 0) {
-            return string.Format("Winning on Replacement Tile for Flower {0}", numberOfReplacementTiles);
+            return "Winning on Replacement Tile for Flower";
         }
         return null;
     }
