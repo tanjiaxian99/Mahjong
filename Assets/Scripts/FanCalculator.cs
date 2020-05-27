@@ -197,7 +197,7 @@ public class FanCalculator {
             }
 
             if (winningCombos.Contains("Four Lesser Blessings")) {
-                fanTotal += 2;
+                fanTotal += handsToCheck["Four Lesser Blessings"];
             }
 
             if (winningCombos.Contains("Four Great Blessings")) {
@@ -206,7 +206,7 @@ public class FanCalculator {
             }
 
             if (winningCombos.Contains("Pure Green Suit")) {
-                fanTotal += 4;
+                fanTotal += handsToCheck["Pure Green Suit"];
             }
 
             if (winningCombos.Contains("Three Lesser Scholars")) {
@@ -617,7 +617,7 @@ public class FanCalculator {
             }
         }
 
-        // Four Lesser Blessings and Four Great Blessings check. Prerequisite: All Honour, Triplets
+        // Four Lesser Blessings and Four Great Blessings check. Prerequisite: All Honour
         if (handsToCheck["Four Lesser Blessings"] > 0 || handsToCheck["Four Great Blessings"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
@@ -625,25 +625,27 @@ public class FanCalculator {
                 winCombos.Add(this.AllHonourCheck(combinedHand));
             }
 
-            if (handsToCheck["Triplets"] == 0) {
-                winCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
-            }
-
-            if (winningCombos.Contains("All Honour") && winCombos.Contains("Triplets")) {
+            if (winningCombos.Contains("All Honour")) {
                 winningCombos.Add(this.FourBlessingsCheck(combinedHand));
-                winningCombos.Remove("All Honour");
-                winningCombos.Remove("Triplets");
             }
 
             if (winningCombos.Contains("Four Lesser Blessings")) {
                 if (handsToCheck["Four Lesser Blessings"] == 0) {
                     winningCombos.Remove("Four Lesser Blessings");
+                } else {
+                    winningCombos.Remove("All Honour");
+                    winningCombos.Remove("Player Wind Combo");
+                    winningCombos.Remove("Prevailing Wind Combo");
                 }
             }
 
             if (winningCombos.Contains("Four Great Blessings")) {
                 if (handsToCheck["Four Great Blessings"] == 0) {
                     winningCombos.Remove("Four Great Blessings");
+                } else {
+                    winningCombos.Remove("All Honour");
+                    winningCombos.Remove("Player Wind Combo");
+                    winningCombos.Remove("Prevailing Wind Combo");
                 }
             }
         }
@@ -651,21 +653,30 @@ public class FanCalculator {
         // Pure Green Suit check
         if (handsToCheck["Pure Green Suit"] > 0) {
             winningCombos.Add(this.PureGreenSuitCheck(combinedHand));
+            winningCombos.Remove("Half Flush");
         }
 
         // Three Lesser Scholars and Three Great Scholars check. 
         if (handsToCheck["Three Lesser Scholars"] > 0 || handsToCheck["Three Great Scholars"] > 0) {
             winningCombos.Add(this.ThreeScholarsCheck(combinedHand));
 
-            if (winningCombos.Contains("Three Lesser Scholarsh")) {
+            if (winningCombos.Contains("Three Lesser Scholars")) {
                 if (handsToCheck["Three Lesser Scholars"] == 0) {
                     winningCombos.Remove("Three Lesser Scholars");
+                } else {
+                    winningCombos.Remove("Dragon");
+                    winningCombos.Remove("Dragon");
                 }
             }
 
             if (winningCombos.Contains("Three Great Scholars")) {
+                winningCombos.Remove("Dragon");
                 if (handsToCheck["Three Great Scholars"] == 0) {
                     winningCombos.Remove("Three Great Scholars");
+                } else {
+                    winningCombos.Remove("Dragon");
+                    winningCombos.Remove("Dragon");
+                    winningCombos.Remove("Dragon");
                 }
             }
         }
