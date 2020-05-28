@@ -60,6 +60,7 @@ public class FanCalculator {
     public (int, List<string>) CalculateFan(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
         fanLimit = handsToCheck["Fan Limit"];
         fanTotalList = new List<int>();
+        listOfWinningCombos = new List<List<string>>();
 
         this.TabulateCombos(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
 
