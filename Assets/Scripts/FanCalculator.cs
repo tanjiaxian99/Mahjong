@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using UnityEditor.WindowsStandalone;
 using UnityEngine;
 using UnityEngine.XR;
@@ -499,18 +500,22 @@ public class FanCalculator {
         // Sequence Hand check.
         if (handsToCheck["Full Sequence"] > 0 || handsToCheck["Lesser Sequence"] > 0) {
             string sequenceHandCheck = this.SequenceHandCheck(comboListNoDuplicate, combinedHand, originalHand, playerWind, prevailingWind, discardTile);
-            if (sequenceHandCheck.Equals("Sequence")) {
-                if (bonusTiles.Count > 0) {
-                    if (handsToCheck["Lesser Sequence"] > 0) {
-                        winningCombos.Add("Lesser Sequence");
-                    }
-                    
-                } else {
-                    if (handsToCheck["Lesser Sequence"] > 0) {
-                        winningCombos.Add("Full Sequence");
+            
+            if (sequenceHandCheck != null) {
+
+                if (sequenceHandCheck.Equals("Sequence")) {
+                    if (bonusTiles.Count > 0) {
+                        if (handsToCheck["Lesser Sequence"] > 0) {
+                            winningCombos.Add("Lesser Sequence");
+                        }
+
+                    } else {
+                        if (handsToCheck["Lesser Sequence"] > 0) {
+                            winningCombos.Add("Full Sequence");
+                        }
                     }
                 }
-            }
+            }            
         }
         
         // Mixed and Pure Terminals check. Prerequisite: Triplets
