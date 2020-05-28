@@ -565,14 +565,14 @@ public class FanCalculator {
                 winCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
             }
 
-            if (handsToCheck["Fully Concealed Hand"] == 0) {
+            if (handsToCheck["Fully Concealed"] == 0) {
                 winCombos.Add(this.FullyConcealedHandCheck(comboTiles, discardTile));
             }
 
-            if (winCombos.Contains("Triplets") && winCombos.Contains("Fully Concealed Hand")) {
+            if (winCombos.Contains("Triplets") && winCombos.Contains("Fully Concealed")) {
                 winningCombos.Add("Hidden Treasure");
                 winningCombos.Remove("Triplets");
-                winningCombos.Remove("Fully Concealed Hand");
+                winningCombos.Remove("Fully Concealed");
             }
         }
 
