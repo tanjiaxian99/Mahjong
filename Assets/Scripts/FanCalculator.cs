@@ -703,9 +703,9 @@ public class FanCalculator {
     /// Container for Replacement Tile Win checks
     /// </summary>
     private void WinningOnReplacementTile(int numberOfReplacementTiles, int numberOfKong) {
-        if (handsToCheck["Winning on Replacement Tile For Flower"] > 0) {
+        if (handsToCheck["Winning on Replacement Tile for Flower"] > 0) {
             for (int i = 0; i < numberOfReplacementTiles; i++) {
-                winningCombos.Add("Winning on Replacement Tile For Flower");
+                winningCombos.Add("Winning on Replacement Tile for Flower");
             }
         }
 
