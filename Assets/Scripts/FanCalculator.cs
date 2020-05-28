@@ -474,7 +474,7 @@ public class FanCalculator {
         if (handsToCheck["Fully Concealed"] > 0) {
             winningCombos.Add(this.FullyConcealedHandCheck(comboTiles, discardTile));
         }
-        
+
         // Triplets Hand check
         if (handsToCheck["Triplets"] > 0) {
             winningCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
@@ -500,7 +500,7 @@ public class FanCalculator {
         // Sequence Hand check.
         if (handsToCheck["Full Sequence"] > 0 || handsToCheck["Lesser Sequence"] > 0) {
             string sequenceHandCheck = this.SequenceHandCheck(comboListNoDuplicate, combinedHand, originalHand, playerWind, prevailingWind, discardTile);
-            
+
             if (sequenceHandCheck != null) {
 
                 if (sequenceHandCheck.Equals("Sequence")) {
@@ -515,9 +515,9 @@ public class FanCalculator {
                         }
                     }
                 }
-            }            
+            }
         }
-        
+
         // Mixed and Pure Terminals check. Prerequisite: Triplets
         if (handsToCheck["Mixed Terminals"] > 0 || handsToCheck["Pure Terminals"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
@@ -603,11 +603,11 @@ public class FanCalculator {
                 winCombos.Add(this.FlushHandCheck(combinedHand));
             }
 
-            if (handsToCheck["Sequence Hand"] == 0) {
+            if (handsToCheck["Full Sequence"] == 0 && handsToCheck["Lesser Sequence"] == 0) {
                 winCombos.Add(this.SequenceHandCheck(comboListNoDuplicate, combinedHand, originalHand, playerWind, prevailingWind, discardTile));
             }
 
-            if (winCombos.Contains("Full Flush") && winCombos.Contains("Sequence Hand")) {
+            if (winCombos.Contains("Full Flush") && (winCombos.Contains("Full Sequence") || winCombos.Contains("Lesser Sequence"))) {
                 winningCombos.Add("Full Flush Sequence");
                 winningCombos.Remove("Full Flush");
                 winningCombos.Remove("Sequence");
