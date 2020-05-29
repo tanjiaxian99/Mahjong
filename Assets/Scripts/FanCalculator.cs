@@ -349,6 +349,8 @@ public class FanCalculator {
 
             this.ThirteenWondersCheck(combinedHand);
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
+
+            this.listOfWinningCombos.Add(winningCombos);
             return;
         }
 
@@ -405,16 +407,17 @@ public class FanCalculator {
                     }
 
                     if (bonusTile.suit == Tile.Suit.Season) {
-                        numberOfSeasonTiles += 1;
+                        numberOfSeasonTiles++;
 
                     } else {
-                        numberOfFlowerTiles += 1;
+                        numberOfFlowerTiles++;
                     }
                 }
 
             } else {
                 if (handsToCheck["Animal"] > 0) {
                     winningCombos.Add("Animal");
+                    numberOfAnimalTiles++;
                 }
             }
         }
@@ -436,7 +439,7 @@ public class FanCalculator {
         }
 
         // Complete Flower Group
-        if (handsToCheck["Complete Season Group"] > 0) {
+        if (handsToCheck["Complete Flower Group"] > 0) {
             if (numberOfFlowerTiles == 4) {
                 winningCombos.Add("Complete Flower Group");
                 winningCombos.Remove("Bonus Tile Match Seat Wind");
@@ -449,6 +452,9 @@ public class FanCalculator {
                 foreach (Tile tile in allPlayersOpenTiles) {
                     if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
                         winningCombos.Add("Robbing the Eighth");
+                        winningCombos.Remove("Bonus Tile Match Seat Wind");
+                        winningCombos.Remove("Complete Season Group");
+                        winningCombos.Remove("Complete Flower Group");
                     }
                 }
             }
