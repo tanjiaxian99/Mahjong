@@ -130,50 +130,52 @@ public class WinCombos {
 
 
         // Check for Chow
-        Tile tilePlusOne = new Tile(firstNonWinningTile.suit, firstNonWinningTile.rank + 1);
-        Tile tilePlusTwo = new Tile(firstNonWinningTile.suit, firstNonWinningTile.rank + 2);
+        if (firstNonWinningTile.suit == Tile.Suit.Character || firstNonWinningTile.suit == Tile.Suit.Dot || firstNonWinningTile.suit == Tile.Suit.Bamboo) {
+            Tile tilePlusOne = new Tile(firstNonWinningTile.suit, firstNonWinningTile.rank + 1);
+            Tile tilePlusTwo = new Tile(firstNonWinningTile.suit, firstNonWinningTile.rank + 2);
 
-        foreach (Tile tile in hand) {
-            if (!tile.isWinning && tile.Equals(firstNonWinningTile) && !winningPotential.Contains(firstNonWinningTile)) {
-                winningPotential.Add(tile);
-            }
-
-            if (!tile.isWinning && tile.Equals(tilePlusOne) && !winningPotential.Contains(tile)) {
-                winningPotential.Add(tile);
-            }
-
-            if (!tile.isWinning && tile.Equals(tilePlusTwo) && !winningPotential.Contains(tile)) {
-                winningPotential.Add(tile);
-            }
-        }
-
-        if (winningPotential.Count == 3) {
-            foreach (Tile tile in winningPotential) {
-                tile.isWinning = true;
-            }
-
-            string comboType = "Chow";
-            comboTypeList.Add(comboType);
-
-            // DEBUG
-            int winningTiles = 0;
             foreach (Tile tile in hand) {
-                if (tile.isWinning) {
-                    winningTiles += 1;
+                if (!tile.isWinning && tile.Equals(firstNonWinningTile) && !winningPotential.Contains(firstNonWinningTile)) {
+                    winningPotential.Add(tile);
+                }
+
+                if (!tile.isWinning && tile.Equals(tilePlusOne) && !winningPotential.Contains(tile)) {
+                    winningPotential.Add(tile);
+                }
+
+                if (!tile.isWinning && tile.Equals(tilePlusTwo) && !winningPotential.Contains(tile)) {
+                    winningPotential.Add(tile);
                 }
             }
-            Debug.LogFormat("New Chow Combo. There are now {0} winning tiles", winningTiles);
 
-            Backtracking(hand, comboTypeList);
-            comboTypeList.Remove(comboType);
+            if (winningPotential.Count == 3) {
+                foreach (Tile tile in winningPotential) {
+                    tile.isWinning = true;
+                }
 
-            foreach (Tile tile in winningPotential) {
-                tile.isWinning = false;
+                string comboType = "Chow";
+                comboTypeList.Add(comboType);
+
+                // DEBUG
+                int winningTiles = 0;
+                foreach (Tile tile in hand) {
+                    if (tile.isWinning) {
+                        winningTiles += 1;
+                    }
+                }
+                Debug.LogFormat("New Chow Combo. There are now {0} winning tiles", winningTiles);
+
+                Backtracking(hand, comboTypeList);
+                comboTypeList.Remove(comboType);
+
+                foreach (Tile tile in winningPotential) {
+                    tile.isWinning = false;
+                }
             }
+            winningPotential.Clear();
         }
-        winningPotential.Clear();
-
         
+
         // The number of winning tiles is always divisible by 3, unless an eye is part of the winning tiles. In which case,
         // don't consider the possibility of an eye
         int numberOfWinningTiles = 0;

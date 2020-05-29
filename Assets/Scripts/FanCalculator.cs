@@ -708,25 +708,17 @@ public class FanCalculator {
             }
         }
 
-        // Four Lesser Blessings and Four Great Blessings check. Prerequisite: All Honour
+        // Four Lesser Blessings and Four Great Blessings check. 
         if (handsToCheck["Four Lesser Blessings"] > 0 || handsToCheck["Four Great Blessings"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
-            if (handsToCheck["All Honour"] == 0) {
-                winCombos.Add(this.AllHonourCheck(combinedHand));
-            }
-
-            if (winningCombos.Contains("All Honour")) {
-                winningCombos.Add(this.FourBlessingsCheck(combinedHand));
-            }
+            winningCombos.Add(this.FourBlessingsCheck(combinedHand));
 
             if (winningCombos.Contains("Four Lesser Blessings")) {
                 if (handsToCheck["Four Lesser Blessings"] == 0) {
                     winningCombos.Remove("Four Lesser Blessings");
                 } else {
-                    winningCombos.Remove("All Honour");
-                    winningCombos.Remove("Player Wind Combo");
-                    winningCombos.Remove("Prevailing Wind Combo");
+                    winningCombos.Remove("Half Flush");
                 }
             }
 
@@ -734,7 +726,6 @@ public class FanCalculator {
                 if (handsToCheck["Four Great Blessings"] == 0) {
                     winningCombos.Remove("Four Great Blessings");
                 } else {
-                    winningCombos.Remove("All Honour");
                     winningCombos.Remove("Player Wind Combo");
                     winningCombos.Remove("Prevailing Wind Combo");
                 }
