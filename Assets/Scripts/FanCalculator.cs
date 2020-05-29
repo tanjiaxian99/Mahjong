@@ -63,6 +63,10 @@ public class FanCalculator {
         listOfWinningCombos = new List<List<string>>();
 
         this.TabulateCombos(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+        
+        for (int i = 0; i < listOfWinningCombos.Count; i++) {
+            listOfWinningCombos[i].RemoveAll(x => x == null);
+        }
 
         foreach (List<string> winningCombos in listOfWinningCombos) {
             fanTotal = 0;
@@ -71,16 +75,19 @@ public class FanCalculator {
 
             if (winningCombos.Contains("Heavenly Hand")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
             if (winningCombos.Contains("Earthly Hand")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
             if (winningCombos.Contains("Humanly Hand")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
@@ -115,11 +122,13 @@ public class FanCalculator {
 
             if (winningCombos.Contains("Robbing the Eighth")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
             if (winningCombos.Contains("All Flowers and Seasons")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
@@ -175,21 +184,25 @@ public class FanCalculator {
 
             if (winningCombos.Contains("Pure Terminals")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
             if (winningCombos.Contains("All Honour")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
             if (winningCombos.Contains("Hidden Treasure")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
             if (winningCombos.Contains("Full Flush Triplets")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
@@ -200,6 +213,7 @@ public class FanCalculator {
 
             if (winningCombos.Contains("Nine Gates")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
@@ -209,6 +223,7 @@ public class FanCalculator {
 
             if (winningCombos.Contains("Four Great Blessings")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
@@ -227,11 +242,13 @@ public class FanCalculator {
 
             if (winningCombos.Contains("Eighteen Arhats")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
             if (winningCombos.Contains("Thirteen Wonders")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
@@ -253,6 +270,7 @@ public class FanCalculator {
 
             if (winningCombos.Contains("Kong on Kong")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
@@ -265,6 +283,8 @@ public class FanCalculator {
             if (winningCombos.Contains("Winning on Last Available Tile")) {
                 fanTotal += handsToCheck["Winning on Last Available Tile"];
             }
+
+            fanTotalList.Add(fanTotal);
         }
 
 
