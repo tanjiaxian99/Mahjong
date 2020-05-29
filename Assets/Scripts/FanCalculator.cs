@@ -673,6 +673,9 @@ public class FanCalculator {
 
             if (winCombos.Contains("Full Flush")) {
                 winningCombos.Add(this.NineGatesCheck(combinedHand));
+            }
+
+            if (winningCombos.Contains("Nine Gates")) {
                 winningCombos.Remove("Full Flush");
             }
         }
@@ -1068,7 +1071,7 @@ public class FanCalculator {
     /// </summary>
     private string PureGreenSuitCheck(List<Tile> combinedHand) {
         foreach (Tile tile in combinedHand) {
-            if (!(tile.suit == Tile.Suit.Bamboo || tile.suit != Tile.Suit.Dragon)) {
+            if (tile.suit != Tile.Suit.Bamboo || tile.suit != Tile.Suit.Dragon) {
                 return null;
             }
 
