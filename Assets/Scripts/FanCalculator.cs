@@ -36,14 +36,14 @@ public class FanCalculator {
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four), PlayerManager.Wind.NORTH);
 
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.One), PlayerManager.Wind.EAST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Two), PlayerManager.Wind.NORTH);
+        bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Three), PlayerManager.Wind.WEST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Four), PlayerManager.Wind.SOUTH);
+        bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Four), PlayerManager.Wind.NORTH);
 
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.One), PlayerManager.Wind.EAST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Two), PlayerManager.Wind.NORTH);
+        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
         bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Three), PlayerManager.Wind.WEST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Four), PlayerManager.Wind.SOUTH);
+        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Four), PlayerManager.Wind.NORTH);
 
         windToTileDict.Add(PlayerManager.Wind.EAST, new Tile(Tile.Suit.Wind, Tile.Rank.One));
         windToTileDict.Add(PlayerManager.Wind.SOUTH, new Tile(Tile.Suit.Wind, Tile.Rank.Two));
@@ -110,6 +110,10 @@ public class FanCalculator {
                         fanTotal += handsToCheck["Animal"];
                     }
                 }
+            }
+
+            if (winningCombos.Contains("Complete Animal Group")) {
+                fanTotal += handsToCheck["Complete Animal Group"];
             }
 
             if (winningCombos.Contains("Complete Season Group")) {
@@ -287,6 +291,9 @@ public class FanCalculator {
             fanTotalList.Add(fanTotal);
         }
 
+        if (listOfWinningCombos.Count == 0) {
+            return (0, null);
+        }
 
         if (listOfWinningCombos.Count == 1) {
             return (fanTotalList[0], listOfWinningCombos[0]);
@@ -338,6 +345,8 @@ public class FanCalculator {
         }
 
         if (listOfCombos.Count == 0) {
+            winningCombos = new List<string>();
+
             this.ThirteenWondersCheck(combinedHand);
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
             return;
@@ -385,6 +394,7 @@ public class FanCalculator {
     private void FanInBonusTiles(List<Tile> bonusTiles, PlayerManager.Wind playerWind, List<Tile> allPlayersOpenTiles) {
         int numberOfSeasonTiles = 0;
         int numberOfFlowerTiles = 0;
+        int numberOfAnimalTiles = 0;
 
         foreach (Tile bonusTile in bonusTiles) {
             if (bonusTileToWindDict.ContainsKey(bonusTile)) {
@@ -406,6 +416,14 @@ public class FanCalculator {
                 if (handsToCheck["Animal"] > 0) {
                     winningCombos.Add("Animal");
                 }
+            }
+        }
+
+        // Complete Animal Group
+        if (handsToCheck["Complete Animal Group"] > 0) {
+            if (numberOfAnimalTiles == 4) {
+                winningCombos.Add("Complete Animal Group");
+                winningCombos.RemoveAll(x => x == "Animal");
             }
         }
 
@@ -463,7 +481,6 @@ public class FanCalculator {
             if (honourTilesCount[tile] == 3) {
 
                 if (handsToCheck["Player Wind Combo"] > 0) {
-                    Debug.Log(tile);
                     if (tile.suit == Tile.Suit.Wind && bonusTileToWindDict[tile] == playerWind) {
                         winningCombos.Add("Player Wind Combo");
                     }
@@ -758,6 +775,69 @@ public class FanCalculator {
             return "Winning on Last Available Tile";
         }
 
+        return null;
+    }
+
+    #endregion
+
+    #region FirstRoundHands
+
+    /// <summary>
+    /// Determine if the hand is a Heavenly Hand
+    /// </summary>
+    /// <returns></returns>
+    private string HeavenlyHandCheck(PlayerManager.Wind playerWind, int turn) {
+        if (playerWind == PlayerManager.Wind.EAST && turn == 1) {
+            return "Heavenly Hand";
+        }
+        return null;
+    }
+
+
+    /// <summary>
+    /// Determine if the hand is a Earthly Hand
+    /// </summary>
+    private string EarthlyHandCheck(PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
+        if (turn == 1 && discardPlayerWind == PlayerManager.Wind.EAST && discardTile != null) {
+            return "Earthly Hand";
+        }
+
+        //// TODO: "Non-dealer wins upon drawing the first card in the game" So Chow/Pong/Kong are allowed before this happens?
+        //if (turn == 1 && playerWind != PlayerManager.Wind.EAST && discardTile == null) {
+        //    return "Earthly Hand";
+        //}
+
+        return null;
+    }
+
+
+    /// <summary>
+    /// Determine if the hand is a Humanly Hand
+    /// </summary>
+    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
+        if (turn == 1 && playerWind != PlayerManager.Wind.EAST && discardTile != null) {
+            int numberOfComboTiles = 0;
+            int numberOfConcealedKong = 0;
+
+
+            foreach (Tile tile in allPlayersOpenTiles) {
+                if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower || tile.suit == Tile.Suit.Animal) {
+                    continue;
+                }
+                numberOfComboTiles++;
+
+                if (tile.kongType == 2) {
+                    numberOfConcealedKong++;
+                }
+
+            }
+
+            if (numberOfConcealedKong * 4 != numberOfComboTiles) {
+                return null;
+            }
+
+            return "Humanly Hand";
+        }
         return null;
     }
 
@@ -1092,69 +1172,6 @@ public class FanCalculator {
     private string KongOnKong(int numberOfKong) {
         if (numberOfKong == 2) {
             return "Kong on Kong";
-        }
-        return null;
-    }
-
-    #endregion
-
-    #region FirstRoundHands
-
-    /// <summary>
-    /// Determine if the hand is a Heavenly Hand
-    /// </summary>
-    /// <returns></returns>
-    private string HeavenlyHandCheck(PlayerManager.Wind playerWind, int turn) {
-        if (playerWind == PlayerManager.Wind.EAST && turn == 1) {
-            return "Heavenly Hand";
-        }
-        return null;
-    }
-
-
-    /// <summary>
-    /// Determine if the hand is a Earthly Hand
-    /// </summary>
-    private string EarthlyHandCheck(PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
-        if (turn == 1 && discardPlayerWind == PlayerManager.Wind.EAST && discardTile != null) {
-            return "Earthly Hand";
-        }
-
-        //// TODO: "Non-dealer wins upon drawing the first card in the game" So Chow/Pong/Kong are allowed before this happens?
-        //if (turn == 1 && playerWind != PlayerManager.Wind.EAST && discardTile == null) {
-        //    return "Earthly Hand";
-        //}
-        
-        return null;
-    }
-
-
-    /// <summary>
-    /// Determine if the hand is a Humanly Hand
-    /// </summary>
-    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
-        if (turn == 1 && playerWind != PlayerManager.Wind.EAST && discardTile != null) {
-            int numberOfComboTiles = 0;
-            int numberOfConcealedKong = 0;
-            
-
-            foreach (Tile tile in allPlayersOpenTiles) {
-                if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower || tile.suit == Tile.Suit.Animal) {
-                    continue;
-                }
-                numberOfComboTiles++;
-
-                if (tile.kongType == 2) {
-                    numberOfConcealedKong++;
-                }
-
-            }
-
-            if (numberOfConcealedKong * 4 != numberOfComboTiles) {
-                return null;
-            }
-
-            return "Humanly Hand";
         }
         return null;
     }
