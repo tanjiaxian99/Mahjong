@@ -767,6 +767,10 @@ public class FanCalculator {
     /// Determine if the player robbed the Kong
     /// </summary>
     private void RobbingTheKong(Tile discardTile) {
+        if (discardTile == null) {
+            return;
+        }
+
         if (discardTile.kongType > 0) {
             winningCombos.Add("Robbing the Kong");
         }
@@ -918,7 +922,7 @@ public class FanCalculator {
             return null;
         }
 
-        if (!comboListNoDuplicate.Contains("Chow")) {
+        if (comboListNoDuplicate.Contains("Pong")) {
             return null;
         }
 

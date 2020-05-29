@@ -102,7 +102,7 @@ public class Tile : IEquatable<Tile> {
         }
 
         if (suit == Suit.Dragon && rank > Rank.Three) {
-            Debug.LogError("The Dragon Tile has rank has a greater rank than three");
+            Debug.LogError("The Dragon Tile has a greater rank than three");
             return;
         }
 
