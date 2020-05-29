@@ -608,6 +608,15 @@ public class FanCalculator {
             if (winCombos.Contains("Triplets")) {
                 winningCombos.Add(this.AllHonourCheck(combinedHand));
             }
+
+            if (winningCombos.Contains("All Honour")) {
+                winningCombos.Remove("Triplets");
+                winningCombos.Remove("Player Wind Combo");
+                winningCombos.Remove("Prevailing Wind Combo");
+                winningCombos.Remove("Dragon_One");
+                winningCombos.Remove("Dragon_Two");
+                winningCombos.Remove("Dragon_Three");
+            }
         }
 
         // Hidden Treasure check. Prerequisite: Triplets, Fully Concealed Hand
@@ -907,6 +916,8 @@ public class FanCalculator {
             if (i == 0 && (combinedHand[i].suit == Tile.Suit.Character || combinedHand[i].suit == Tile.Suit.Dot || combinedHand[i].suit == Tile.Suit.Bamboo)) {
                 predominantSuit = combinedHand[i].suit;
                 continue;
+            } else if (i == 0 && (combinedHand[i].suit == Tile.Suit.Wind || combinedHand[i].suit == Tile.Suit.Dragon)) {
+                break;
             }
 
             if (combinedHand[i].suit != predominantSuit && (combinedHand[i].suit == Tile.Suit.Character || combinedHand[i].suit == Tile.Suit.Dot || combinedHand[i].suit == Tile.Suit.Bamboo)) {
@@ -987,6 +998,10 @@ public class FanCalculator {
     /// Determine if the hand is a Mixed Terminals or Pure Terminals Hand
     /// </summary>
     private string TerminalsHandCheck(List<Tile> combinedHand) {
+
+        if (combinedHand[0].suit == Tile.Suit.Wind || combinedHand[0].suit == Tile.Suit.Dragon) {
+            return null;
+        }
 
         foreach (Tile tile in combinedHand) {
             if (tile.suit == Tile.Suit.Character || tile.suit == Tile.Suit.Dot || tile.suit == Tile.Suit.Bamboo) {
