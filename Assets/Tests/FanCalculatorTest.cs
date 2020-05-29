@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Internal.Builders;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.TestTools;
@@ -210,8 +211,8 @@ namespace Tests {
                 new Tile(Tile.Suit.Dragon, Tile.Rank.One),
                 new Tile(Tile.Suit.Dragon, Tile.Rank.One)};
 
-            playerManager.bonusTiles = new List<Tile>() { 
-                new Tile(Tile.Suit.Season, Tile.Rank.Two), 
+            playerManager.bonusTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Two)};
 
             playerManager.comboTiles = new List<List<Tile>>() { };
@@ -226,7 +227,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>();
 
-            (int expectedFan, List<string> expectedWinningCombos) = (2, new List<string>() { "Bonus Tile Match Seat Wind", "Bonus Tile Match Seat Wind" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Bonus Tile Match Seat Wind"] + handsToCheck["Bonus Tile Match Seat Wind"], new List<string>() { "Bonus Tile Match Seat Wind", "Bonus Tile Match Seat Wind" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -267,7 +268,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>();
 
-            (int expectedFan, List<string> expectedWinningCombos) = (2, new List<string>() { "Animal", "Animal" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Animal"] + handsToCheck["Animal"], new List<string>() { "Animal", "Animal" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -310,7 +311,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>();
 
-            (int expectedFan, List<string> expectedWinningCombos) = (5, new List<string>() { "Complete Animal Group" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Complete Animal Group"], new List<string>() { "Complete Animal Group" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -353,7 +354,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>();
 
-            (int expectedFan, List<string> expectedWinningCombos) = (2, new List<string>() { "Complete Season Group" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Complete Season Group"], new List<string>() { "Complete Season Group" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -396,7 +397,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>();
 
-            (int expectedFan, List<string> expectedWinningCombos) = (2, new List<string>() { "Complete Flower Group" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Complete Flower Group"], new List<string>() { "Complete Flower Group" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -528,7 +529,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>() { };
 
-            (int expectedFan, List<string> expectedWinningCombos) = (1, new List<string>() { "Player Wind Combo" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Player Wind Combo"], new List<string>() { "Player Wind Combo" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -567,7 +568,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>() { };
 
-            (int expectedFan, List<string> expectedWinningCombos) = (1, new List<string>() { "Prevailing Wind Combo" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Prevailing Wind Combo"], new List<string>() { "Prevailing Wind Combo" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -606,7 +607,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>() { };
 
-            (int expectedFan, List<string> expectedWinningCombos) = (2, new List<string>() { "Player Wind Combo", "Prevailing Wind Combo" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Player Wind Combo"] + handsToCheck["Prevailing Wind Combo"], new List<string>() { "Player Wind Combo", "Prevailing Wind Combo" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -645,7 +646,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>() { };
 
-            (int expectedFan, List<string> expectedWinningCombos) = (2, new List<string>() { "Dragon_One", "Dragon_Two" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Dragon"] + handsToCheck["Dragon"], new List<string>() { "Dragon_One", "Dragon_Two" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -685,7 +686,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>() { };
 
-            (int expectedFan, List<string> expectedWinningCombos) = (1, new List<string>() { "Fully Concealed" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fully Concealed"], new List<string>() { "Fully Concealed" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -728,7 +729,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>() { };
 
-            (int expectedFan, List<string> expectedWinningCombos) = (2, new List<string>() { "Triplets" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Triplets"], new List<string>() { "Triplets" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -771,7 +772,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>() { };
 
-            (int expectedFan, List<string> expectedWinningCombos) = (2, new List<string>() { "Half Flush" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Half Flush"], new List<string>() { "Half Flush" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -814,7 +815,353 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>() { };
 
-            (int expectedFan, List<string> expectedWinningCombos) = (4, new List<string>() { "Full Flush" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Full Flush"], new List<string>() { "Full Flush" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void FullSequence() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                new Tile(Tile.Suit.Character, Tile.Rank.Six),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One)};
+
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Three)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Seven);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Full Sequence"], new List<string>() { "Full Sequence" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void FullSequenceFail_PlayerWind() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                new Tile(Tile.Suit.Character, Tile.Rank.Six),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One)};
+
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Three)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.EAST;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Seven);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (0, new List<string>() { });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void FullSequenceFail_PrevailingWind() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                new Tile(Tile.Suit.Character, Tile.Rank.Six),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One)};
+
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Three)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.NORTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Seven);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.EAST;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (0, new List<string>() { });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void FullSequenceFail_Dragon() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                new Tile(Tile.Suit.Character, Tile.Rank.Six),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One)};
+
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Three)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.EAST;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Seven);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (0, new List<string>() { });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void FullSequenceFail_WaitingOnOneTile() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                new Tile(Tile.Suit.Character, Tile.Rank.Six),
+                new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Six), 
+                new Tile(Tile.Suit.Dot, Tile.Rank.Seven)};
+
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Three)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Dot, Tile.Rank.Seven);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (0, new List<string>() { });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void LesserSequence() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                new Tile(Tile.Suit.Character, Tile.Rank.Six),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One)};
+
+
+            playerManager.bonusTiles = new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.Two)};
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Three)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Seven);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Bonus Tile Match Seat Wind"] + handsToCheck["Lesser Sequence"], new List<string>() { "Bonus Tile Match Seat Wind", "Lesser Sequence" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void MixedTerminals() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One)};
+
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Seven);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Mixed Terminals"], new List<string>() { "Mixed Terminals" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void PureTerminals() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One)};
+
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Seven);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Pure Terminals" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);

@@ -385,6 +385,10 @@ public class FanCalculator {
 
         if (handsToCheck["Humanly Hand"] > 0) {
             winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, turn));
+
+            if (winningCombos.Contains("Earthly Hand")) {
+                winningCombos.Remove("Humanly Hand");
+            }
         }
 
     }
