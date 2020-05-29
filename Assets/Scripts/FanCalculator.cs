@@ -355,6 +355,17 @@ public class FanCalculator {
             this.ThirteenWondersCheck(combinedHand);
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
 
+            if (handsToCheck["Four Great Blessings"] > 0) {
+                List<string> winCombos = new List<string>(winningCombos);
+
+                winningCombos.Add(this.FourBlessingsCheck(combinedHand));
+
+                if (winningCombos.Contains("Four Great Blessings")) {
+                    winningCombos.Remove("Player Wind Combo");
+                    winningCombos.Remove("Prevailing Wind Combo");
+                }
+            }
+
             this.listOfWinningCombos.Add(winningCombos);
             return;
         }
