@@ -572,18 +572,23 @@ public class FanCalculator {
 
             if (winCombos.Contains("Triplets")) {
                 winningCombos.Add(this.TerminalsHandCheck(combinedHand));
-                winningCombos.Remove("Triplets");
             }
 
             if (winningCombos.Contains("Mixed Terminals")) {
+                winningCombos.Remove("Triplets");
+
                 if (handsToCheck["Mixed Terminals"] == 0) {
                     winningCombos.Remove("Mixed Terminals");
+                    winningCombos.Add("Triplets");
                 }
             }
 
             if (winningCombos.Contains("Pure Terminals")) {
+                winningCombos.Remove("Triplets");
+
                 if (handsToCheck["Pure Terminals"] == 0) {
                     winningCombos.Remove("Pure Terminals");
+                    winningCombos.Add("Triplets");
                 }
             }
         }
@@ -875,11 +880,11 @@ public class FanCalculator {
     /// Determine if the hand is a Triplets Hand
     /// </summary>
     private string TripletsHandCheck(HashSet<string> comboListNoDuplicate) {
-        if (comboListNoDuplicate.Count == 2 && comboListNoDuplicate.Contains("Pong")) {
-            return "Triplets";
+        if (comboListNoDuplicate.Contains("Chow")) {
+            return null;
         }
 
-        return null;
+        return "Triplets";
     }
 
 
