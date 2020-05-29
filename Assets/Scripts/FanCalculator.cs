@@ -710,10 +710,13 @@ public class FanCalculator {
             }
         }
 
-        // Pure Green Suit check
+        // Pure Green Suit check. Prerequisite-ish: Half Flush
         if (handsToCheck["Pure Green Suit"] > 0) {
             winningCombos.Add(this.PureGreenSuitCheck(combinedHand));
-            winningCombos.Remove("Half Flush");
+
+            if (winningCombos.Contains("Pure Green Suit")) {
+                winningCombos.Remove("Half Flush");
+            }
         }
 
         // Three Lesser Scholars and Three Great Scholars check. 
