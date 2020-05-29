@@ -210,9 +210,14 @@ public class FanCalculator {
                 continue;
             }
 
-            if (winningCombos.Contains("Full Flush Sequence")) {
+            if (winningCombos.Contains("Full Flush Full Sequence")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
+            }
+
+            if (winningCombos.Contains("Full Flush Lesser Sequence")) {
+                fanTotal += handsToCheck["Full Flush Lesser Sequence"];
             }
 
             if (winningCombos.Contains("Nine Gates")) {
@@ -657,8 +662,8 @@ public class FanCalculator {
             }
         }
 
-        // Full Flush Sequence Hand check. Prerequisite: Full Flush, Sequence Hand
-        if (handsToCheck["Full Flush Sequence"] > 0) {
+        // Full Flush Full/Lesser Sequence Hand check. Prerequisite: Full Flush, Full Sequence/Lesser Sequence
+        if (handsToCheck["Full Flush Full Sequence"] > 0 || handsToCheck["Full Flush Lesser Sequence"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
             if (handsToCheck["Full Flush"] == 0) {
@@ -669,10 +674,20 @@ public class FanCalculator {
                 winCombos.Add(this.SequenceHandCheck(comboListNoDuplicate, combinedHand, originalHand, playerWind, prevailingWind, discardTile));
             }
 
-            if (winCombos.Contains("Full Flush") && (winCombos.Contains("Full Sequence") || winCombos.Contains("Lesser Sequence"))) {
-                winningCombos.Add("Full Flush Sequence");
-                winningCombos.Remove("Full Flush");
-                winningCombos.Remove("Sequence");
+            if (handsToCheck["Full Flush Full Sequence"] > 0) {
+                if (winCombos.Contains("Full Flush") && (winCombos.Contains("Full Sequence"))) {
+                    winningCombos.Add("Full Flush Full Sequence");
+                    winningCombos.Remove("Full Flush");
+                    winningCombos.Remove("Full Sequence");
+                }
+            }
+
+            if (handsToCheck["Full Flush Lesser Sequence"] > 0) {
+                if (winCombos.Contains("Full Flush") && winCombos.Contains("Lesser Sequence")) {
+                    winningCombos.Add("Full Flush Lesser Sequence");
+                    winningCombos.Remove("Full Flush");
+                    winningCombos.Remove("Lesser Sequence");
+                }
             }
         }
 

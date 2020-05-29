@@ -58,7 +58,8 @@ namespace Tests {
             handsToCheck.Add("All Honour", 10);
             handsToCheck.Add("Hidden Treasure", 10);
             handsToCheck.Add("Full Flush Triplets", 10);
-            handsToCheck.Add("Full Flush Sequence", 10);
+            handsToCheck.Add("Full Flush Full Sequence", 10);
+            handsToCheck.Add("Full Flush Lesser Sequence", 5);
             handsToCheck.Add("Nine Gates", 10);
             handsToCheck.Add("Four Lesser Blessings", 2);
             handsToCheck.Add("Four Great Blessings", 10);
@@ -1215,6 +1216,129 @@ namespace Tests {
             LogAssert.Expect(LogType.Error, "The Dragon Tile has a greater rank than three");
         }
 
+        [Test]
+        public void HiddenTreasure() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One)};
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {  };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = null;
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Hidden Treasure" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void FullFlushTriplets() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Four),
+                new Tile(Tile.Suit.Character, Tile.Rank.Four),
+                new Tile(Tile.Suit.Character, Tile.Rank.Four),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine)};
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() { 
+                new List<Tile>(){
+                    new Tile(Tile.Suit.Character, Tile.Rank.Eight),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Eight),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Eight)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Nine);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Full Flush Triplets" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void FullFlushFullSequence() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                new Tile(Tile.Suit.Character, Tile.Rank.Six),
+                new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+                new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                new Tile(Tile.Suit.Character, Tile.Rank.Six),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine)};
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Character, Tile.Rank.One),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Three)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Seven);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Full Flush Full Sequence" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
         //// A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         //// `yield return null;` to skip a frame.
         //[UnityTest]
