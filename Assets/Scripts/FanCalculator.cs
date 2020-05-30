@@ -1006,17 +1006,33 @@ public class FanCalculator {
             }
         }
 
-        Tile tileMinusTwo = new Tile(discardTile.suit, discardTile.rank - 2);
-        Tile tileMinusOne = new Tile(discardTile.suit, discardTile.rank - 1);
-        Tile tilePlusOne = new Tile(discardTile.suit, discardTile.rank + 1);
-        Tile tilePlusTwo = new Tile(discardTile.suit, discardTile.rank + 2);
+        Tile tileMinusThree = new Tile(discardTile.suit, discardTile.rank - 3);
+        Tile tilePlusThree = new Tile(discardTile.suit, discardTile.rank + 3);
 
-        // Works for 6789 (6 or 9) and 45678 (3, 6 or 9)
-        if (combinedHand.Contains(tilePlusOne) && combinedHand.Contains(tilePlusTwo)) {
-            return "Sequence";
+        List<Tile> testHand;
+        int testHandWinCombosCount = 0;
+
+        if (tileMinusThree.rank != null) {
+            testHand = new List<Tile>(combinedHand);
+            testHand.Remove(discardTile);
+            testHand.Add(tileMinusThree);
+            testHand = testHand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
+
+            List<List<string>> testHandWinningCombos = winCombos.CheckWin(testHand);
+            testHandWinCombosCount += testHandWinningCombos.Count;
         }
 
-        if (combinedHand.Contains(tileMinusTwo) && combinedHand.Contains(tileMinusOne)) {
+        if (tilePlusThree.rank != null) {
+            testHand = new List<Tile>(combinedHand);
+            testHand.Remove(discardTile);
+            testHand.Add(tilePlusThree);
+            testHand = testHand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
+
+            List<List<string>> testHandWinningCombos = winCombos.CheckWin(testHand);
+            testHandWinCombosCount += testHandWinningCombos.Count;
+        }
+
+        if (testHandWinCombosCount > 0) {
             return "Sequence";
         }
 
