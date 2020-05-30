@@ -246,6 +246,7 @@ public class FanCalculator {
 
             if (winningCombos.Contains("Three Great Scholars")) {
                 fanTotal = fanLimit;
+                fanTotalList.Add(fanTotal);
                 continue;
             }
 
@@ -363,6 +364,16 @@ public class FanCalculator {
                 if (winningCombos.Contains("Four Great Blessings")) {
                     winningCombos.Remove("Player Wind Combo");
                     winningCombos.Remove("Prevailing Wind Combo");
+                }
+            }
+
+            if (handsToCheck["Three Great Scholars"] > 0) {
+                winningCombos.Add(this.ThreeScholarsCheck(combinedHand));
+
+                if (winningCombos.Contains("Three Great Scholars")) {
+                    winningCombos.Remove("Dragon_One");
+                    winningCombos.Remove("Dragon_Two");
+                    winningCombos.Remove("Dragon_Three");
                 }
             }
 
@@ -767,7 +778,6 @@ public class FanCalculator {
             }
 
             if (winningCombos.Contains("Three Great Scholars")) {
-                winningCombos.Remove("Dragon");
                 if (handsToCheck["Three Great Scholars"] == 0) {
                     winningCombos.Remove("Three Great Scholars");
                 } else {
