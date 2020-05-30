@@ -266,10 +266,10 @@ public class FanCalculator {
 
             #region Fan in Replacement Tile
 
-            if (winningCombos.Contains("Winning on Replacement Tile For Flower")) {
+            if (winningCombos.Contains("Winning on Replacement Tile for Flower")) {
                 foreach (string winCombo in winningCombos) {
-                    if (winCombo == "Winning on Replacement Tile For Flower") {
-                        fanTotal += handsToCheck["Winning on Replacement Tile For Flower"];
+                    if (winCombo == "Winning on Replacement Tile for Flower") {
+                        fanTotal += handsToCheck["Winning on Replacement Tile for Flower"];
                     }
                 }
             }

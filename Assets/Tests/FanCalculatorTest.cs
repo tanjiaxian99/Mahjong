@@ -1722,6 +1722,47 @@ namespace Tests {
             Assert.AreEqual(expectedFan, actualFan);
         }
 
+        [Test]
+        public void WinningOnReplacementTileForFlower() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One)};
+
+            playerManager.bonusTiles = new List<Tile>() { };
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One) }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.WEST;
+            playerManager.numberOfReplacementTiles = 2;
+            playerManager.numberOfKong = 0;
+
+            discardTile = null;
+            discardPlayerWind = PlayerManager.Wind.SOUTH;
+            prevailingWind = PlayerManager.Wind.SOUTH;
+            numberOfTilesLeft = 45;
+            turn = 1;
+            allPlayersOpenTiles = new List<Tile>();
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Winning on Replacement Tile for Flower"] + handsToCheck["Winning on Replacement Tile for Flower"], new List<string>() { "Winning on Replacement Tile for Flower", "Winning on Replacement Tile for Flower" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
         //// A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         //// `yield return null;` to skip a frame.
         //[UnityTest]
