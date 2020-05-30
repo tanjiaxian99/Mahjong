@@ -760,8 +760,9 @@ public class FanCalculator {
                 if (handsToCheck["Three Lesser Scholars"] == 0) {
                     winningCombos.Remove("Three Lesser Scholars");
                 } else {
-                    winningCombos.Remove("Dragon");
-                    winningCombos.Remove("Dragon");
+                    winningCombos.Remove("Dragon_One");
+                    winningCombos.Remove("Dragon_Two");
+                    winningCombos.Remove("Dragon_Three");
                 }
             }
 
@@ -770,9 +771,9 @@ public class FanCalculator {
                 if (handsToCheck["Three Great Scholars"] == 0) {
                     winningCombos.Remove("Three Great Scholars");
                 } else {
-                    winningCombos.Remove("Dragon");
-                    winningCombos.Remove("Dragon");
-                    winningCombos.Remove("Dragon");
+                    winningCombos.Remove("Dragon_One");
+                    winningCombos.Remove("Dragon_Two");
+                    winningCombos.Remove("Dragon_Three");
                 }
             }
         }
