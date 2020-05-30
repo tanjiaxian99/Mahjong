@@ -13,7 +13,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
         SOUTH
     }
 
-    public Wind PlayerWind { get; set; }
+    public Wind playerWind { get; set; }
 
     public List<Tile> hand { get; set; } = new List<Tile>() ;
 
@@ -26,6 +26,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
     public bool myTurn = false;
 
     public bool canTouchHandTiles = false;
+
+    public int numberOfReplacementTiles { get; set; }
+
+    public int numberOfKong { get; set; }
 
     #endregion
 

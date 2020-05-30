@@ -79,6 +79,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public Tile latestDiscardTile;
 
+    /// <summary>
+    /// The number of tiles left in the wall
+    /// </summary>
+    public int numberOfTilesLeft;
+
     #endregion
 
     #region OnEvent Fields
@@ -110,8 +115,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// the latest discard tile.
     /// </summary>
     public const byte EvPongKongUpdate = 12;
-
-
 
 
     /// <summary>
@@ -584,7 +587,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             ht.Add(PlayerWindPropKey, wind);
             PhotonNetwork.SetPlayerCustomProperties(ht);
             // Update local player's playerManager
-            playerManager.PlayerWind = wind;
+            playerManager.playerWind = wind;
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
@@ -1169,16 +1172,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void OnPlayerTurn() {
         List<Tile> hand = playerManager.hand;
 
-        if (turnManager.Turn == 1 && playerManager.PlayerWind == PlayerManager.Wind.EAST) {
-            // Ensure turnManager.Turn is greater than 1 when the East Wind calls OnPlayerTurn() again.
-            this.StartTurn();
+        if (playerManager.playerWind == PlayerManager.Wind.EAST) {
+            if (turnManager.Turn == 1) {
+                if (playerManager.ConcealedKongTiles().Count != 0) {
+                    this.KongUI(playerManager.ConcealedKongTiles());
+                }
+                return;
 
-            if (playerManager.ConcealedKongTiles().Count != 0) {
-                this.KongUI(playerManager.ConcealedKongTiles());
+            } else {
+                this.StartTurn();
             }
-
-            return;
         }
+
 
         // Check if the discarded tile could be Chow/Ponged/Konged
         Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
@@ -1227,6 +1232,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Tile tile = new Tile(tileName);
 
                 if (playerManager.hand.Contains(tile)) {
+                    playerManager.numberOfReplacementTiles = 0;
+                    playerManager.numberOfKong = 0;
+
                     playerManager.myTurn = false;
                     playerManager.canTouchHandTiles = false;
                     playerManager.hand.Remove(tile);
@@ -1258,6 +1266,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
             playerManager.bonusTiles.Add(tile);
             hand[hand.Count - 1] = this.DrawTile();
+            playerManager.numberOfReplacementTiles++;
         }
     }
 
@@ -1265,13 +1274,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Draw a new tile. No distinction made between front end or back end of Wall Tiles.
     /// </summary>
-    // TODO: To be called when converting bonus tiles
     public Tile DrawTile() {
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
         int randomIndex = RandomNumber(tiles.Count());
         Tile tile = tiles[randomIndex];
         tiles.Remove(tiles[randomIndex]);
+
+        numberOfTilesLeft = tiles.Count;
 
         // Reinsert updated tiles list into Room Custom Properties
         Hashtable ht = new Hashtable();
@@ -1346,7 +1356,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         int openSize = playerManager.openTiles.Count;
         foreach (Tile tile in playerManager.openTiles) {
-            if (tile.isConcealedKongTile) {
+            if (tile.kongType == 2) {
                 openSize -= 1;
             }
         }
@@ -1365,7 +1375,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             GameObject newTile;
 
             // Instantiate the last Concealed Kong tile one tile above the other 3 Concealed Kong tiles.
-            if (tile.isConcealedKongTile) {
+            if (tile.kongType == 2) {
                 xPosOpen -= xSepOpen;
                 newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f + 0.3f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             } else {
@@ -1745,7 +1755,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else if (playerManager.ConcealedKongTiles().Contains(kongTile)) {
             // The second-last tile will be instantiated above the 3 other Kong tiles
             Tile kongTileSpecial = new Tile(spriteName);
-            kongTileSpecial.isConcealedKongTile = true;
+            kongTileSpecial.kongType = 2;
             List<Tile> combo = new List<Tile>();
 
             combo.Add(kongTile);
@@ -1758,7 +1768,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
 
             playerManager.comboTiles.Add(combo);
-        } 
+        }
+        playerManager.numberOfKong++;
 
         // Always draw a tile regardless of Kong type
         hand.Add(this.DrawTile());
@@ -1877,7 +1888,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
         foreach (Tile tile in remoteTiles) {
-            if (tile.isConcealedKongTile) {
+            if (tile.kongType == 2) {
                 remoteTilesSizeWithoutConcealedKongTile -= 1;
             }
         }
@@ -1918,7 +1929,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             } else if (tileType.Equals("Open")) {
                 float yPos = 1f;
-                if (remoteTiles[i].isConcealedKongTile) {
+                if (remoteTiles[i].kongType == 2) {
                     pos -= -negativeConversion * sep;
                     yPos = 1f + 0.3f;
                 }
@@ -2088,10 +2099,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public static byte[] SerializeTilesList(object customType) {
         var tilesList = (List<Tile>)customType;
-        byte[] byteArray = new byte[tilesList.Count];
+        byte[] byteArray = new byte[tilesList.Count * 2];
 
         for (int i = 0; i < tilesList.Count; i++) {
-            byteArray[i] = tilesList[i].Id;
+            byteArray[i * 2] = tilesList[i].Id[0];
+            byteArray[i * 2 + 1] = tilesList[i].Id[1]; 
         }
         return byteArray;
     }
@@ -2103,9 +2115,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public static object DeserializeTilesList(byte[] data) {
         List<Tile> tilesList = new List<Tile>();
 
-        foreach (byte tileByte in data) {
+        for (int i = 0; i < data.Length / 2; i++) {
             Tile tile = new Tile(0, 0);
-            tile.Id = tileByte;
+            tile.Id = new byte[2] { data[i * 2], data[i * 2 + 1] };
             tilesList.Add(tile);
         }
 
@@ -2114,9 +2126,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Serialize Tuple<int, Tile, float> into a byteStream. sizeof(memTuple) = sizeof(int) + sizeof(short) + sizeof(int)
+    /// Serialize Tuple<int, Tile, float> into a byteStream. sizeof(memTuple) = sizeof(int) + sizeof(short) + sizeof(short) + sizeof(int)
     /// </summary>
-    public static readonly byte[] memTuple = new byte[10];
+    public static readonly byte[] memTuple = new byte[12];
     public static short SerializeTuple(StreamBuffer outStream, object customobject) {
         var tuple = (Tuple<int, Tile, float>)customobject;
 
@@ -2125,12 +2137,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             int index = 0;
 
             Protocol.Serialize(tuple.Item1, bytes, ref index);
-            Protocol.Serialize(tuple.Item2.Id, bytes, ref index);
+            Protocol.Serialize(tuple.Item2.Id[0], bytes, ref index);
+            Protocol.Serialize(tuple.Item2.Id[1], bytes, ref index);
             Protocol.Serialize(tuple.Item3, bytes, ref index);
-            outStream.Write(bytes, 0, 10);
+            outStream.Write(bytes, 0, 12);
         }
 
-        return 10;
+        return 12;
     }
 
 
@@ -2140,20 +2153,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     private static object DeserializeTuple(StreamBuffer inStream, short length) {
         Tuple<int, Tile, float> tuple = new Tuple<int, Tile, float>(0, new Tile(0, 0), 0f);
         int actorNumber;
-        short tileId;
+        short tileIdOne;
+        short tileIdTwo;
         Tile tile = new Tile(0, 0);
         float pos;
 
         lock (memTuple) {
-            inStream.Read(memTuple, 0, 10);
+            inStream.Read(memTuple, 0, 12);
             int index = 0;
 
             Protocol.Deserialize(out actorNumber, memTuple, ref index);
-            Protocol.Deserialize(out tileId, memTuple, ref index);
+            Protocol.Deserialize(out tileIdOne, memTuple, ref index);
+            Protocol.Deserialize(out tileIdTwo, memTuple, ref index);
             Protocol.Deserialize(out pos, memTuple, ref index);
 
 
-            tile.Id = (byte)tileId;
+            tile.Id = new byte[2] { (byte)tileIdOne, (byte)tileIdTwo };
         }
         return new Tuple<int, Tile, float>(actorNumber, tile, pos);
     }
