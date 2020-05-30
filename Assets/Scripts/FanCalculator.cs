@@ -353,7 +353,7 @@ public class FanCalculator {
         if (listOfCombos.Count == 0) {
             winningCombos = new List<string>();
 
-            this.ThirteenWondersCheck(combinedHand);
+            winningCombos.Add(this.ThirteenWondersCheck(combinedHand));
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
 
             if (handsToCheck["Four Great Blessings"] > 0) {
@@ -1193,6 +1193,7 @@ public class FanCalculator {
             new Tile(Tile.Suit.Dot, Tile.Rank.One),
             new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
             new Tile(Tile.Suit.Wind, Tile.Rank.One),
             new Tile(Tile.Suit.Wind, Tile.Rank.Two),
             new Tile(Tile.Suit.Wind, Tile.Rank.Three),
@@ -1211,10 +1212,7 @@ public class FanCalculator {
 
         return "Thirteen Wonders";
     }
-
-
     
-
     #endregion
 
     #region Winning on Replacement Tile
