@@ -836,12 +836,10 @@ public class FanCalculator {
     /// <summary>
     /// Determine if the player won on the last available tile
     /// </summary>
-    private string WinningOnTheLastAvailableTile(int numberOfReplacementTiles, int numberOfTilesLeft) {
+    private void WinningOnTheLastAvailableTile(int numberOfReplacementTiles, int numberOfTilesLeft) {
         if (numberOfReplacementTiles == 0 && numberOfTilesLeft == 15) {
-            return "Winning on Last Available Tile";
+            winningCombos.Add("Winning on Last Available Tile");
         }
-
-        return null;
     }
 
     #endregion
