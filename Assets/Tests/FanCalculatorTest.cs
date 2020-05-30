@@ -1632,6 +1632,56 @@ namespace Tests {
             Assert.AreEqual(expectedFan, actualFan);
         }
 
+        [Test]
+        public void EighteenArhats() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One)};
+
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One)}, 
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Three)},
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three)},
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Three)}
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = null;
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Eighteen Arhats" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
         //// A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         //// `yield return null;` to skip a frame.
         //[UnityTest]

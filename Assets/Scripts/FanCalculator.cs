@@ -791,6 +791,10 @@ public class FanCalculator {
         // Eighteen Arhats check
         if (handsToCheck["Eighteen Arhats"] > 0) {
             winningCombos.Add(this.EighteenArhatsCheck(comboTiles));
+
+            if (winningCombos.Contains("Eighteen Arhats")) {
+                winningCombos.Remove("Triplets");
+            }
         }
     }
 
@@ -1162,6 +1166,24 @@ public class FanCalculator {
 
 
     /// <summary>
+    /// Determine if the hand is an Eighteen Arhats Hand
+    /// </summary>
+    private string EighteenArhatsCheck(List<List<Tile>> comboTiles) {
+        int comboTilesCount = 0;
+
+        foreach (List<Tile> combo in comboTiles) {
+            comboTilesCount += combo.Count;
+        }
+
+        if (comboTilesCount == 16) {
+            return "Eighteen Arhats";
+        }
+
+        return null;
+    }
+
+
+    /// <summary>
     /// Determine if the hand is a Thirteen Wonders Hand
     /// </summary>
     private string ThirteenWondersCheck(List<Tile> combinedHand) {
@@ -1191,22 +1213,7 @@ public class FanCalculator {
     }
 
 
-    /// <summary>
-    /// Determine if the hand is an Eighteen Arhats Hand
-    /// </summary>
-    private string EighteenArhatsCheck(List<List<Tile>> comboTiles) {
-        int comboTilesCount = 0;
-
-        foreach (List<Tile> combo in comboTiles) {
-            comboTilesCount += combo.Count;
-        }
-
-        if (comboTilesCount == 18) {
-            return "Eighteen Arhats";
-        }
-
-        return null;
-    }
+    
 
     #endregion
 
