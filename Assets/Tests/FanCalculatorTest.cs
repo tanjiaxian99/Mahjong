@@ -1501,6 +1501,50 @@ namespace Tests {
             Assert.AreEqual(expectedFan, actualFan);
         }
 
+        [Test]
+        public void PureGreenSuit() {
+            playerManager = new PlayerManager();
+            playerManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.Three) };
+
+
+            playerManager.bonusTiles = new List<Tile>() { };
+
+            playerManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight)
+                }
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Dragon, Tile.Rank.Three);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Pure Green Suit"], new List<string>() { "Pure Green Suit" });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+
         //// A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         //// `yield return null;` to skip a frame.
         //[UnityTest]
