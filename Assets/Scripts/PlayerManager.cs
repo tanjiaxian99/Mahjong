@@ -31,6 +31,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public int numberOfKong { get; set; }
 
+    public int points = 200;
+
     #endregion
 
     #region MonoBehaviour Callbacks
