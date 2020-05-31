@@ -1356,7 +1356,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         int openSize = playerManager.openTiles.Count;
         foreach (Tile tile in playerManager.openTiles) {
-            if (tile.kongType == 2) {
+            if (tile.kongType == 3) {
                 openSize -= 1;
             }
         }
@@ -1375,7 +1375,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             GameObject newTile;
 
             // Instantiate the last Concealed Kong tile one tile above the other 3 Concealed Kong tiles.
-            if (tile.kongType == 2) {
+            if (tile.kongType == 3) {
                 xPosOpen -= xSepOpen;
                 newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f + 0.3f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             } else {
@@ -1755,7 +1755,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else if (playerManager.ConcealedKongTiles().Contains(kongTile)) {
             // The second-last tile will be instantiated above the 3 other Kong tiles
             Tile kongTileSpecial = new Tile(spriteName);
-            kongTileSpecial.kongType = 2;
+            kongTileSpecial.kongType = 3;
             List<Tile> combo = new List<Tile>();
 
             combo.Add(kongTile);
@@ -1888,7 +1888,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
         foreach (Tile tile in remoteTiles) {
-            if (tile.kongType == 2) {
+            if (tile.kongType == 3) {
                 remoteTilesSizeWithoutConcealedKongTile -= 1;
             }
         }
@@ -1929,7 +1929,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             } else if (tileType.Equals("Open")) {
                 float yPos = 1f;
-                if (remoteTiles[i].kongType == 2) {
+                if (remoteTiles[i].kongType == 3) {
                     pos -= -negativeConversion * sep;
                     yPos = 1f + 0.3f;
                 }

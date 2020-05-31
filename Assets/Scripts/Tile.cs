@@ -18,7 +18,7 @@ public class Tile : IEquatable<Tile> {
     public Rank? rank { get; set; }
 
     /// <summary>
-    /// Value is 1 if the tile is part of an Exposed Kong. Value is 2 if the tile is part of a Concealed Kong.
+    /// Discard Kong: 1, Exposed Kong: 2, Concealed Kong: 3
     /// </summary>
     public byte kongType { get; set; } = 0;
     public bool isWinning { get; set; } = false;
@@ -50,15 +50,15 @@ public class Tile : IEquatable<Tile> {
 
 
     /// <summary>
-    /// The Id of each tile is a 2-digit number: the first digit represents the suit while the second represents the rank.
+    /// The Id consists of 2 bytes: the first represents the suit and rank, while the second represents the kongType.
     /// </summary>
     public byte[] Id {
         get {
             return new byte[2] { (byte)((int) suit * 10 + (int) rank), kongType };
         } set {
-            kongType = value[0];
-            suit = (Suit) (value[1] / 10);
-            rank = (Rank) (value[1] % 10);
+            suit = (Suit) (value[0] / 10);
+            rank = (Rank) (value[0] % 10);
+            kongType = value[1];
         }
     }
 
