@@ -7,7 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Agenda: Payment depending on Fan, shooter pay all, instant payout, Fresh tile, paying for all players, sacred discard
+    // Agenda: Payment depending on Fan, shooter pay all, robbing the kong different payout, Fresh tile, paying for all players, sacred discard
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
@@ -18,6 +18,8 @@ public class Payment {
 
     private PlayerManager playerManager;
     private int minPoint;
+
+    Dictionary<int, int> kongTypeCount;
 
     /// <summary>
     /// Constructor to instantiate instantPaymentDict
@@ -60,6 +62,7 @@ public class Payment {
         
     }
 
+    #region Bonus Tile 
 
     /// <summary>
     /// Determine if the player has both the Cat and Rat. Runs locally.
@@ -222,6 +225,60 @@ public class Payment {
             playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Complete Flower Group Payout"]) * 3;
         } else {
             playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Complete Flower Group Payout"]);
+        }
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Determine if the player has a Kong. Runs locally.
+    /// </summary>
+    public void KongPayout(Player player, List<Tile> openTiles) {
+        kongTypeCount = new Dictionary<int, int>();
+
+        for (int i = 0; i < 4; i++) {
+            kongTypeCount.Add(i, 0);
+        }
+
+        foreach (Tile tile in openTiles) {
+            kongTypeCount[tile.kongType]++;
+        }
+
+        foreach (string instantPayment in instantPaymentDict[player]) {
+            if (instantPayment == "Discard Kong") {
+                kongTypeCount[1]--;
+            } else if (instantPayment == "Exposed Kong") {
+                kongTypeCount[2]--;
+            } else if (instantPayment == "Concealed Kong") {
+                kongTypeCount[3]--;
+            }
+        }
+
+        if (kongTypeCount[1] == 0 && kongTypeCount[2] == 0 & kongTypeCount[3] == 0) {
+            return;
+        }
+
+        // Concealed Kong vs Discard and Exposed Kong check
+        if (kongTypeCount[3] > 0) {
+            instantPaymentDict[player].Add("Concealed Kong");
+
+            if (player == PhotonNetwork.LocalPlayer) {
+                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong"]) * 3;
+            } else {
+                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong"]);
+            }
+            return;
+
+        } else if (kongTypeCount[2] > 0) {
+            instantPaymentDict[player].Add("Exposed Kong");
+        } else {
+            instantPaymentDict[player].Add("Discard Kong");
+        }
+
+        if (player == PhotonNetwork.LocalPlayer) {
+            playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]) * 3;
+        } else {
+            playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]);
         }
     }
 }
