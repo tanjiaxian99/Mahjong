@@ -18,6 +18,7 @@ public class Payment {
 
     private PlayerManager playerManager;
     private int minPoint;
+    bool shooterPay;
 
     Dictionary<int, int> kongTypeCount;
 
@@ -54,6 +55,7 @@ public class Payment {
         this.handsToCheck = handsToCheck;
         this.playerManager = playerManager;
         this.minPoint = handsToCheck["Min Point"];
+        this.shooterPay = handsToCheck["Shooter Pay"] != 0;
     }
 
     
@@ -62,7 +64,7 @@ public class Payment {
         
     }
 
-    #region Bonus Tile 
+    #region Bonus Tile Payouts
 
     /// <summary>
     /// Determine if the player has both the Cat and Rat. Runs locally.
@@ -279,6 +281,50 @@ public class Payment {
             playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]) * 3;
         } else {
             playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]);
+        }
+    }
+
+
+    /// <summary>
+    /// Determine the number of points to give the winning player. Runs locally.
+    /// </summary>
+    public void HandPayout(Player winner, Player discardPlayer, int fan, List<string> winningCombos) {
+
+        if (winner == PhotonNetwork.LocalPlayer) {
+            // If the local player is the winner
+
+            if (discardPlayer == null) {
+                // Self-pick
+                playerManager.points += minPoint * (int)Math.Pow(2, fan - 1) * 2 * 3;
+            } else {
+                playerManager.points += minPoint * (int)Math.Pow(2, fan - 1) * 4;
+            }
+
+        } else {
+            // If the local player is the loser
+
+            // Shooter pay
+            if (shooterPay) {
+                // If local player is the shooter
+                if (discardPlayer == PhotonNetwork.LocalPlayer) {
+                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
+
+                } else if (discardPlayer == null) {
+                    // If the remote player self pick
+                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
+                }
+                return;
+            }
+
+            // Non-shooter pay
+            if (discardPlayer == null || discardPlayer == PhotonNetwork.LocalPlayer) {
+                // If the winner self-pick or if the local player discarded the winning tile
+                playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
+
+            } else {
+                // If the local player is a loser
+                playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1);
+            }
         }
     }
 }
