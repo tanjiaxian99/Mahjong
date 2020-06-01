@@ -7,7 +7,9 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Agenda: Payment depending on Fan, shooter pay all, robbing the kong different payout, Fresh tile, paying for all players, sacred discard
+    // Agenda: Fresh tile, paying for all players, sacred discard
+    // Done: Payment depending on Fan, shooter pay all
+    // Pending: Robbing the kong different payout (executed by GameManager).
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
@@ -59,10 +61,19 @@ public class Payment {
     }
 
     
+    /// <summary>
+    /// Determine the need for instant payments to a remote player/from other players. Called when instantiating either local or remote open tiles. 
+    /// </summary>
     public void InstantPayout(Player player, List<Tile> openTiles, bool isStartingHand) {
-
-        
+        this.CatAndRat(player, openTiles, isStartingHand);
+        this.ChickenAndCentipede(player, openTiles, isStartingHand);
+        this.CompleteAnimalGroupPayout(player, openTiles);
+        this.BonusTileMatchSeatWindPair(player, playerManager.playerWind, openTiles, isStartingHand);
+        this.CompleteSeasonGroupPayout(player, openTiles);
+        this.CompleteFlowerGroupPayout(player, openTiles);
+        this.KongPayout(player, openTiles);
     }
+
 
     #region Bonus Tile Payouts
 
@@ -232,6 +243,7 @@ public class Payment {
 
     #endregion
 
+
     /// <summary>
     /// Determine if the player has a Kong. Runs locally.
     /// </summary>
@@ -286,7 +298,7 @@ public class Payment {
 
 
     /// <summary>
-    /// Determine the number of points to give the winning player. Runs locally.
+    /// Determine the number of points to give or remove from the local player. Runs locally after the game is won.
     /// </summary>
     public void HandPayout(Player winner, Player discardPlayer, int fan, List<string> winningCombos) {
 
