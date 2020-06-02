@@ -129,24 +129,18 @@ public class PayAllDiscard {
     /// </summary>
     public List<Tile> PointLimit(List<Tile> openTiles, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind) {
         List<Tile> highRiskTiles = new List<Tile>();
+        int totalFan = 0;
 
         if (handsToCheck["Point Limit Pay All"] == 0) {
             return highRiskTiles;
         }
 
-        Dictionary<Tile, int> openTilesDict = new Dictionary<Tile, int>();
-
-        openTilesDict.Add(windToTileDict[playerWind][0], 0);
-        openTilesDict.Add(windToTileDict[playerWind][1], 0);
-        openTilesDict.Add(windToTileDict[playerWind][2], 0);
-        openTilesDict.Add(windToTileDict[prevailingWind][2], 0);
-        openTilesDict.Add(dragonOne, 0);
-        openTilesDict.Add(dragonTwo, 0);
-        openTilesDict.Add(dragonThree, 0);
-        openTilesDict.Add(animalOne, 0);
-        openTilesDict.Add(animalTwo, 0);
-        openTilesDict.Add(animalThree, 0);
-        openTilesDict.Add(animalFour, 0);
+        Dictionary<Tile, int> highRiskDict = new Dictionary<Tile, int>();
+        highRiskDict.Add(windToTileDict[playerWind][2], 0);
+        highRiskDict.Add(windToTileDict[prevailingWind][2], 0);
+        highRiskDict.Add(dragonOne, 0);
+        highRiskDict.Add(dragonTwo, 0);
+        highRiskDict.Add(dragonThree, 0);
 
         int seasonTilesCount = 0;
         int flowerTilesCount = 0;
@@ -154,26 +148,27 @@ public class PayAllDiscard {
 
         // Bonus Tile Match Seat Wind: Season & Flower. Player Wind Combo: Wind. Prevailing Wind Combo: Wind
         foreach (Tile tile in openTiles) {
-            if (openTilesDict.Keys.Contains(tile)) {
 
-                if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
-                    openTilesDict[tile] += handsToCheck["Bonus Tile Match Seat Wind"];
+            if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
+                totalFan += handsToCheck["Bonus Tile Match Seat Wind"];
+            }
+
+            if (tile.suit == Tile.Suit.Wind) {
+                if (tile == windToTileDict[playerWind][2]) {
+                    highRiskDict[tile] += handsToCheck["Player Wind Combo"];
                 }
 
-                if (tile.suit == Tile.Suit.Wind) {
-                    if (tile == windToTileDict[playerWind][2]) {
-                        openTilesDict[tile] += handsToCheck["Player Wind Combo"];
-                    }
-
-                    if (tile == windToTileDict[prevailingWind][2]) {
-                        openTilesDict[tile] += handsToCheck["Prevailing Wind Combo"];
-                    }
+                if (tile == windToTileDict[prevailingWind][2]) {
+                    highRiskDict[tile] += handsToCheck["Prevailing Wind Combo"];
                 }
+            }
 
-                if (tile.suit == Tile.Suit.Animal) {
-                    openTilesDict[tile] += handsToCheck["Animal"];
-                }
+            if (tile.suit == Tile.Suit.Dragon) {
+                totalFan += handsToCheck["Dragon"];
+            }
 
+            if (tile.suit == Tile.Suit.Animal) {
+                totalFan += handsToCheck["Animal"];
             }
 
             if (tile.suit == Tile.Suit.Season) {
@@ -189,9 +184,7 @@ public class PayAllDiscard {
             }
         }
 
-        // Calculate total fan in open tiles
-        int totalFan = 0;
-        foreach (int fan in openTilesDict.Values) {
+        foreach (int fan in highRiskDict.Values) {
             totalFan += fan;
         }
 
@@ -211,7 +204,7 @@ public class PayAllDiscard {
         }
 
         // If fan limit is 5, there are high risk discards only when there are at least 3 fan.
-        if (totalFan >= handsToCheck["Fan Limit"] - 2 && totalFan <= handsToCheck["Fan Limit"]) {
+        if (totalFan >= handsToCheck["Fan Limit"] - 2) {
 
         }
 
