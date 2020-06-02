@@ -235,6 +235,43 @@ public class PayAllDiscard {
 
     }
 
+
+    /// <summary>
+    /// Determine the high risk discards in Pure Terminals Scenario
+    /// </summary>
+    public List<Tile> PureTerminals(List<Tile> openTiles) {
+        List<Tile> highRiskTiles = new List<Tile>();
+        Dictionary<Tile, int> pureTerminalsDict = new Dictionary<Tile, int>();
+        int terminalsCount = 0;
+
+        pureTerminalsDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.One), 0);
+        pureTerminalsDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine), 0);
+        pureTerminalsDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One), 0);
+        pureTerminalsDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine), 0);
+        pureTerminalsDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One), 0);
+        pureTerminalsDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine), 0);
+
+        foreach (Tile terminalTile in pureTerminalsDict.Keys) {
+            if (openTiles.Contains(terminalTile)) {
+                pureTerminalsDict[terminalTile]++;
+                terminalsCount++;
+            }
+        }
+
+        if (terminalsCount < 3) {
+            return highRiskTiles;
+        }
+
+        foreach (Tile terminalTile in pureTerminalsDict.Keys) {
+            if (pureTerminalsDict[terminalTile] == 0) {
+                highRiskTiles.Add(terminalTile);
+            }
+        }
+
+        return highRiskTiles;
+    }
+
+
     #region Initializer Functions
 
     /// <summary>
