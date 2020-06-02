@@ -263,7 +263,25 @@ public class PayAllDiscard {
             return highRiskTiles;
         }
 
-        return fullFlushDict[referenceSuit];
+        highRiskTiles = fullFlushDict[referenceSuit];
+
+        var q = from x in openTiles
+                group x by x into g
+                let count = g.Count()
+                orderby count descending
+                select new { Tile = g.Key, Count = count };
+
+        foreach (var tileCountDict in q) {
+            if (tileCountDict.Count == 4) {
+                highRiskTiles.Remove(tileCountDict.Tile);
+            }
+
+            if (tileCountDict.Count == 3 && (tileCountDict.Tile.suit == Tile.Suit.Wind || tileCountDict.Tile.suit == Tile.Suit.Dragon)) {
+                highRiskTiles.Remove(tileCountDict.Tile);
+            }
+        } 
+
+        return highRiskTiles;
     }
 
 

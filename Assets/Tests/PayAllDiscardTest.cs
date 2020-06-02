@@ -217,22 +217,21 @@ namespace Tests {
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Three),
                 new Tile(Tile.Suit.Dot, Tile.Rank.Three),
                 new Tile(Tile.Suit.Dot, Tile.Rank.Four),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Six),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four)
             };
 
             playerWind = PlayerManager.Wind.SOUTH;
             prevailingWind = PlayerManager.Wind.EAST;
 
             List<Tile> expectedHighRiskTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Dot, Tile.Rank.One),
                 new Tile(Tile.Suit.Dot, Tile.Rank.Two),
                 new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Four),
                 new Tile(Tile.Suit.Dot, Tile.Rank.Five),
                 new Tile(Tile.Suit.Dot, Tile.Rank.Six),
                 new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
@@ -263,11 +262,8 @@ namespace Tests {
             prevailingWind = PlayerManager.Wind.EAST;
 
             List<Tile> expectedHighRiskTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Wind, Tile.Rank.One),
-                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
                 new Tile(Tile.Suit.Wind, Tile.Rank.Three),
                 new Tile(Tile.Suit.Wind, Tile.Rank.Four),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
                 new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
                 new Tile(Tile.Suit.Dragon, Tile.Rank.Three)};
 
@@ -276,7 +272,7 @@ namespace Tests {
         }
 
         [Test]
-        public void PureTerminalTest() {
+        public void PureTerminalsTest() {
             openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
