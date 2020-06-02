@@ -240,16 +240,18 @@ public class PayAllDiscard {
 
         foreach (Tile tile in openTiles) {
             if (tile.suit != referenceSuit) {
-                if (tile.suit != Tile.Suit.Season && tile.suit != Tile.Suit.Flower && tile.suit != Tile.Suit.Animal) {
-                    return highRiskTiles;
-                }
-
                 if (tile.suit == Tile.Suit.Wind && referenceSuit == Tile.Suit.Dragon) {
                     referenceSuitCount++;
+                    continue;
                 }
 
                 if (tile.suit == Tile.Suit.Dragon && referenceSuit == Tile.Suit.Wind) {
                     referenceSuitCount++;
+                    continue;
+                }
+
+                if (tile.suit != Tile.Suit.Season && tile.suit != Tile.Suit.Flower && tile.suit != Tile.Suit.Animal) {
+                    return highRiskTiles;
                 }
 
             } else {
@@ -261,15 +263,7 @@ public class PayAllDiscard {
             return highRiskTiles;
         }
 
-        highRiskTiles = fullFlushDict[referenceSuit];
-        
-        for (int i = highRiskTiles.Count - 1; i >= 0; i--) {
-            if (openTiles.Contains(highRiskTiles[i])) {
-                highRiskTiles.RemoveAt(i);
-            }
-        }
-
-        return highRiskTiles;
+        return fullFlushDict[referenceSuit];
     }
 
 
@@ -292,7 +286,8 @@ public class PayAllDiscard {
         pureTerminalsDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One), 0);
         pureTerminalsDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine), 0);
 
-        foreach (Tile terminalTile in pureTerminalsDict.Keys) {
+        List<Tile> terminalTiles = pureTerminalsDict.Keys.ToList();
+        foreach (Tile terminalTile in terminalTiles) {
             if (openTiles.Contains(terminalTile)) {
                 pureTerminalsDict[terminalTile]++;
                 terminalsCount++;

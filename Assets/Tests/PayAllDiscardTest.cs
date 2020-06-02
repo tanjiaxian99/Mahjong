@@ -126,7 +126,7 @@ namespace Tests {
         }
 
         [Test]
-        public void PointLimitTest_ThreeFan() {
+        public void PointLimitTest_ThreeFan_One() {
             openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Three),
@@ -142,6 +142,162 @@ namespace Tests {
             List<Tile> expectedHighRiskTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Wind, Tile.Rank.One)
             };
+            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
+            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+        }
+
+        [Test]
+        public void PointLimitTest_ThreeFan_Two() {
+            openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Animal, Tile.Rank.One)
+            };
+
+            playerWind = PlayerManager.Wind.EAST;
+            prevailingWind = PlayerManager.Wind.EAST;
+
+            List<Tile> expectedHighRiskTiles = new List<Tile>() { };
+            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
+            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+        }
+
+        [Test]
+        public void PointLimitTest_FourFan_One() {
+            openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Season, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Animal, Tile.Rank.One)
+            };
+
+            playerWind = PlayerManager.Wind.EAST;
+            prevailingWind = PlayerManager.Wind.EAST;
+
+            List<Tile> expectedHighRiskTiles = new List<Tile>() { 
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.Three)};
+            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
+            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+        }
+
+        [Test]
+        public void PointLimitTest_FourFan_Two() {
+            openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Season, Tile.Rank.Two),
+                new Tile(Tile.Suit.Flower, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two)
+            };
+
+            playerWind = PlayerManager.Wind.SOUTH;
+            prevailingWind = PlayerManager.Wind.EAST;
+
+            List<Tile> expectedHighRiskTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One)};
+            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
+            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+        }
+
+        [Test]
+        public void FullFlushTest_One() {
+            openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Season, Tile.Rank.Two),
+                new Tile(Tile.Suit.Flower, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Six),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
+            };
+
+            playerWind = PlayerManager.Wind.SOUTH;
+            prevailingWind = PlayerManager.Wind.EAST;
+
+            List<Tile> expectedHighRiskTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Six),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Eight),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Nine),};
+            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
+            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+        }
+
+        [Test]
+        public void FullFlushTest_Two() {
+            openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Season, Tile.Rank.One),
+                new Tile(Tile.Suit.Flower, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+            };
+
+            playerWind = PlayerManager.Wind.SOUTH;
+            prevailingWind = PlayerManager.Wind.EAST;
+
+            List<Tile> expectedHighRiskTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.Three)};
+
+            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
+            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+        }
+
+        [Test]
+        public void PureTerminalTest() {
+            openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+            };
+
+            playerWind = PlayerManager.Wind.SOUTH;
+            prevailingWind = PlayerManager.Wind.EAST;
+
+            List<Tile> expectedHighRiskTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+            };
+
             List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
             Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
         }
