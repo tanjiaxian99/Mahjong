@@ -54,10 +54,10 @@ public class Tile : IEquatable<Tile> {
     /// </summary>
     public byte[] Id {
         get {
-            return new byte[2] { (byte)((int) suit * 10 + (int) rank), kongType };
+            return new byte[2] { (byte)((int)suit * 10 + (int)rank), kongType };
         } set {
-            suit = (Suit) (value[0] / 10);
-            rank = (Rank) (value[0] % 10);
+            suit = (Suit)(value[0] / 10);
+            rank = (Rank)(value[0] % 10);
             kongType = value[1];
         }
     }
@@ -146,7 +146,7 @@ public class Tile : IEquatable<Tile> {
         return suit == tile.suit &&
                rank == tile.rank;
     }
-    
+
 
     public override int GetHashCode() {
         int hashCode = 39855015;
@@ -155,5 +155,15 @@ public class Tile : IEquatable<Tile> {
         return hashCode;
     }
 
-    
+
+    public static bool operator==(Tile tile1, Tile tile2) {
+        return tile1.suit == tile2.suit &&
+               tile1.rank == tile2.rank;
+    }
+
+    public static bool operator !=(Tile tile1, Tile tile2) {
+        return tile1.suit != tile2.suit ||
+               tile1.rank != tile2.rank;
+    }
+
 }

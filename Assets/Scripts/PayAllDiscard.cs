@@ -41,6 +41,22 @@ public class PayAllDiscard {
     }
 
     /// <summary>
+    /// Wrapper method for Pay All Discard methods
+    /// </summary>
+    public List<Tile> PayAllCheck(List<Tile> openTiles, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind) {
+        List<Tile> highRiskTiles = new List<Tile>();
+
+        highRiskTiles.AddRange(this.DragonTileSet(openTiles));
+        //highRiskTiles.AddRange(this.WindTileSet(openTiles));
+        highRiskTiles.AddRange(this.PointLimit(openTiles, playerWind, prevailingWind));
+        highRiskTiles.AddRange(this.FullFlush(openTiles));
+        highRiskTiles.AddRange(this.PureTerminals(openTiles));
+
+        return highRiskTiles;
+    }
+
+
+    /// <summary>
     /// Determine the high risk discard in a Dragon Tile Set Scenario
     /// </summary>
     public List<Tile> DragonTileSet(List<Tile> openTiles) {
@@ -110,35 +126,24 @@ public class PayAllDiscard {
         }
 
         Dictionary<Tile, int> highRiskDict = new Dictionary<Tile, int>();
-        highRiskDict.Add(windToTileDict[playerWind][2], 0);
-        highRiskDict.Add(windToTileDict[prevailingWind][2], 0);
         highRiskDict.Add(dragonOne, 0);
         highRiskDict.Add(dragonTwo, 0);
         highRiskDict.Add(dragonThree, 0);
+        highRiskDict.Add(windToTileDict[playerWind][2], 0);
+        if (playerWind != prevailingWind) {
+            highRiskDict.Add(windToTileDict[prevailingWind][2], 0);
+        }
 
         int seasonTilesCount = 0;
         int flowerTilesCount = 0;
         int animalTilesCount = 0;
+        
 
         // Bonus Tile Match Seat Wind: Season & Flower. Player Wind Combo: Wind. Prevailing Wind Combo: Wind
         foreach (Tile tile in openTiles) {
 
-            if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
+            if (tile == windToTileDict[playerWind][0] || tile == windToTileDict[playerWind][1]) {
                 totalFan += handsToCheck["Bonus Tile Match Seat Wind"];
-            }
-
-            if (tile.suit == Tile.Suit.Wind) {
-                if (tile == windToTileDict[playerWind][2]) {
-                    highRiskDict[tile] += handsToCheck["Player Wind Combo"];
-                }
-
-                if (tile == windToTileDict[prevailingWind][2]) {
-                    highRiskDict[tile] += handsToCheck["Prevailing Wind Combo"];
-                }
-            }
-
-            if (tile.suit == Tile.Suit.Dragon) {
-                highRiskDict[tile] += handsToCheck["Dragon"];
             }
 
             if (tile.suit == Tile.Suit.Animal) {
@@ -157,6 +162,27 @@ public class PayAllDiscard {
                 animalTilesCount++;
             }
         }
+
+        if (openTiles.Contains(windToTileDict[playerWind][2])) {
+            highRiskDict[windToTileDict[playerWind][2]] += handsToCheck["Player Wind Combo"];
+        }
+
+        if (openTiles.Contains(windToTileDict[prevailingWind][2])) {
+            highRiskDict[windToTileDict[prevailingWind][2]] += handsToCheck["Prevailing Wind Combo"];
+        }
+
+        if (openTiles.Contains(dragonOne)) {
+            highRiskDict[dragonOne] += handsToCheck["Dragon"];
+        }
+
+        if (openTiles.Contains(dragonTwo)) {
+            highRiskDict[dragonTwo] += handsToCheck["Dragon"];
+        }
+
+        if (openTiles.Contains(dragonThree)) {
+            highRiskDict[dragonThree] += handsToCheck["Dragon"];
+        }
+
 
         foreach (int fan in highRiskDict.Values) {
             totalFan += fan;
@@ -204,6 +230,10 @@ public class PayAllDiscard {
         Tile.Suit? referenceSuit = openTiles[openTiles.Count - 1].suit;
         int referenceSuitCount = 0;
 
+        if (handsToCheck["Full Flush Pay All"] == 0) {
+            return highRiskTiles;
+        }
+
         if (referenceSuit == Tile.Suit.Season || referenceSuit == Tile.Suit.Flower || referenceSuit == Tile.Suit.Animal) {
             return highRiskTiles;
         }
@@ -231,8 +261,15 @@ public class PayAllDiscard {
             return highRiskTiles;
         }
 
-        return fullFlushDict[referenceSuit];
+        highRiskTiles = fullFlushDict[referenceSuit];
+        
+        for (int i = highRiskTiles.Count - 1; i >= 0; i--) {
+            if (openTiles.Contains(highRiskTiles[i])) {
+                highRiskTiles.RemoveAt(i);
+            }
+        }
 
+        return highRiskTiles;
     }
 
 
@@ -243,6 +280,10 @@ public class PayAllDiscard {
         List<Tile> highRiskTiles = new List<Tile>();
         Dictionary<Tile, int> pureTerminalsDict = new Dictionary<Tile, int>();
         int terminalsCount = 0;
+
+        if (handsToCheck["Pure Terminals Pay All"] == 0) {
+            return highRiskTiles;
+        }
 
         pureTerminalsDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.One), 0);
         pureTerminalsDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine), 0);
@@ -271,6 +312,8 @@ public class PayAllDiscard {
         return highRiskTiles;
     }
 
+
+    // Eighteen Arhats Scenario
 
     #region Initializer Functions
 
