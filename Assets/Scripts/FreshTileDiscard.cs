@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FreshTileDiscard {
+public static class FreshTileDiscard {
 
     public static bool IsFreshTile(List<Tile> discardTiles, List<Tile> allPlayersOpenTiles, Tile discardTile) {
         if (discardTiles.Contains(discardTile)) {
@@ -22,11 +22,13 @@ public class FreshTileDiscard {
                 continue;
             }
 
+
             // Pong case
             if (allPlayersOpenTiles[i + 1] == allPlayersOpenTiles[i] && allPlayersOpenTiles[i + 2] == allPlayersOpenTiles[i]) {
                 if (discardTile == allPlayersOpenTiles[i]) {
                     return false;
                 }
+                i += 2;
             }
 
             // If the previous case was Kong, nothing happens.
