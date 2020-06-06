@@ -157,13 +157,19 @@ public class Tile : IEquatable<Tile> {
 
 
     public static bool operator==(Tile tile1, Tile tile2) {
-        return tile1.suit == tile2.suit &&
-               tile1.rank == tile2.rank;
+        if (object.ReferenceEquals(tile2, null)) {
+            return object.ReferenceEquals(tile1, null);
+        }
+
+        return tile1.Equals(tile2);
     }
 
     public static bool operator !=(Tile tile1, Tile tile2) {
-        return tile1.suit != tile2.suit ||
-               tile1.rank != tile2.rank;
+        if (object.ReferenceEquals(tile2, null)) {
+            return !object.ReferenceEquals(tile1, null);
+        }
+
+        return tile1.Equals(tile1);
     }
 
 }
