@@ -7,9 +7,8 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Agenda: Fresh tile, paying for all players, sacred discard
-    // Done: Payment depending on Fan, shooter pay all
-    // Pending: Robbing the kong different payout (executed by GameManager).
+    // Agenda: Fresh tile, shooter pay all and paying for all players reconcile
+    // Pending: Robbing the kong different payout (executed by GameManager). Sacred discard and missed discard (executed by GameManager).
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
