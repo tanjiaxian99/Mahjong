@@ -625,6 +625,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             // Inform Master Client that the local player can't Pong/Kong
             PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+        
+        } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
+            numberOfTilesLeft = ((List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey]).Count;
+
+            if (numberOfTilesLeft == 15) {
+                this.EndRound();
+            }
         }
     }
 
@@ -1170,6 +1177,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// when the player Pong or Kong
     /// </summary>
     public void OnPlayerTurn() {
+        // If there are only 15 tiles left, end the game
+        if (numberOfTilesLeft == 15) {
+            this.EndRound();
+            return;
+        }
+
         List<Tile> hand = playerManager.hand;
 
         if (playerManager.playerWind == PlayerManager.Wind.EAST) {
@@ -1258,6 +1271,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         List<Tile> hand = playerManager.hand;
 
         while (true) {
+            // If there are only 15 tiles left, end the game
+            if (numberOfTilesLeft == 15) {
+                this.EndRound();
+                return;
+            }
+
             Tile tile = hand[hand.Count - 1];
 
             // Check if the tile is a bonusTile
@@ -1265,6 +1284,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 break;
             }
             playerManager.bonusTiles.Add(tile);
+
             hand[hand.Count - 1] = this.DrawTile();
             playerManager.numberOfReplacementTiles++;
         }
@@ -1280,8 +1300,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         int randomIndex = RandomNumber(tiles.Count());
         Tile tile = tiles[randomIndex];
         tiles.Remove(tiles[randomIndex]);
-
-        numberOfTilesLeft = tiles.Count;
 
         // Reinsert updated tiles list into Room Custom Properties
         Hashtable ht = new Hashtable();
@@ -1469,6 +1487,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Hashtable ht = new Hashtable();
         ht.Add(NextPlayerPropKey, nextPlayer);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
+
+    public void EndRound() {
+
     }
 
     #endregion

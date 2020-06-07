@@ -7,7 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Agenda: paying for all players reconcile, handsToCheck settings, numberOfTilesLeft room properties update
+    // Agenda: numberOfTilesLeft room properties update, stop drawing when numberOfTiles < 15;
     // Pending: Robbing the kong different payout (executed by GameManager). Sacred discard and missed discard (executed by GameManager).
 
     private Dictionary<Player, List<string>> instantPaymentDict;
@@ -56,22 +56,42 @@ public class Payment {
         this.shooterPay = handsToCheck["Shooter Pay"] != 0;
     }
 
-    
+
     /// <summary>
     /// Determine the need for instant payments to a remote player/from other players. Called when instantiating either local or remote open tiles. 
     /// </summary>
-    public void InstantPayout(Player player, List<Tile> openTiles, bool isStartingHand, int numberOfTilesLeft, 
+    public void InstantPayout(Player player, List<Tile> openTiles, bool isStartingHand, int numberOfTilesLeft,
                               List<Tile> discardTiles, List<Tile> allPlayersOpenTiles, Tile discardTile, Player discardPlayer) {
 
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, allPlayersOpenTiles, discardTile);
 
-        this.CatAndRat(player, openTiles, isStartingHand);
-        this.ChickenAndCentipede(player, openTiles, isStartingHand);
-        this.CompleteAnimalGroupPayout(player, openTiles);
-        this.BonusTileMatchSeatWindPair(player, playerManager.playerWind, openTiles, isStartingHand);
-        this.CompleteSeasonGroupPayout(player, openTiles);
-        this.CompleteFlowerGroupPayout(player, openTiles);
-        this.KongPayout(player, openTiles, numberOfTilesLeft, isFreshTile, discardPlayer);
+        if (handsToCheck["Hidden Cat and Rat"] > 0 && handsToCheck["Cat and Rat"] > 0) {
+            this.CatAndRat(player, openTiles, isStartingHand);
+        }
+
+        if (handsToCheck["Hidden Chicken and Centipede"] > 0 && handsToCheck["Chicken and Centipede"] > 0) {
+            this.ChickenAndCentipede(player, openTiles, isStartingHand);
+        }
+
+        if (handsToCheck["Complete Animal Group Payout"] > 0) {
+            this.CompleteAnimalGroupPayout(player, openTiles);
+        }
+
+        if (handsToCheck["Hidden Bonus Tile Match Seat Wind Pair"] > 0 && handsToCheck["Bonus Tile Match Seat Wind Pair"] > 0) {
+            this.BonusTileMatchSeatWindPair(player, playerManager.playerWind, openTiles, isStartingHand);
+        }
+
+        if (handsToCheck["Complete Season Group Payout"] > 0) {
+            this.CompleteSeasonGroupPayout(player, openTiles);
+        }
+
+        if (handsToCheck["Complete Flower Group Payout"] > 0) {
+            this.CompleteFlowerGroupPayout(player, openTiles);
+        }
+
+        if (handsToCheck["Kong Payout"] > 0) {
+            this.KongPayout(player, openTiles, numberOfTilesLeft, isFreshTile, discardPlayer);
+        }
     }
 
 
@@ -297,6 +317,7 @@ public class Payment {
                 playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]);
             }
             return;
+
         } else {
             instantPaymentDict[player].Add("Discard Kong");
 
@@ -313,7 +334,6 @@ public class Payment {
                 playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]);
             }
         }
-
     }
 
     #endregion
