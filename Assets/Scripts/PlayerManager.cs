@@ -33,7 +33,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public int points = 200;
 
-    public string payForAll = ""; 
+    public string payForAll = "";
+
+    public Tile sacredDiscard;
 
     #endregion
 

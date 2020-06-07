@@ -7,8 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Agenda: numberOfTilesLeft room properties update, stop drawing when numberOfTiles < 15;
-    // Pending: Robbing the kong different payout (executed by GameManager). Sacred discard and missed discard (executed by GameManager).
+    // Pending: Robbing the kong different payout (executed by GameManager). CanWin. Integrate payment with GameManager.
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;

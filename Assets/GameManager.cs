@@ -84,6 +84,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public int numberOfTilesLeft;
 
+    private Dictionary<Player, List<Tile>> missedDiscard = new Dictionary<Player, List<Tile>>();
+
+    private Player discardPlayer;
+
     #endregion
 
     #region OnEvent Fields
@@ -600,19 +604,29 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 return;
             }
 
-            Player player = PhotonNetwork.LocalPlayer.Get(discardTileInfo.Item1);
+            discardPlayer = PhotonNetwork.LocalPlayer.Get(discardTileInfo.Item1);
             latestDiscardTile = discardTileInfo.Item2;
             float hPos = discardTileInfo.Item3;
 
             // Only instantiate the tile if a remote player threw it
-            if (player == PhotonNetwork.LocalPlayer) {
+            if (discardPlayer == PhotonNetwork.LocalPlayer) {
                 return;
             }
 
-            this.InstantiateRemoteDiscardTile(player, latestDiscardTile, hPos);
+            this.InstantiateRemoteDiscardTile(discardPlayer, latestDiscardTile, hPos);
+
+            if (IsMissedDiscard(latestDiscardTile)) {
+                this.MissedDiscardUI();
+                return;
+            }
 
             // Check for Pong/Kong against discard tile
             if (playerManager.CanPong(latestDiscardTile)) {
+                if (playerManager.sacredDiscard == latestDiscardTile) {
+                    this.SacredDiscardUI();
+                    return;
+                }
+
                 this.PongUI(latestDiscardTile);
                 return;
             }
@@ -622,6 +636,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.KongUI(new List<Tile>() { latestDiscardTile });
                 return;
             }
+
+            this.UpdateMissedDiscard(discardPlayer, latestDiscardTile);
 
             // Inform Master Client that the local player can't Pong/Kong
             PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
@@ -1254,8 +1270,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                     this.InstantiateLocalHand();
                     this.DiscardTile(tile, hitObject.transform.position.x);
+                    this.ResetMissedDiscard();
                     this.nextPlayersTurn();
-                    // TODO: Integrate turnManager.SendMove?
                 }
             }
         }
@@ -1418,6 +1434,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht.Add(DiscardTilePropKey, tuple);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
+        // The tile is now the Sacred Discard
+        playerManager.sacredDiscard = tile;
+
         // Remove the tag of the tile discarded before the current tile
         GameObject previousDiscard = GameObject.FindGameObjectWithTag("Discard");
         if (previousDiscard != null) {
@@ -1490,8 +1509,50 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
 
-    public void EndRound() {
+    /// <summary>
+    /// Updates the Missed Discard Dictionary with the tile the discardPlayer discarded
+    /// </summary>
+    public void UpdateMissedDiscard(Player discardPlayer, Tile discardTile) {
+        if (discardPlayer == PhotonNetwork.LocalPlayer) {
+            return;
+        }
 
+        if (!missedDiscard.ContainsKey(discardPlayer)) {
+            missedDiscard.Add(discardPlayer, new List<Tile>() { discardTile });
+            return;
+        }
+
+        missedDiscard[discardPlayer].Add(discardTile);
+    }
+
+
+    /// <summary>
+    /// Returns true if the tile is a Missed Discard
+    /// </summary>
+    public bool IsMissedDiscard(Tile discardTile) {
+        foreach (Player player in missedDiscard.Keys) {
+            foreach (Tile tile in missedDiscard[player]) {
+                if (discardTile == tile) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Reset Missed Discard Dictionary. Called when the local player discards a tile
+    /// </summary>
+    public void ResetMissedDiscard() {
+        var playerList = missedDiscard.Keys;
+        foreach (Player player in playerList) {
+            missedDiscard[player].Clear();
+        }
+    }
+
+
+    public void EndRound() {
+        // TODO
     }
 
     #endregion
@@ -1685,6 +1746,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Update MasterClient that the player doesn't want to Pong
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
+        this.UpdateMissedDiscard(discardPlayer, latestDiscardTile);
+
         PongCombo.SetActive(false);
         KongComboZero.SetActive(false);
         KongComboOne.SetActive(false);
@@ -1832,6 +1895,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
             playerManager.canTouchHandTiles = true;
         }
+    }
+
+
+    public void SacredDiscardUI() {
+        PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+        // TODO
+    }
+
+
+    public void MissedDiscardUI() {
+        PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+        // TODO
     }
 
     #endregion
