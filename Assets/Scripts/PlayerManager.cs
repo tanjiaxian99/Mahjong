@@ -33,7 +33,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
     public int points = 200;
 
-    public bool payForAllWin = false; 
+    public string payForAll = ""; 
 
     #endregion
 

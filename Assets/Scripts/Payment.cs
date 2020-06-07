@@ -7,7 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Agenda: Fresh tile, shooter pay all and paying for all players reconcile, handsToCheck settings, numberOfTilesLeft room properties update
+    // Agenda: paying for all players reconcile, handsToCheck settings, numberOfTilesLeft room properties update
     // Pending: Robbing the kong different payout (executed by GameManager). Sacred discard and missed discard (executed by GameManager).
 
     private Dictionary<Player, List<string>> instantPaymentDict;
@@ -346,6 +346,17 @@ public class Payment {
                 return;
             }
 
+
+            // Paying for all players
+            if (playerManager.payForAll == "Local") {
+                if (discardPlayer == null) {
+                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2 * 4;
+                } else {
+                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
+                }
+            } else if (playerManager.payForAll == "Remote") {
+                return;
+            }
 
             // Shooter pay
             if (shooterPay) {
