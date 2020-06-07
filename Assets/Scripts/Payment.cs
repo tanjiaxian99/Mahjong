@@ -7,7 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Agenda: Fresh tile, shooter pay all and paying for all players reconcile
+    // Agenda: Fresh tile, shooter pay all and paying for all players reconcile, handsToCheck settings, numberOfTilesLeft room properties update
     // Pending: Robbing the kong different payout (executed by GameManager). Sacred discard and missed discard (executed by GameManager).
 
     private Dictionary<Player, List<string>> instantPaymentDict;
@@ -23,9 +23,6 @@ public class Payment {
 
     Dictionary<int, int> kongTypeCount;
 
-    /// <summary>
-    /// Constructor to instantiate instantPaymentDict
-    /// </summary>
     public Payment(List<Player> playerList, Dictionary<string, int> handsToCheck, PlayerManager playerManager) {
         instantPaymentDict = new Dictionary<Player, List<string>>();
         foreach (Player player in playerList) {
@@ -63,18 +60,22 @@ public class Payment {
     /// <summary>
     /// Determine the need for instant payments to a remote player/from other players. Called when instantiating either local or remote open tiles. 
     /// </summary>
-    public void InstantPayout(Player player, List<Tile> openTiles, bool isStartingHand) {
+    public void InstantPayout(Player player, List<Tile> openTiles, bool isStartingHand, int numberOfTilesLeft, 
+                              List<Tile> discardTiles, List<Tile> allPlayersOpenTiles, Tile discardTile, Player discardPlayer) {
+
+        bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, allPlayersOpenTiles, discardTile);
+
         this.CatAndRat(player, openTiles, isStartingHand);
         this.ChickenAndCentipede(player, openTiles, isStartingHand);
         this.CompleteAnimalGroupPayout(player, openTiles);
         this.BonusTileMatchSeatWindPair(player, playerManager.playerWind, openTiles, isStartingHand);
         this.CompleteSeasonGroupPayout(player, openTiles);
         this.CompleteFlowerGroupPayout(player, openTiles);
-        this.KongPayout(player, openTiles);
+        this.KongPayout(player, openTiles, numberOfTilesLeft, isFreshTile, discardPlayer);
     }
 
 
-    #region Bonus Tile Payouts
+    #region Instant Payouts
 
     /// <summary>
     /// Determine if the player has both the Cat and Rat. Runs locally.
@@ -240,13 +241,11 @@ public class Payment {
         }
     }
 
-    #endregion
-
 
     /// <summary>
     /// Determine if the player has a Kong. Runs locally.
     /// </summary>
-    public void KongPayout(Player player, List<Tile> openTiles) {
+    public void KongPayout(Player player, List<Tile> openTiles, int numberOfTilesLeft, bool isFreshTile, Player discardPlayer) {
         kongTypeCount = new Dictionary<int, int>();
 
         for (int i = 0; i < 4; i++) {
@@ -278,28 +277,52 @@ public class Payment {
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong"]) * 3;
             } else {
+                if (numberOfTilesLeft < 22 && isFreshTile) {
+                    // Only the player that discarded the Fresh Tile pays 
+                    if (discardPlayer == PhotonNetwork.LocalPlayer) {
+                        playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong"]) * 3;
+                    }
+                    return;
+                }
                 playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong"]);
             }
             return;
 
         } else if (kongTypeCount[2] > 0) {
             instantPaymentDict[player].Add("Exposed Kong");
+
+            if (player == PhotonNetwork.LocalPlayer) {
+                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]) * 3;
+            } else {
+                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]);
+            }
+            return;
         } else {
             instantPaymentDict[player].Add("Discard Kong");
+
+            if (player == PhotonNetwork.LocalPlayer) {
+                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]) * 3;
+            } else {
+                if (numberOfTilesLeft < 22 && isFreshTile) {
+                    // Only the player that discarded the Fresh Tile pays 
+                    if (discardPlayer == PhotonNetwork.LocalPlayer) {
+                        playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]) * 3;
+                    }
+                    return;
+                }
+                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]);
+            }
         }
 
-        if (player == PhotonNetwork.LocalPlayer) {
-            playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]) * 3;
-        } else {
-            playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]);
-        }
     }
+
+    #endregion
 
 
     /// <summary>
     /// Determine the number of points to give or remove from the local player. Runs locally after the game is won.
     /// </summary>
-    public void HandPayout(Player winner, Player discardPlayer, int fan, List<string> winningCombos) {
+    public void HandPayout(Player winner, Player discardPlayer, int fan, List<string> winningCombos, int numberOfTilesLeft, bool isFreshTile) {
 
         if (winner == PhotonNetwork.LocalPlayer) {
             // If the local player is the winner
@@ -314,6 +337,16 @@ public class Payment {
         } else {
             // If the local player is the loser
 
+            // Fresh Tile Mahjong Scenario
+            if (numberOfTilesLeft < 20 && isFreshTile) {
+                // Only the player that discarded the Fresh Tile pays 
+                if (discardPlayer == PhotonNetwork.LocalPlayer) {
+                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
+                }
+                return;
+            }
+
+
             // Shooter pay
             if (shooterPay) {
                 // If local player is the shooter
@@ -327,6 +360,7 @@ public class Payment {
                 return;
             }
 
+
             // Non-shooter pay
             if (discardPlayer == null || discardPlayer == PhotonNetwork.LocalPlayer) {
                 // If the winner self-pick or if the local player discarded the winning tile
@@ -338,4 +372,5 @@ public class Payment {
             }
         }
     }
+
 }
