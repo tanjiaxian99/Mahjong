@@ -481,7 +481,7 @@ public class FanCalculator {
         if (handsToCheck["Robbing the Eighth"] > 0) {
             if (numberOfSeasonTiles + numberOfFlowerTiles == 7) {
                 foreach (Tile tile in allPlayersOpenTiles) {
-                    if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
+                    if ((tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) && !bonusTiles.Contains(tile)) {
                         winningCombos.Add("Robbing the Eighth");
                         winningCombos.Remove("Bonus Tile Match Seat Wind");
                         winningCombos.Remove("Complete Season Group");

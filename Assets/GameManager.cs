@@ -14,6 +14,8 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = System.Random;
 using UnityEngine.SocialPlatforms;
 using UnityEngine.XR;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine.Apple.TV;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
@@ -87,6 +89,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     private Dictionary<Player, List<Tile>> missedDiscard = new Dictionary<Player, List<Tile>>();
 
     private Player discardPlayer;
+
+    public Dictionary<string, int> handsToCheck;
+
+    public FanCalculator fanCalculator;
+
+    /// <summary>
+    /// The prevailing wind of the current round
+    /// </summary>
+    public PlayerManager.Wind prevailingWind = PlayerManager.Wind.EAST;
+
+    public Dictionary<Player, List<Tile>> openTilesDict;
 
     #endregion
 
@@ -487,6 +500,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Set up a dictionary for tiles prefabs and their sprites
             this.InstantiateTilesDict();
             this.InstantiateSpritesDict();
+            this.InstantiateHandsToCheck();
+
+            this.fanCalculator = new FanCalculator(handsToCheck);
+            this.openTilesDict = new Dictionary<Player, List<Tile>>();
 
             // Had to be called manually since PhotonNetwork wasn't calling it
             this.OnJoinedRoom();
@@ -528,7 +545,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public override void OnJoinedRoom() {
         // Initialize PlayerManager for local player
         playerManager = playerPrefab.GetComponent<PlayerManager>();
-        
+
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             // Players that disconnect and reconnect won't start the game at turn 0
             // Game is initialized by MasterClient
@@ -641,7 +658,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             // Inform Master Client that the local player can't Pong/Kong
             PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
-        
+
         } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
             numberOfTilesLeft = ((List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey]).Count;
 
@@ -1134,6 +1151,80 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
+    /// Instantiates the handsToCheck dictionary.
+    /// </summary>
+    // TODO: Toggled in UI by Master Client
+    public void InstantiateHandsToCheck() {
+        this.handsToCheck = new Dictionary<string, int>();
+
+        handsToCheck.Add("Fan Limit", 5);
+
+        handsToCheck.Add("Heavenly Hand", 10);
+        handsToCheck.Add("Earthly Hand", 10);
+        handsToCheck.Add("Humanly Hand", 10);
+
+        handsToCheck.Add("Bonus Tile Match Seat Wind", 1);
+        handsToCheck.Add("Animal", 1);
+        handsToCheck.Add("Complete Animal Group", 5);
+        handsToCheck.Add("Complete Season Group", 2);
+        handsToCheck.Add("Complete Flower Group", 2);
+        handsToCheck.Add("Robbing the Eighth", 10);
+        handsToCheck.Add("All Flowers and Seasons", 10);
+
+        handsToCheck.Add("Player Wind Combo", 1);
+        handsToCheck.Add("Prevailing Wind Combo", 1);
+        handsToCheck.Add("Dragon", 1);
+
+        handsToCheck.Add("Fully Concealed", 1);
+        handsToCheck.Add("Triplets", 2);
+        handsToCheck.Add("Half Flush", 2);
+        handsToCheck.Add("Full Flush", 4);
+        handsToCheck.Add("Lesser Sequence", 1);
+        handsToCheck.Add("Full Sequence", 4);
+        handsToCheck.Add("Mixed Terminals", 4);
+        handsToCheck.Add("Pure Terminals", 10);
+        handsToCheck.Add("All Honour", 10);
+        handsToCheck.Add("Hidden Treasure", 10);
+        handsToCheck.Add("Full Flush Triplets", 10);
+        handsToCheck.Add("Full Flush Full Sequence", 10);
+        handsToCheck.Add("Full Flush Lesser Sequence", 5);
+        handsToCheck.Add("Nine Gates", 10);
+        handsToCheck.Add("Four Lesser Blessings", 2);
+        handsToCheck.Add("Four Great Blessings", 10);
+        handsToCheck.Add("Pure Green Suit", 4);
+        handsToCheck.Add("Three Lesser Scholars", 3);
+        handsToCheck.Add("Three Great Scholars", 10);
+        handsToCheck.Add("Eighteen Arhats", 10);
+        handsToCheck.Add("Thirteen Wonders", 10);
+
+        handsToCheck.Add("Winning on Replacement Tile for Flower", 1);
+        handsToCheck.Add("Winning on Replacement Tile for Kong", 1);
+        handsToCheck.Add("Kong on Kong", 10);
+
+        handsToCheck.Add("Robbing the Kong", 1);
+        handsToCheck.Add("Winning on Last Available Tile", 1);
+
+        handsToCheck.Add("Dragon Tile Set Pay All", 1);
+        handsToCheck.Add("Wind Tile Set Pay All", 1);
+        handsToCheck.Add("Point Limit Pay All", 1);
+        handsToCheck.Add("Full Flush Pay All", 1);
+        handsToCheck.Add("Pure Terminals Pay All", 1);
+
+        handsToCheck.Add("Hidden Cat and Rat", 2);
+        handsToCheck.Add("Cat and Rat", 1);
+        handsToCheck.Add("Hidden Chicken and Centipede", 2);
+        handsToCheck.Add("Chicken and Centipede", 1);
+        handsToCheck.Add("Complete Animal Group Payout", 2);
+        handsToCheck.Add("Hidden Bonus Tile Match Seat Wind Pair", 2);
+        handsToCheck.Add("Bonus Tile Match Seat Wind Pair", 1);
+        handsToCheck.Add("Complete Season Group Payout", 2);
+        handsToCheck.Add("Complete Flower Group Payout", 2);
+        handsToCheck.Add("Concealed Kong Payout", 2);
+        handsToCheck.Add("Discard and Exposed Kong Payout", 1);
+    }
+
+
+    /// <summary>
     /// Point the camera towards the GameTable and stretch the GameTable to fill up the screen
     /// </summary>
     public void LocalScreenViewAdjustment() {
@@ -1153,7 +1244,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// player's hand and open tiles are instantiated.
     /// </summary>
     public void InitialLocalInstantiation() {
-        
+
         if (playerManager.hand == null) {
             Debug.LogError("The player's hand is empty.");
         }
@@ -1182,7 +1273,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Initial sort. Afterwards, hand will only be sorted after discarding a tile.
         playerManager.hand = playerManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
-        
+
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
     }
@@ -1382,6 +1473,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateLocalOpenTiles() {
         playerManager.UpdateOpenTiles();
+        this.UpdateOpenTiles(PhotonNetwork.LocalPlayer, playerManager.openTiles);
 
         // Update the list of open tiles on the local player's custom properties
         Hashtable ht = new Hashtable();
@@ -1415,7 +1507,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             } else {
                 newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             }
-            
+
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
             newTile.tag = "Open";
             xPosOpen += xSepOpen;
@@ -1540,6 +1632,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         return false;
     }
 
+
     /// <summary>
     /// Reset Missed Discard Dictionary. Called when the local player discards a tile
     /// </summary>
@@ -1550,6 +1643,40 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
     }
 
+
+    /// <summary>
+    /// Update the allPlayersOpenTiles dictionary
+    /// </summary>
+    public void UpdateOpenTiles(Player player, List<Tile> openTiles) {
+        openTilesDict[player] = openTiles;
+    }
+
+    /// <summary>
+    /// Checks whether the player can win
+    /// </summary>
+    public void CheckWin() {
+        Tile discardTile;
+
+        // discardTile is null to represent a self-picked tile
+        if (playerManager.myTurn) {
+            discardTile = null;
+        } else {
+            discardTile = latestDiscardTile;
+        }
+
+        PlayerManager.Wind discardPlayerWind = (PlayerManager.Wind)windsDict[discardPlayer.ActorNumber];
+        List<Tile> allPlayersOpenTiles = new List<Tile>();
+        foreach (List<Tile> openTiles in openTilesDict.Values) {
+            allPlayersOpenTiles.AddRange(openTiles);
+        }
+
+        (int fanTotal, List<string> winningCombos) = fanCalculator.CalculateFan(
+            playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, allPlayersOpenTiles);
+
+        if (fanTotal > 0) {
+            this.WinUI();
+        }
+    }
 
     public void EndRound() {
         // TODO
@@ -1909,6 +2036,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // TODO
     }
 
+    public void WinUI() {
+        // TODO
+    }
+
     #endregion
 
     #region Methods called by Remote Player
@@ -1941,6 +2072,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InstantiateRemoteOpenTiles(Player remotePlayer) {
         List<Tile> remoteOpenTiles = (List<Tile>)remotePlayer.CustomProperties[OpenTilesPropKey];
         PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
+
+        this.UpdateOpenTiles(remotePlayer, remoteOpenTiles);
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(wind + "_" + "Open");

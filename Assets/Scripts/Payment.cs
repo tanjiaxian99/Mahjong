@@ -7,7 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Pending: Robbing the kong different payout (executed by GameManager). CanWin. Integrate payment with GameManager.
+    // Pending: Robbing the kong different payout (executed by GameManager). CanWin. Integrate payment with GameManager. payalldiscard
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
@@ -88,7 +88,7 @@ public class Payment {
             this.CompleteFlowerGroupPayout(player, openTiles);
         }
 
-        if (handsToCheck["Kong Payout"] > 0) {
+        if (handsToCheck["Concealed Kong Payout"] > 0 && handsToCheck["Discard and Exposed Kong Payout"] > 0) {
             this.KongPayout(player, openTiles, numberOfTilesLeft, isFreshTile, discardPlayer);
         }
     }
@@ -294,16 +294,16 @@ public class Payment {
             instantPaymentDict[player].Add("Concealed Kong");
 
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong"]) * 3;
+                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong Payout"]) * 3;
             } else {
                 if (numberOfTilesLeft < 22 && isFreshTile) {
                     // Only the player that discarded the Fresh Tile pays 
                     if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                        playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong"]) * 3;
+                        playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong Payout"]) * 3;
                     }
                     return;
                 }
-                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong"]);
+                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong Payout"]);
             }
             return;
 
@@ -311,9 +311,9 @@ public class Payment {
             instantPaymentDict[player].Add("Exposed Kong");
 
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]) * 3;
+                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
             } else {
-                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]);
+                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]);
             }
             return;
 
@@ -321,16 +321,16 @@ public class Payment {
             instantPaymentDict[player].Add("Discard Kong");
 
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]) * 3;
+                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
             } else {
                 if (numberOfTilesLeft < 22 && isFreshTile) {
                     // Only the player that discarded the Fresh Tile pays 
                     if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                        playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]) * 3;
+                        playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
                     }
                     return;
                 }
-                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong"]);
+                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]);
             }
         }
     }
