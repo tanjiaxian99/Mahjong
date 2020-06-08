@@ -7,7 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Pending: Robbing the kong different payout (executed by GameManager). CanWin. Integrate payment with GameManager. payalldiscard
+    // Pending: Robbing the kong different payout (executed by GameManager). Integrate payment with GameManager. payalldiscard. test payment class
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
@@ -376,6 +376,7 @@ public class Payment {
             } else if (playerManager.payForAll == "Remote") {
                 return;
             }
+
 
             // Shooter pay
             if (shooterPay) {

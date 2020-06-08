@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public List<bool> PongKongUpdateList = new List<bool>();
 
     /// <summary>
-    /// The latest tile to be discarded
+    /// The latest tile to be discarded. Null if the player drew a tile
     /// </summary>
     public Tile latestDiscardTile;
 
@@ -100,6 +100,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public PlayerManager.Wind prevailingWind = PlayerManager.Wind.EAST;
 
     public Dictionary<Player, List<Tile>> openTilesDict;
+
+    public PayAllDiscard payAllDiscard;
 
     #endregion
 
@@ -173,6 +175,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// The next player to play
     /// </summary>
     public static readonly string NextPlayerPropKey = "np";
+
+    /// <summary>
+    /// The player that has to pay for all players
+    /// </summary>
+    public static readonly string PayAllDiscardPropKey = "pa";
 
     #endregion
 
@@ -504,6 +511,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             this.fanCalculator = new FanCalculator(handsToCheck);
             this.openTilesDict = new Dictionary<Player, List<Tile>>();
+            this.payAllDiscard = new PayAllDiscard(handsToCheck);
 
             // Had to be called manually since PhotonNetwork wasn't calling it
             this.OnJoinedRoom();
@@ -632,18 +640,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             this.InstantiateRemoteDiscardTile(discardPlayer, latestDiscardTile, hPos);
 
-            if (IsMissedDiscard(latestDiscardTile)) {
-                this.MissedDiscardUI();
+            // Check to see if the player can win based on the discard tile
+            if (this.CanWin()) {
+                this.WinUI();
                 return;
             }
 
             // Check for Pong/Kong against discard tile
             if (playerManager.CanPong(latestDiscardTile)) {
-                if (playerManager.sacredDiscard == latestDiscardTile) {
-                    this.SacredDiscardUI();
-                    return;
-                }
-
                 this.PongUI(latestDiscardTile);
                 return;
             }
@@ -664,6 +668,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             if (numberOfTilesLeft == 15) {
                 this.EndRound();
+            }
+
+        } else if (propertiesThatChanged.ContainsKey(PayAllDiscardPropKey)) {
+            Player player = (Player)PhotonNetwork.CurrentRoom.CustomProperties[PayAllDiscardPropKey];
+            if (player == PhotonNetwork.LocalPlayer) {
+                playerManager.payForAll = "Local";
+            } else {
+                playerManager.payForAll = "Remote";
             }
         }
     }
@@ -1244,7 +1256,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// player's hand and open tiles are instantiated.
     /// </summary>
     public void InitialLocalInstantiation() {
-
         if (playerManager.hand == null) {
             Debug.LogError("The player's hand is empty.");
         }
@@ -1294,6 +1305,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         if (playerManager.playerWind == PlayerManager.Wind.EAST) {
             if (turnManager.Turn == 1) {
+                // Check to see if the player can win based on the East Wind's initial 14 tiles
+                if (this.CanWin()) {
+                    this.WinUI();
+                    return;
+                }
+
                 if (playerManager.ConcealedKongTiles().Count != 0) {
                     this.KongUI(playerManager.ConcealedKongTiles());
                 }
@@ -1316,9 +1333,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         hand.Add(this.DrawTile());
+        latestDiscardTile = null;
         this.ConvertLocalBonusTiles();
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
+
+        // Check to see if the player can win based on the drawn tile
+        if (this.CanWin()) {
+            this.WinUI();
+            return;
+        }
 
         if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
             this.KongUI(playerManager.ExposedKongTiles().Concat(playerManager.ConcealedKongTiles()).ToList());
@@ -1651,19 +1675,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         openTilesDict[player] = openTiles;
     }
 
+
     /// <summary>
-    /// Checks whether the player can win
+    /// Returns true if the local player can win. Called when a tile has been discarded, when the player draws a tile, and when
+    /// the player Kongs.
     /// </summary>
-    public void CheckWin() {
-        Tile discardTile;
-
-        // discardTile is null to represent a self-picked tile
-        if (playerManager.myTurn) {
-            discardTile = null;
-        } else {
-            discardTile = latestDiscardTile;
-        }
-
+    public bool CanWin() {
         PlayerManager.Wind discardPlayerWind = (PlayerManager.Wind)windsDict[discardPlayer.ActorNumber];
         List<Tile> allPlayersOpenTiles = new List<Tile>();
         foreach (List<Tile> openTiles in openTilesDict.Values) {
@@ -1671,13 +1688,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         (int fanTotal, List<string> winningCombos) = fanCalculator.CalculateFan(
-            playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, allPlayersOpenTiles);
+            playerManager, latestDiscardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, allPlayersOpenTiles);
 
         if (fanTotal > 0) {
-            this.WinUI();
+            return true;
         }
+
+        return false;
     }
 
+
+    /// <summary>
+    /// Called to end the round
+    /// </summary>
     public void EndRound() {
         // TODO
     }
@@ -1802,6 +1825,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
+        // Check to see if the player can win based on the drawn tile
+        if (this.CanWin()) {
+            this.WinUI();
+            return;
+        }
+
         if (playerManager.ConcealedKongTiles().Count != 0) {
             this.KongUI(playerManager.ConcealedKongTiles());
             return;
@@ -1816,6 +1845,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can Pong
     /// </summary>
     public void PongUI(Tile discardTile) {
+        if (playerManager.sacredDiscard == latestDiscardTile) {
+            this.SacredDiscardUI();
+            return;
+        }
+
+        if (this.IsMissedDiscard(latestDiscardTile)) {
+            this.MissedDiscardUI();
+            return;
+        }
+
         Transform spritesPanel = PongCombo.transform.GetChild(0);
 
         // Instantiate the tile sprites
@@ -1834,6 +1873,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void OnPongOk() {
         // Update MasterClient that the player want to Pong
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+
+        // Check if the discard tile is a high risk discard
+        List<Tile> highRiskTiles = payAllDiscard.PayAllCheck(playerManager.openTiles, playerManager.playerWind, prevailingWind);
+        if (highRiskTiles.Contains(latestDiscardTile)) {
+            Hashtable hashTable = new Hashtable();
+            hashTable.Add(PayAllDiscardPropKey, discardPlayer);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
+        }
 
         PongCombo.SetActive(false);
         KongComboZero.SetActive(false);
@@ -1919,6 +1966,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when "Ok" is clicked for Kong Combo
     /// </summary>
     public void OnKongOk() {
+        // Check if the discard tile is a high risk discard
+        List<Tile> highRiskTiles = payAllDiscard.PayAllCheck(playerManager.openTiles, playerManager.playerWind, prevailingWind);
+        if (highRiskTiles.Contains(latestDiscardTile)) {
+            Hashtable hashTable = new Hashtable();
+            hashTable.Add(PayAllDiscardPropKey, discardPlayer);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
+        }
+
         PongCombo.SetActive(false);
         KongComboZero.SetActive(false);
         KongComboOne.SetActive(false);
@@ -1994,6 +2049,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         playerManager.canTouchHandTiles = true;
         playerManager.myTurn = true;
 
+        // Check to see if the player can win based on the discard tile
+        if (this.CanWin()) {
+            this.WinUI();
+            return;
+        }
+
         if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
             this.KongUI(playerManager.ExposedKongTiles().Concat(playerManager.ConcealedKongTiles()).ToList());
         }
@@ -2025,20 +2086,58 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
 
+    /// <summary>
+    /// Called when the player can Pong/Win but the discard tile is a Sacred Discard
+    /// </summary>
     public void SacredDiscardUI() {
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
         // TODO
     }
 
 
+    /// <summary>
+    /// Called when the player can Pong/Win but the discard tile is a Missed Discard
+    /// </summary>
     public void MissedDiscardUI() {
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
         // TODO
     }
 
+
+    /// <summary>
+    /// Called when the player can win
+    /// </summary>
     public void WinUI() {
+        if (playerManager.sacredDiscard == latestDiscardTile) {
+            this.SacredDiscardUI();
+            return;
+        }
+
+        if (this.IsMissedDiscard(latestDiscardTile)) {
+            this.MissedDiscardUI();
+            return;
+        }
+
         // TODO
     }
+
+
+    /// <summary>
+    /// Called when "Ok" button is clicked for the win
+    /// </summary>
+    public void WinOk() {
+        // Check if the discard tile is a high risk discard
+        List<Tile> highRiskTiles = payAllDiscard.PayAllCheck(playerManager.openTiles, playerManager.playerWind, prevailingWind);
+        if (highRiskTiles.Contains(latestDiscardTile)) {
+            Hashtable hashTable = new Hashtable();
+            hashTable.Add(PayAllDiscardPropKey, discardPlayer);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
+        }
+
+        // TODO
+
+    }
+
 
     #endregion
 

@@ -59,7 +59,7 @@ public class PayAllDiscard {
     /// <summary>
     /// Determine the high risk discard in a Dragon Tile Set Scenario
     /// </summary>
-    public List<Tile> DragonTileSet(List<Tile> openTiles) {
+    private List<Tile> DragonTileSet(List<Tile> openTiles) {
         List<Tile> highRiskTiles = new List<Tile>();
 
         if (handsToCheck["Dragon Tile Set Pay All"] == 0) {
@@ -83,7 +83,7 @@ public class PayAllDiscard {
     /// <summary>
     /// Determine the high risk discard in a Wind Tile Set Scenario
     /// </summary>
-    public List<Tile> WindTileSet(List<Tile> openTiles) {
+    private List<Tile> WindTileSet(List<Tile> openTiles) {
         List<Tile> highRiskTiles = new List<Tile>();
 
         if (handsToCheck["Wind Tile Set Pay All"] == 0) {
@@ -117,7 +117,7 @@ public class PayAllDiscard {
     /// <summary>
     /// Determine the high risk discards in a Point Limit Scenario
     /// </summary>
-    public List<Tile> PointLimit(List<Tile> openTiles, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind) {
+    private List<Tile> PointLimit(List<Tile> openTiles, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind) {
         List<Tile> highRiskTiles = new List<Tile>();
         int totalFan = 0;
 
@@ -225,7 +225,7 @@ public class PayAllDiscard {
     /// <summary>
     /// Determine the high risk discards in Full Flush Scenario
     /// </summary>
-    public List<Tile> FullFlush(List<Tile> openTiles) {
+    private List<Tile> FullFlush(List<Tile> openTiles) {
         List<Tile> highRiskTiles = new List<Tile>();
         Tile.Suit? referenceSuit = openTiles[openTiles.Count - 1].suit;
         int referenceSuitCount = 0;
@@ -288,7 +288,7 @@ public class PayAllDiscard {
     /// <summary>
     /// Determine the high risk discards in Pure Terminals Scenario
     /// </summary>
-    public List<Tile> PureTerminals(List<Tile> openTiles) {
+    private List<Tile> PureTerminals(List<Tile> openTiles) {
         List<Tile> highRiskTiles = new List<Tile>();
         Dictionary<Tile, int> pureTerminalsDict = new Dictionary<Tile, int>();
         int terminalsCount = 0;
