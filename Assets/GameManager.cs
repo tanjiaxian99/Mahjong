@@ -103,6 +103,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     public PayAllDiscard payAllDiscard;
 
+    public Payment payment;
+
+    public List<Tile> discardTiles;
+
     #endregion
 
     #region OnEvent Fields
@@ -512,6 +516,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             this.fanCalculator = new FanCalculator(handsToCheck);
             this.openTilesDict = new Dictionary<Player, List<Tile>>();
             this.payAllDiscard = new PayAllDiscard(handsToCheck);
+            this.payment = new Payment(PhotonNetwork.PlayerList.ToList(), handsToCheck, playerManager);
+            this.discardTiles = new List<Tile>();
 
             // Had to be called manually since PhotonNetwork wasn't calling it
             this.OnJoinedRoom();
@@ -626,12 +632,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 // Remove the last discard tile
                 GameObject lastDiscardTile = GameObject.FindGameObjectWithTag("Discard");
                 Destroy(lastDiscardTile);
+                discardTiles.RemoveAt(discardTiles.Count - 1);
                 return;
             }
 
             discardPlayer = PhotonNetwork.LocalPlayer.Get(discardTileInfo.Item1);
             latestDiscardTile = discardTileInfo.Item2;
             float hPos = discardTileInfo.Item3;
+
+            discardTiles.Add(latestDiscardTile);
 
             // Only instantiate the tile if a remote player threw it
             if (discardPlayer == PhotonNetwork.LocalPlayer) {
@@ -1682,19 +1691,28 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public bool CanWin() {
         PlayerManager.Wind discardPlayerWind = (PlayerManager.Wind)windsDict[discardPlayer.ActorNumber];
-        List<Tile> allPlayersOpenTiles = new List<Tile>();
-        foreach (List<Tile> openTiles in openTilesDict.Values) {
-            allPlayersOpenTiles.AddRange(openTiles);
-        }
 
-        (int fanTotal, List<string> winningCombos) = fanCalculator.CalculateFan(
-            playerManager, latestDiscardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, allPlayersOpenTiles);
+        (playerManager.fanTotal, playerManager.winningCombos) = fanCalculator.CalculateFan(
+            playerManager, latestDiscardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, this.AllPlayersOpenTiles());
 
-        if (fanTotal > 0) {
+        if (playerManager.fanTotal > 0) {
             return true;
         }
 
         return false;
+    }
+
+
+    /// <summary>
+    /// Returns the list of all open tiles
+    /// </summary>
+    /// <returns></returns>
+    public List<Tile> AllPlayersOpenTiles() {
+        List<Tile> allPlayersOpenTiles = new List<Tile>();
+        foreach (List<Tile> openTiles in openTilesDict.Values) {
+            allPlayersOpenTiles.AddRange(openTiles);
+        }
+        return allPlayersOpenTiles;
     }
 
 
@@ -2134,6 +2152,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
         }
 
+        // Inform other players of win
+
+        bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
+        payment.HandPayout(PhotonNetwork.LocalPlayer, discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
+        
+        // Show win screen
         // TODO
 
     }

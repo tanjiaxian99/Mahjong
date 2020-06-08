@@ -1,6 +1,7 @@
 ﻿using Photon.Pun;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
 
 public class PlayerManager : MonoBehaviourPunCallbacks {
     #region Private Fields
@@ -36,6 +37,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
     public string payForAll = "";
 
     public Tile sacredDiscard;
+
+    public int fanTotal;
+
+    public List<string> winningCombos;
 
     #endregion
 
