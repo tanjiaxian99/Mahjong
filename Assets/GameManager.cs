@@ -135,6 +135,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public const byte EvPongKongUpdate = 12;
 
+    /// <summary>
+    /// The Player Win event message byte. Used internally by the winner to inform all players that he has won the round.
+    /// </summary>
+    public const byte EvPlayerWin = 13;
+
 
     /// <summary>
     /// Dictionary containing actor numbers and wind assignments
@@ -623,16 +628,43 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
 
-            // Item1 is set to -1 by a player to inform all players to remove the last discard tile. See OnChowOk
+            // Item1 = -1 when the latest discard tile is to be removed, due to Chow, Pong, Kong or Win
+            // Item1 = -2 when a player has drawn a tile and both discardPlayer and latestDiscardTile can be reset to null;
+            // Item3 = 200 when Exposed Kong has been executed and Robbing the Kong is possible
+            // Item3 = 300 when Concealed Kong has been executed andRobbing the Kong is possible
             if (discardTileInfo.Item1 == -1) {
                 // Remove the last discard tile
                 GameObject lastDiscardTile = GameObject.FindGameObjectWithTag("Discard");
                 Destroy(lastDiscardTile);
                 discardTiles.RemoveAt(discardTiles.Count - 1);
                 return;
+
+            } else if (discardTileInfo.Item1 == -2) {
+                discardPlayer = null;
+                latestDiscardTile = null;
+
+            } else if (discardTileInfo.Item3 == 200) {
+                discardPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
+                latestDiscardTile = discardTileInfo.Item2;
+
+                if (this.CanWin()) {
+                    this.WinUI();
+                    return;
+                }
+
+            } else if (discardTileInfo.Item3 == 300) {
+                discardPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
+                latestDiscardTile = discardTileInfo.Item2;
+
+                if (this.CanWin()) {
+                    if (playerManager.winningCombos.Contains("Thirteen Wonders")) {
+                        this.WinUI();
+                        return;
+                    }
+                }
             }
 
-            discardPlayer = PhotonNetwork.LocalPlayer.Get(discardTileInfo.Item1);
+            discardPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
             latestDiscardTile = discardTileInfo.Item2;
             float hPos = discardTileInfo.Item3;
 
@@ -820,7 +852,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // The values of windsDict are PlayerManager.Wind types, which are order from East:0 to South: 3
             // The integer value of windsDict themselves is the order of play
             int index = windsDict[actorNumber];
-            playOrder[index] = PhotonNetwork.LocalPlayer.Get(actorNumber);
+            playOrder[index] = PhotonNetwork.CurrentRoom.GetPlayer(actorNumber);
         }
 
         Hashtable ht = new Hashtable();
@@ -1029,6 +1061,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                     PongKongUpdateList.Clear();
                 }
+                break;
+
+            case EvPlayerWin:
+                Tuple<int, List<string>> winInfo = (Tuple<int, List<string>>)photonEvent.CustomData;
+                Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
+                this.RemoteWin(sender, winInfo.Item1, winInfo.Item2);
                 break;
         }
     }
@@ -1342,6 +1380,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         hand.Add(this.DrawTile());
         latestDiscardTile = null;
+        discardPlayer = null;
+
+
         this.ConvertLocalBonusTiles();
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
@@ -2028,15 +2069,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     playerManager.hand.Remove(kongTile);
                 }
             }
+            combo[3].kongType = 1;
             playerManager.comboTiles.Add(combo);
 
         } else if (playerManager.ExposedKongTiles().Contains(kongTile)) {
-            foreach (List<Tile> tilesList in playerManager.comboTiles) {
-                if (tilesList.Contains(drawnTile)) {
-                    tilesList.Add(drawnTile);
+            foreach (List<Tile> combo in playerManager.comboTiles) {
+                if (combo.Contains(drawnTile)) {
+                    drawnTile.kongType = 2;
+                    combo.Add(drawnTile);
                 }
             }
             hand.Remove(drawnTile);
+
+            // Update discard tile properties to indicate to all players that Robbing the Kong is possible
+            Hashtable ht = new Hashtable();
+            ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, drawnTile, 200));
+            PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
         } else if (playerManager.ConcealedKongTiles().Contains(kongTile)) {
             // The second-last tile will be instantiated above the 3 other Kong tiles
@@ -2054,6 +2102,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
 
             playerManager.comboTiles.Add(combo);
+
+            // Update discard tile properties to indicate to all players that Robbing the Kong is possible for Thirteen Wonders
+            Hashtable ht = new Hashtable();
+            ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, kongTileSpecial, 300));
+            PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
         }
         playerManager.numberOfKong++;
 
@@ -2143,7 +2196,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Called when "Ok" button is clicked for the win
     /// </summary>
-    public void WinOk() {
+    public void OnWinOk() {
         // Check if the discard tile is a high risk discard
         List<Tile> highRiskTiles = payAllDiscard.PayAllCheck(playerManager.openTiles, playerManager.playerWind, prevailingWind);
         if (highRiskTiles.Contains(latestDiscardTile)) {
@@ -2152,14 +2205,30 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
         }
 
-        // Inform other players of win
+        if (playerManager.winningCombos.Contains("Robbing the Kong")) {
+            Hashtable hashTable = new Hashtable();
+            hashTable.Add(PayAllDiscardPropKey, discardPlayer);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
+        }
+
+        // Raise an event to inform remote players of the win
+        PhotonNetwork.RaiseEvent(EvPlayerWin, new Tuple<int, List<string>>(playerManager.fanTotal, playerManager.winningCombos), new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+
+        // Update DiscardTilesPropkey to remove the discard tile used for the win
+        if (latestDiscardTile != null) {
+            Hashtable ht = new Hashtable();
+            Tuple<int, Tile, float> discardTileInfo = new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0);
+            ht.Add(DiscardTilePropKey, discardTileInfo);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        }
+
 
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
         payment.HandPayout(PhotonNetwork.LocalPlayer, discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
-        
+        payment.RevertKongPayout();
+
         // Show win screen
         // TODO
-
     }
 
 
@@ -2197,7 +2266,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
 
         this.UpdateOpenTiles(remotePlayer, remoteOpenTiles);
-        payment.InstantPayout(PhotonNetwork.LocalPlayer, playerManager.openTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer);
+        payment.InstantPayout(remotePlayer, remoteOpenTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer);
 
 
         // Represents the tiles currently on the GameTable which the remote player had
@@ -2444,6 +2513,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
             rb.AddForce(new Vector3((float)hForce, 0f, (float)vForce), ForceMode.VelocityChange);
         }
+    }
+
+
+    /// <summary>
+    /// Called by the remote player when the local player has won.
+    /// </summary>
+    public void RemoteWin(Player winner, int fanTotal, List<string> winningCombos) {
+        bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
+        payment.HandPayout(winner, discardPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
+        payment.RevertKongPayout();
     }
 
     #endregion

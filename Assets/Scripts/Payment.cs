@@ -7,11 +7,12 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Pending: Robbing the kong different payout (executed by GameManager). Integrate InstantPayout with GameManager. kongtypes
+    // Pending: Can only kong if someone decline a win, custom data for int, list<string>
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
     private Dictionary<PlayerManager.Wind, List<Tile>> windToTileDict;
+    private Player latestKongPlayer;
 
     private List<Tile> seasonGroupTiles;
     private List<Tile> flowerGroupTiles;
@@ -274,6 +275,7 @@ public class Payment {
     /// </summary>
     public void KongPayout(Player player, List<Tile> openTiles, int numberOfTilesLeft, bool isFreshTile, Player discardPlayer) {
         kongTypeCount = new Dictionary<int, int>();
+        latestKongPlayer = null;
 
         for (int i = 0; i < 4; i++) {
             kongTypeCount.Add(i, 0);
@@ -317,6 +319,7 @@ public class Payment {
 
         } else if (kongTypeCount[2] > 0) {
             instantPaymentDict[player].Add("Exposed Kong");
+            latestKongPlayer = player;
 
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
@@ -344,7 +347,6 @@ public class Payment {
     }
 
     #endregion
-
 
     /// <summary>
     /// Determine the number of points to give or remove from the local player. Runs locally after the game is won.
@@ -412,4 +414,15 @@ public class Payment {
         }
     }
 
+
+    /// <summary>
+    /// Return payouts from Exposed Kong if the Kong caused a player to execute Robbing the Kong
+    /// </summary>
+    public void RevertKongPayout() {
+        if (latestKongPlayer == PhotonNetwork.LocalPlayer) {
+            playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
+        } else {
+            playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]);
+        }
+    }
 }

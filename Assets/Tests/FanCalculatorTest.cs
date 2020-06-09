@@ -2092,7 +2092,7 @@ namespace Tests {
             playerManager.numberOfKong = 0;
 
             discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Four);
-            discardTile.kongType = 1;
+            discardTile.kongType = 2;
 
             discardPlayerWind = PlayerManager.Wind.SOUTH;
             prevailingWind = PlayerManager.Wind.SOUTH;

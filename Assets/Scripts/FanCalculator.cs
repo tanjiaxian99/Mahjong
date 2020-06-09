@@ -823,7 +823,7 @@ public class FanCalculator {
             return;
         }
 
-        if (discardTile.kongType > 0) {
+        if (discardTile.kongType > 1) {
             winningCombos.Add("Robbing the Kong");
         }
     }
