@@ -7,7 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Pending: Robbing the kong different payout (executed by GameManager). Integrate payment with GameManager.
+    // Pending: Robbing the kong different payout (executed by GameManager). Integrate InstantPayout with GameManager. kongtypes
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
@@ -59,9 +59,10 @@ public class Payment {
     /// <summary>
     /// Determine the need for instant payments to a remote player/from other players. Called when instantiating either local or remote open tiles. 
     /// </summary>
-    public void InstantPayout(Player player, List<Tile> openTiles, bool isStartingHand, int numberOfTilesLeft,
+    public void InstantPayout(Player player, List<Tile> openTiles, int turn, int numberOfTilesLeft,
                               List<Tile> discardTiles, List<Tile> allPlayersOpenTiles, Tile discardTile, Player discardPlayer) {
 
+        bool isStartingHand = turn == 1;
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, allPlayersOpenTiles, discardTile);
 
         if (handsToCheck["Hidden Cat and Rat"] > 0 && handsToCheck["Cat and Rat"] > 0) {
@@ -107,7 +108,8 @@ public class Payment {
             } else {
                 instantPaymentDict[player].Add("Cat and Rat");
             }
-            
+        } else {
+            return;
         }
 
         // Hidden Cat and Rat check
@@ -139,7 +141,8 @@ public class Payment {
             } else {
                 instantPaymentDict[player].Add("Chicken and Centipede");
             }
-
+        } else {
+            return;
         }
 
         // Hidden Cat and Rat check
@@ -170,6 +173,8 @@ public class Payment {
             } else {
                 instantPaymentDict[player].Add("Complete Animal Group");
             }
+        } else {
+            return;
         }
 
 
@@ -192,7 +197,8 @@ public class Payment {
             } else {
                 instantPaymentDict[player].Add("Bonus Tile Match Seat Wind Pair");
             }
-
+        } else {
+            return;
         }
 
         // Hidden Bonus Tile Match Seat Wind check
@@ -225,7 +231,8 @@ public class Payment {
             } else {
                 instantPaymentDict[player].Add("Complete Season Group Payout");
             }
-
+        } else {
+            return;
         }
 
 
@@ -249,7 +256,8 @@ public class Payment {
             } else {
                 instantPaymentDict[player].Add("Complete Flower Group Payout");
             }
-
+        } else {
+            return;
         }
 
 

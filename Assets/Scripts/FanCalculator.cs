@@ -2,12 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Net;
-using UnityEditor.WindowsStandalone;
-using UnityEngine;
-using UnityEngine.XR;
+
 
 /// <summary>
 /// Calculates the number of Fan the player has
@@ -851,7 +847,7 @@ public class FanCalculator {
     /// </summary>
     /// <returns></returns>
     private string HeavenlyHandCheck(PlayerManager.Wind playerWind, int turn) {
-        if (playerWind == PlayerManager.Wind.EAST && turn == 1) {
+        if (playerWind == PlayerManager.Wind.EAST && turn == 2) {
             return "Heavenly Hand";
         }
         return null;
@@ -862,7 +858,7 @@ public class FanCalculator {
     /// Determine if the hand is a Earthly Hand
     /// </summary>
     private string EarthlyHandCheck(PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
-        if (turn == 1 && discardPlayerWind == PlayerManager.Wind.EAST && discardTile != null) {
+        if (turn == 2 && discardPlayerWind == PlayerManager.Wind.EAST && discardTile != null) {
             return "Earthly Hand";
         }
 
@@ -879,7 +875,7 @@ public class FanCalculator {
     /// Determine if the hand is a Humanly Hand
     /// </summary>
     private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
-        if (turn == 1 && playerWind != PlayerManager.Wind.EAST && discardTile != null) {
+        if (turn == 2 && playerWind != PlayerManager.Wind.EAST && discardTile != null) {
             int numberOfComboTiles = 0;
             int numberOfConcealedKong = 0;
 

@@ -108,7 +108,7 @@ namespace Tests {
             discardPlayerWind = PlayerManager.Wind.SOUTH;
             prevailingWind = PlayerManager.Wind.SOUTH;
             numberOfTilesLeft = 45;
-            turn = 1;
+            turn = 2;
             allPlayersOpenTiles = new List<Tile>();
 
             (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Heavenly Hand", "Player Wind Combo" });
@@ -146,7 +146,7 @@ namespace Tests {
             discardPlayerWind = PlayerManager.Wind.EAST;
             prevailingWind = PlayerManager.Wind.SOUTH;
             numberOfTilesLeft = 45;
-            turn = 1;
+            turn = 2;
             allPlayersOpenTiles = new List<Tile>();
 
             (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Earthly Hand", });
@@ -184,7 +184,7 @@ namespace Tests {
             discardPlayerWind = PlayerManager.Wind.WEST;
             prevailingWind = PlayerManager.Wind.SOUTH;
             numberOfTilesLeft = 45;
-            turn = 1;
+            turn = 2;
             allPlayersOpenTiles = new List<Tile>();
 
             (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Humanly Hand", });

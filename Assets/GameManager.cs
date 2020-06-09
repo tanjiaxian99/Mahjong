@@ -12,10 +12,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = System.Random;
-using UnityEngine.SocialPlatforms;
-using UnityEngine.XR;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine.Apple.TV;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
     #region Private Fields
@@ -1231,6 +1227,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         handsToCheck.Add("Full Flush Pay All", 1);
         handsToCheck.Add("Pure Terminals Pay All", 1);
 
+        handsToCheck.Add("Min Point", 1);
+        handsToCheck.Add("Shooter Pay", 0);
+
         handsToCheck.Add("Hidden Cat and Rat", 2);
         handsToCheck.Add("Cat and Rat", 1);
         handsToCheck.Add("Hidden Chicken and Centipede", 2);
@@ -1313,7 +1312,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         List<Tile> hand = playerManager.hand;
 
         if (playerManager.playerWind == PlayerManager.Wind.EAST) {
-            if (turnManager.Turn == 1) {
+            this.StartTurn();
+
+            if (turnManager.Turn == 2) {
+
                 // Check to see if the player can win based on the East Wind's initial 14 tiles
                 if (this.CanWin()) {
                     this.WinUI();
@@ -1324,9 +1326,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     this.KongUI(playerManager.ConcealedKongTiles());
                 }
                 return;
-
-            } else {
-                this.StartTurn();
             }
         }
 
@@ -1507,6 +1506,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InstantiateLocalOpenTiles() {
         playerManager.UpdateOpenTiles();
         this.UpdateOpenTiles(PhotonNetwork.LocalPlayer, playerManager.openTiles);
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, playerManager.openTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer);
 
         // Update the list of open tiles on the local player's custom properties
         Hashtable ht = new Hashtable();
@@ -2197,6 +2197,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
 
         this.UpdateOpenTiles(remotePlayer, remoteOpenTiles);
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, playerManager.openTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer);
+
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(wind + "_" + "Open");
