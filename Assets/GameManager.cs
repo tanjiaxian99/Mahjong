@@ -73,6 +73,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public List<bool> PongKongUpdateList = new List<bool>();
 
     /// <summary>
+    /// A list used by MasterClient to track whether players can/want to win
+    /// </summary>
+    public List<bool> winUpdateList = new List<bool>();
+
+    /// <summary>
     /// The latest tile to be discarded. Null if the player drew a tile
     /// </summary>
     public Tile latestDiscardTile;
@@ -130,15 +135,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvPlayerTurn = 11;
 
     /// <summary>
+    /// The Win Update event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
+    /// </summary>
+    public const byte EvWinUpdate = 12;
+
+    /// <summary>
+    /// The Check Pong Kong event message byte. Used internally to check whether the local player can Pong/Kong.
+    /// </summary>
+    public const byte EvCheckPongKong = 13;
+
+    /// <summary>
     /// The Pong Kong Update event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
     /// the latest discard tile.
     /// </summary>
-    public const byte EvPongKongUpdate = 12;
+    public const byte EvPongKongUpdate = 14;
 
     /// <summary>
-    /// The Player Win event message byte. Used internally by the winner to inform all players that he has won the round.
+    /// The Player Win event message byte. Used internally by the local player when a remote player has won.
     /// </summary>
-    public const byte EvPlayerWin = 13;
+    public const byte EvPlayerWin = 15;
 
 
     /// <summary>
@@ -525,7 +540,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             // Register customType Tile and List<Tile>
             PhotonPeer.RegisterType(typeof(List<Tile>), 255, SerializeTilesList, DeserializeTilesList);
-            PhotonPeer.RegisterType(typeof(Tuple<int, Tile, float>), 254, SerializeTuple, DeserializeTuple);
+            PhotonPeer.RegisterType(typeof(Tuple<int, Tile, float>), 254, SerializeDiscardTileInfo, DeserializeDiscardTileInfo);
         }
     }
 
@@ -681,24 +696,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             if (this.CanWin()) {
                 this.WinUI();
                 return;
+            } else {
+                // Inform the Master Client that the player can't win
+                PhotonNetwork.RaiseEvent(EvWinUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
             }
 
-            // Check for Pong/Kong against discard tile
-            if (playerManager.CanPong(latestDiscardTile)) {
-                this.PongUI(latestDiscardTile);
-                return;
-            }
-
-            if (playerManager.CanDiscardKong(latestDiscardTile)) {
-                this.PongUI(latestDiscardTile);
-                this.KongUI(new List<Tile>() { latestDiscardTile });
-                return;
-            }
-
-            this.UpdateMissedDiscard(discardPlayer, latestDiscardTile);
-
-            // Inform Master Client that the local player can't Pong/Kong
-            PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
 
         } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
             numberOfTilesLeft = ((List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey]).Count;
@@ -1063,10 +1065,39 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 }
                 break;
 
+            case EvWinUpdate:
+                if (!PhotonNetwork.IsMasterClient) {
+                    return;
+                }
+
+                bool winUpdate = (bool)photonEvent.CustomData;
+                winUpdateList.Add(winUpdate);
+
+                // If none of the players can/wants to win from the discard, players can then check for Pong/Kong
+                bool allWinFalse = true;
+                if (winUpdateList.Count == 3) {
+                    foreach (bool update in winUpdateList) {
+                        if (update) {
+                            allFalse = false;
+                        }
+                    }
+
+                    if (allWinFalse) {
+                        PhotonNetwork.RaiseEvent(EvCheckPongKong, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
+                    }
+
+                    winUpdateList.Clear();
+                }
+                break;
+
+            case EvCheckPongKong:
+                this.CheckPongKong();
+                break;
+
             case EvPlayerWin:
-                Tuple<int, List<string>> winInfo = (Tuple<int, List<string>>)photonEvent.CustomData;
+                Dictionary <int, string[]>winInfo = (Dictionary<int, string[]>)photonEvent.CustomData;
                 Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
-                this.RemoteWin(sender, winInfo.Item1, winInfo.Item2);
+                this.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
                 break;
         }
     }
@@ -1644,6 +1675,30 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
+    /// Checks to see if the local player can Pong/Kong.
+    /// </summary>
+    public void CheckPongKong() {
+        // Check for Pong/Kong against discard tile
+        if (playerManager.CanPong(latestDiscardTile)) {
+            this.PongUI(latestDiscardTile);
+            return;
+        }
+
+        if (playerManager.CanDiscardKong(latestDiscardTile)) {
+            this.PongUI(latestDiscardTile);
+            this.KongUI(new List<Tile>() { latestDiscardTile });
+            return;
+        }
+
+        this.UpdateMissedDiscard(discardPlayer, latestDiscardTile);
+
+        // Inform Master Client that the local player can't Pong/Kong
+        PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+
+    }
+
+
+    /// <summary>
     /// Called by the local player to inform the next player that it is his turn
     /// </summary>
     public void nextPlayersTurn() {
@@ -2212,7 +2267,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         // Raise an event to inform remote players of the win
-        PhotonNetwork.RaiseEvent(EvPlayerWin, new Tuple<int, List<string>>(playerManager.fanTotal, playerManager.winningCombos), new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+        Dictionary<int, string[]> winInfo = new Dictionary<int, string[]>() {
+            [playerManager.fanTotal] = playerManager.winningCombos.ToArray()
+        };
+        PhotonNetwork.RaiseEvent(EvPlayerWin, winInfo, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
 
         // Update DiscardTilesPropkey to remove the discard tile used for the win
         if (latestDiscardTile != null) {
@@ -2222,15 +2280,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
         }
 
-
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
         payment.HandPayout(PhotonNetwork.LocalPlayer, discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
         payment.RevertKongPayout();
 
-        // Show win screen
-        // TODO
+        // TODO: Show win screen
     }
+    
 
+    /// <summary>
+    /// Called when "Skip" button is clicked for the win
+    /// </summary>
+    public void OnWinSkip() {
+        PhotonNetwork.RaiseEvent(EvWinUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+    }
 
     #endregion
 
@@ -2564,7 +2627,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Serialize Tuple<int, Tile, float> into a byteStream. sizeof(memTuple) = sizeof(int) + sizeof(short) + sizeof(short) + sizeof(int)
     /// </summary>
     public static readonly byte[] memTuple = new byte[12];
-    public static short SerializeTuple(StreamBuffer outStream, object customobject) {
+    public static short SerializeDiscardTileInfo(StreamBuffer outStream, object customobject) {
         var tuple = (Tuple<int, Tile, float>)customobject;
 
         lock (memTuple) {
@@ -2585,7 +2648,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Deserialize the byteStream into a Tuple<int, Tile, float>
     /// </summary>
-    private static object DeserializeTuple(StreamBuffer inStream, short length) {
+    public static object DeserializeDiscardTileInfo(StreamBuffer inStream, short length) {
         Tuple<int, Tile, float> tuple = new Tuple<int, Tile, float>(0, new Tile(0, 0), 0f);
         int actorNumber;
         short tileIdOne;
@@ -2607,7 +2670,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
         return new Tuple<int, Tile, float>(actorNumber, tile, pos);
     }
-
 
     #endregion
 }
