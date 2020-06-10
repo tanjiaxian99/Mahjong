@@ -7,7 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Pending: sprite compression
+    // Pending: is InstantPayout called before Turn becomes 2?
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
@@ -61,7 +61,7 @@ public class Payment {
     /// Determine the need for instant payments to a remote player/from other players. Called when instantiating either local or remote open tiles. 
     /// </summary>
     public void InstantPayout(Player player, List<Tile> openTiles, int turn, int numberOfTilesLeft,
-                              List<Tile> discardTiles, List<Tile> allPlayersOpenTiles, Tile discardTile, Player discardPlayer) {
+                              List<Tile> discardTiles, List<Tile> allPlayersOpenTiles, Tile discardTile, Player discardPlayer, PlayerManager.Wind playerWind) {
 
         bool isStartingHand = turn == 1;
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, allPlayersOpenTiles, discardTile);
@@ -79,7 +79,7 @@ public class Payment {
         }
 
         if (handsToCheck["Hidden Bonus Tile Match Seat Wind Pair"] > 0 && handsToCheck["Bonus Tile Match Seat Wind Pair"] > 0) {
-            this.BonusTileMatchSeatWindPair(player, playerManager.playerWind, openTiles, isStartingHand);
+            this.BonusTileMatchSeatWindPair(player, playerWind, openTiles, isStartingHand);
         }
 
         if (handsToCheck["Complete Season Group Payout"] > 0) {

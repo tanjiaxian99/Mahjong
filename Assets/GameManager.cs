@@ -532,7 +532,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             this.fanCalculator = new FanCalculator(handsToCheck);
             this.openTilesDict = new Dictionary<Player, List<Tile>>();
             this.payAllDiscard = new PayAllDiscard(handsToCheck);
-            this.payment = new Payment(PhotonNetwork.PlayerList.ToList(), handsToCheck, playerManager);
             this.discardTiles = new List<Tile>();
 
             // Had to be called manually since PhotonNetwork wasn't calling it
@@ -1333,6 +1332,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// player's hand and open tiles are instantiated.
     /// </summary>
     public void InitialLocalInstantiation() {
+        this.payment = new Payment(PhotonNetwork.PlayerList.ToList(), handsToCheck, playerManager);
+
         if (playerManager.hand == null) {
             Debug.LogError("The player's hand is empty.");
         }
@@ -1382,8 +1383,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         if (playerManager.playerWind == PlayerManager.Wind.EAST) {
             this.StartTurn();
-
-            if (turnManager.Turn == 2) {
+            Debug.LogFormat("We are at round {0}", turnManager.Turn);
+            if (turnManager.Turn == 1) {
 
                 // Check to see if the player can win based on the East Wind's initial 14 tiles
                 if (this.CanWin()) {
@@ -1399,7 +1400,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
 
-        // Check if the discarded tile could be Chow/Ponged/Konged
+        // Check if the discarded tile could be Chowed
         Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
         Tile tile = discardTileInfo.Item2;
         chowTiles = playerManager.ChowCombinations(tile);
@@ -1577,8 +1578,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateLocalOpenTiles() {
         playerManager.UpdateOpenTiles();
-        this.UpdateOpenTiles(PhotonNetwork.LocalPlayer, playerManager.openTiles);
-        payment.InstantPayout(PhotonNetwork.LocalPlayer, playerManager.openTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer);
+        this.UpdateAllPlayersOpenTiles(PhotonNetwork.LocalPlayer, playerManager.openTiles);
+        Debug.LogErrorFormat("(Instant Payout) Initial player points: {0}", playerManager.points);
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, playerManager.openTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer, playerManager.playerWind);
+        Debug.LogErrorFormat("(Instant Payout) Updated player points: {0}", playerManager.points);
 
         // Update the list of open tiles on the local player's custom properties
         Hashtable ht = new Hashtable();
@@ -1776,7 +1779,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// Update the allPlayersOpenTiles dictionary
     /// </summary>
-    public void UpdateOpenTiles(Player player, List<Tile> openTiles) {
+    public void UpdateAllPlayersOpenTiles(Player player, List<Tile> openTiles) {
         openTilesDict[player] = openTiles;
     }
 
@@ -1786,10 +1789,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// the player Kongs.
     /// </summary>
     public bool CanWin() {
-        PlayerManager.Wind discardPlayerWind = (PlayerManager.Wind)windsDict[discardPlayer.ActorNumber];
+        PlayerManager.Wind? discardPlayerWind;
+        if (discardPlayer == null) {
+            discardPlayerWind = null;
+        } else {
+            discardPlayerWind = (PlayerManager.Wind)windsDict[discardPlayer.ActorNumber];
+        }
 
         (playerManager.fanTotal, playerManager.winningCombos) = fanCalculator.CalculateFan(
             playerManager, latestDiscardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, this.AllPlayersOpenTiles());
+        if (playerManager.fanTotal > 0) {
+            Debug.LogErrorFormat("The player can win with {0} fan and the following combos: ", playerManager.fanTotal);
+            playerManager.winningCombos.ForEach(Debug.LogError);
+        }
 
         if (playerManager.fanTotal > 0) {
             return true;
@@ -2281,8 +2293,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
+        Debug.LogErrorFormat("(Hand Payout) Initial player points: {0}", playerManager.points); 
         payment.HandPayout(PhotonNetwork.LocalPlayer, discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
+        Debug.LogErrorFormat("(Hand Payout) Updated player points: {0}", playerManager.points);
+
+        Debug.LogErrorFormat("(Revert Kong Payout) Initial player points: {0}", playerManager.points);
         payment.RevertKongPayout();
+        Debug.LogErrorFormat("(Revert Kong Payout) Updated player points: {0}", playerManager.points);
 
         // TODO: Show win screen
     }
@@ -2328,9 +2345,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         List<Tile> remoteOpenTiles = (List<Tile>)remotePlayer.CustomProperties[OpenTilesPropKey];
         PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
 
-        this.UpdateOpenTiles(remotePlayer, remoteOpenTiles);
-        payment.InstantPayout(remotePlayer, remoteOpenTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer);
-
+        this.UpdateAllPlayersOpenTiles(remotePlayer, remoteOpenTiles);
+        Debug.LogErrorFormat("(Instant Payout) Initial player points: {0}", playerManager.points);
+        PlayerManager.Wind remotePlayerWind = (PlayerManager.Wind)windsDict[discardPlayer.ActorNumber];
+        payment.InstantPayout(remotePlayer, remoteOpenTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer, remotePlayerWind);
+        Debug.LogErrorFormat("(Instant Payout) Updated player points: {0}", playerManager.points);
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(wind + "_" + "Open");
@@ -2584,8 +2603,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void RemoteWin(Player winner, int fanTotal, List<string> winningCombos) {
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
+
+        Debug.LogErrorFormat("(Hand Payout) Initial player points: {0}", playerManager.points);
         payment.HandPayout(winner, discardPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
+        Debug.LogErrorFormat("(Hand Payout) Initial player points: {0}", playerManager.points);
+
+        Debug.LogErrorFormat("(Revert Kong Payout) Initial player points: {0}", playerManager.points);
         payment.RevertKongPayout();
+        Debug.LogErrorFormat("(Revert Kong Payout) Updated player points: {0}", playerManager.points);
     }
 
     #endregion

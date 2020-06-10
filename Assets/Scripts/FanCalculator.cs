@@ -53,7 +53,7 @@ public class FanCalculator {
     /// <summary>
     /// Calculates and returns the number of Fan the player's tiles contain
     /// </summary>
-    public (int, List<string>) CalculateFan(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
+    public (int, List<string>) CalculateFan(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
         fanLimit = handsToCheck["Fan Limit"];
         fanTotalList = new List<int>();
         listOfWinningCombos = new List<List<string>>();
@@ -314,7 +314,7 @@ public class FanCalculator {
     /// Tabulates all the combos the player has
     /// </summary>
     /// <param name="discardTile">The latest discard tile. Null if the tile is self-picked</param>
-    private void TabulateCombos(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
+    private void TabulateCombos(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
         List<Tile> hand = playerManager.hand;
         List<Tile> bonusTiles = playerManager.bonusTiles;
         List<List<Tile>> comboTiles = playerManager.comboTiles;
@@ -397,7 +397,7 @@ public class FanCalculator {
     /// <summary>
     /// Container for Heavenly, Earthly and Humanly Hands
     /// </summary>
-    private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
+    private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind? discardPlayerWind, Tile discardTile, int turn) {
         if (handsToCheck["Heavenly Hand"] > 0) {
             winningCombos.Add(HeavenlyHandCheck(playerWind, turn));
         }
@@ -407,7 +407,7 @@ public class FanCalculator {
         }
 
         if (handsToCheck["Humanly Hand"] > 0) {
-            winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, turn));
+            winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, playerWind, discardTile, turn));
 
             if (winningCombos.Contains("Earthly Hand")) {
                 winningCombos.Remove("Humanly Hand");
@@ -857,7 +857,7 @@ public class FanCalculator {
     /// <summary>
     /// Determine if the hand is a Earthly Hand
     /// </summary>
-    private string EarthlyHandCheck(PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
+    private string EarthlyHandCheck(PlayerManager.Wind? discardPlayerWind, Tile discardTile, int turn) {
         if (turn == 2 && discardPlayerWind == PlayerManager.Wind.EAST && discardTile != null) {
             return "Earthly Hand";
         }
@@ -874,7 +874,7 @@ public class FanCalculator {
     /// <summary>
     /// Determine if the hand is a Humanly Hand
     /// </summary>
-    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind discardPlayerWind, Tile discardTile, int turn) {
+    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, Tile discardTile, int turn) {
         if (turn == 2 && playerWind != PlayerManager.Wind.EAST && discardTile != null) {
             int numberOfComboTiles = 0;
             int numberOfConcealedKong = 0;
