@@ -349,8 +349,8 @@ public class FanCalculator {
         if (listOfCombos.Count == 0) {
             winningCombos = new List<string>();
 
-            winningCombos.Add(this.ThirteenWondersCheck(combinedHand));
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
+            winningCombos.Add(this.ThirteenWondersCheck(combinedHand));
 
             if (handsToCheck["Four Great Blessings"] > 0) {
                 List<string> winCombos = new List<string>(winningCombos);
@@ -371,6 +371,10 @@ public class FanCalculator {
                     winningCombos.Remove("Dragon_Two");
                     winningCombos.Remove("Dragon_Three");
                 }
+            }
+
+            if (!winningCombos.Contains("Thirteen Wonders") && !winningCombos.Contains("Four Great Blessings") && !winningCombos.Contains("Three Great Scholars")) {
+                winningCombos.Clear();
             }
 
             this.listOfWinningCombos.Add(winningCombos);

@@ -509,6 +509,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     [SerializeField]
     private GameObject KongComboTwo;
 
+    [SerializeField]
+    private GameObject pointsGameObject;
+
     #endregion
 
     #region MonoBehavior Callbacks
@@ -548,6 +551,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             this.OnLocalPlayerMove();
         }
 
+        Text pointsText = pointsGameObject.GetComponent<Text>();
+        pointsText.text = "200";
     }
 
     #endregion
@@ -1579,9 +1584,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InstantiateLocalOpenTiles() {
         playerManager.UpdateOpenTiles();
         this.UpdateAllPlayersOpenTiles(PhotonNetwork.LocalPlayer, playerManager.openTiles);
-        Debug.LogErrorFormat("(Instant Payout) Initial player points: {0}", playerManager.points);
         payment.InstantPayout(PhotonNetwork.LocalPlayer, playerManager.openTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer, playerManager.playerWind);
-        Debug.LogErrorFormat("(Instant Payout) Updated player points: {0}", playerManager.points);
 
         // Update the list of open tiles on the local player's custom properties
         Hashtable ht = new Hashtable();
@@ -2293,13 +2296,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
-        Debug.LogErrorFormat("(Hand Payout) Initial player points: {0}", playerManager.points); 
         payment.HandPayout(PhotonNetwork.LocalPlayer, discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
-        Debug.LogErrorFormat("(Hand Payout) Updated player points: {0}", playerManager.points);
 
-        Debug.LogErrorFormat("(Revert Kong Payout) Initial player points: {0}", playerManager.points);
         payment.RevertKongPayout();
-        Debug.LogErrorFormat("(Revert Kong Payout) Updated player points: {0}", playerManager.points);
 
         // TODO: Show win screen
     }
@@ -2346,10 +2345,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
 
         this.UpdateAllPlayersOpenTiles(remotePlayer, remoteOpenTiles);
-        Debug.LogErrorFormat("(Instant Payout) Initial player points: {0}", playerManager.points);
-        PlayerManager.Wind remotePlayerWind = (PlayerManager.Wind)windsDict[discardPlayer.ActorNumber];
+        PlayerManager.Wind remotePlayerWind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
         payment.InstantPayout(remotePlayer, remoteOpenTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer, remotePlayerWind);
-        Debug.LogErrorFormat("(Instant Payout) Updated player points: {0}", playerManager.points);
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(wind + "_" + "Open");
@@ -2604,13 +2601,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void RemoteWin(Player winner, int fanTotal, List<string> winningCombos) {
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
 
-        Debug.LogErrorFormat("(Hand Payout) Initial player points: {0}", playerManager.points);
         payment.HandPayout(winner, discardPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
-        Debug.LogErrorFormat("(Hand Payout) Initial player points: {0}", playerManager.points);
 
-        Debug.LogErrorFormat("(Revert Kong Payout) Initial player points: {0}", playerManager.points);
         payment.RevertKongPayout();
-        Debug.LogErrorFormat("(Revert Kong Payout) Updated player points: {0}", playerManager.points);
     }
 
     #endregion
