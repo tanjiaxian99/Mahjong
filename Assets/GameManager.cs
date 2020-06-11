@@ -1975,7 +1975,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can Pong
     /// </summary>
     public void PongUI(Tile discardTile) {
-        if (playerManager.sacredDiscard == latestDiscardTile) {
+        if (playerManager.sacredDiscard != null && playerManager.sacredDiscard == latestDiscardTile) {
             this.SacredDiscardUI();
             return;
         }
@@ -2250,7 +2250,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can win
     /// </summary>
     public void WinUI() {
-        if (playerManager.sacredDiscard == latestDiscardTile) {
+        if (playerManager.sacredDiscard != null && playerManager.sacredDiscard == latestDiscardTile) {
             this.SacredDiscardUI();
             return;
         }
