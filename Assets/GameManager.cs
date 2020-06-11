@@ -78,6 +78,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public List<bool> winUpdateList = new List<bool>();
 
     /// <summary>
+    /// A list used by MasterClient to track the actor numbers of players who didn't discard the tile
+    /// </summary>
+    public List<int> nonDiscardActorNumbers = new List<int>();
+
+    /// <summary>
     /// The latest tile to be discarded. Null if the player drew a tile
     /// </summary>
     public Tile latestDiscardTile;
@@ -1046,6 +1051,36 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.OnPlayerTurn();
                 break;
 
+            case EvWinUpdate:
+                if (!PhotonNetwork.IsMasterClient) {
+                    return;
+                }
+
+                bool winUpdate = (bool)photonEvent.CustomData;
+                winUpdateList.Add(winUpdate);
+                nonDiscardActorNumbers.Add(photonEvent.Sender);
+
+                // If none of the players can/wants to win from the discard, players can then check for Pong/Kong
+                bool allWinFalse = true;
+                if (winUpdateList.Count == 3) {
+                    foreach (bool update in winUpdateList) {
+                        if (update) {
+                            allWinFalse = false;
+                        }
+                    }
+
+                    if (allWinFalse) {
+                        PhotonNetwork.RaiseEvent(EvCheckPongKong, null, new RaiseEventOptions() { TargetActors =  nonDiscardActorNumbers.ToArray()}, SendOptions.SendReliable);
+                    }
+                    winUpdateList.Clear();
+                    nonDiscardActorNumbers.Clear();
+                }
+                break;
+
+            case EvCheckPongKong:
+                this.CheckPongKong();
+                break;
+
             case EvPongKongUpdate:
                 if (!PhotonNetwork.IsMasterClient) {
                     return;
@@ -1070,35 +1105,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                     PongKongUpdateList.Clear();
                 }
-                break;
-
-            case EvWinUpdate:
-                if (!PhotonNetwork.IsMasterClient) {
-                    return;
-                }
-
-                bool winUpdate = (bool)photonEvent.CustomData;
-                winUpdateList.Add(winUpdate);
-
-                // If none of the players can/wants to win from the discard, players can then check for Pong/Kong
-                bool allWinFalse = true;
-                if (winUpdateList.Count == 3) {
-                    foreach (bool update in winUpdateList) {
-                        if (update) {
-                            allFalse = false;
-                        }
-                    }
-
-                    if (allWinFalse) {
-                        PhotonNetwork.RaiseEvent(EvCheckPongKong, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
-                    }
-
-                    winUpdateList.Clear();
-                }
-                break;
-
-            case EvCheckPongKong:
-                this.CheckPongKong();
                 break;
 
             case EvPlayerWin:
@@ -1420,7 +1426,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         latestDiscardTile = null;
         discardPlayer = null;
 
-
         this.ConvertLocalBonusTiles();
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
@@ -1701,7 +1706,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Inform Master Client that the local player can't Pong/Kong
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
-
     }
 
 
@@ -2232,6 +2236,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can Pong/Win but the discard tile is a Sacred Discard
     /// </summary>
     public void SacredDiscardUI() {
+        Debug.LogError("Called SacredDiscardUI");
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
         // TODO
     }
@@ -2241,6 +2246,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called when the player can Pong/Win but the discard tile is a Missed Discard
     /// </summary>
     public void MissedDiscardUI() {
+        Debug.LogError("Called MissedDiscardUI");
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
         // TODO
     }
