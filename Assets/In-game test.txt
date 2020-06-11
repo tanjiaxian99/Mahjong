@@ -1,0 +1,95 @@
+### Instant Payout ###
+Hidden Cat and Rat []
+Cat and Rat []
+
+Hidden Chicken and Centipede []
+Chicken and Centipede
+
+Complete Animal Group Payout []
+
+Hidden Bonus Tile Match Seat Wind Pair []
+Bonus Tile Match Seat Wind Pair []
+
+Complete Season Group Payout []
+Complete Flower Group Payout []
+
+Concealed Kong Payout []
+Discard and Exposed Kong Payout []
+
+### Hand Fan + Payout ###
+Heavenly Hand []
+Earthly Hand []
+Humanly Hand []
+
+Bonus Tile Match Seat Wind []
+Animal []
+Complete Animal Group []
+Complete Season Group []
+Complete Flower Group []
+Robbing the Eighth []
+All Flowers and Seasons []
+
+Player Wind Combo []
+Prevailing Wind Combo []
+Player and Prevailing Wind Combo []
+Dragon []
+
+Fully Concealed []
+Triplets []
+Half Flush []
+Full Flush []
+Full Sequence []
+Full Sequence 67899 []
+Full Sequence 34567 []
+Full Sequence Fail Player Wind []
+Full Sequence Fail Prevailing Wind []
+Full Sequence Fail Dragon []
+Full Sequence Fail Waiting for Eye []
+Full Sequence Fail Waiting for Edge Tile (1) []
+Full Sequence Fail Waiting for Edge Tile (2) []
+Full Sequence Fail Waiting for Middle Tile (1) []
+Lesser Sequence []
+Mixed Terminals []
+Pure Terminals []
+All Honour []
+Hidden Treasure []
+Full Flush Triplets []
+Full Flush Full Sequence []
+Full Flush Lesser Sequence []
+Nine Gates []
+Four Lesser Blessings []
+Four Great Blessings []
+Pure Green Suit []
+Three Lesser Scholars []
+Three Great Scholars []
+Eighteen Arhats []
+Thirteen Wonders []
+Winning on Replacement Tile for Flower []
+Winning on Replacement Tile for Kong []
+Kong on Kong []
+Robbing the Kong []
+Winning on Last Available Tile []
+Winning on Last Available Tile Fail []
+Two Winning Combos []
+One Fan Non Winning []
+
+### Fresh Tile Discard ###
+Tile in Chow Combo []
+Tile in Discard Pool []
+Tile in Pong Combo []
+
+### Pay All Discard ###
+Dragon Tile Set []
+Full Flush (1) []
+Full Flush (2) []
+Point Limit 4 Fan (1) []
+Point Limit 4 Fan (2) []
+Point Limit 3 Fan (1) []
+Point Limit 3 Fan (2) []
+Pure Terminals []
+Wind Tile Set []
+
+### Miscellaneous ###
+Revert Kong Payout [] 
+Sacred Discard []
+Missed Discard []

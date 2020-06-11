@@ -63,7 +63,7 @@ public class Payment {
     public void InstantPayout(Player player, List<Tile> openTiles, int turn, int numberOfTilesLeft,
                               List<Tile> discardTiles, List<Tile> allPlayersOpenTiles, Tile discardTile, Player discardPlayer, PlayerManager.Wind playerWind) {
 
-        bool isStartingHand = turn == 1;
+        bool isStartingHand = turn <= 2;
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, allPlayersOpenTiles, discardTile);
 
         if (handsToCheck["Hidden Cat and Rat"] > 0 && handsToCheck["Cat and Rat"] > 0) {
@@ -115,6 +115,7 @@ public class Payment {
 
         // Hidden Cat and Rat check
         if (isStartingHand) {
+            Debug.LogError("Instant Payout: Hidden Cat and Rat");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int) Math.Pow(2, handsToCheck["Hidden Cat and Rat"]) * 3;
             } else {
@@ -122,6 +123,7 @@ public class Payment {
             }
 
         } else {
+            Debug.LogError("Instant Payout: Cat and Rat");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Cat and Rat"]) * 3;
             } else {
@@ -146,8 +148,9 @@ public class Payment {
             return;
         }
 
-        // Hidden Cat and Rat check
+        // Hidden Chicken and Centipede check
         if (isStartingHand) {
+            Debug.LogError("Instant Payout: Hidden Chicken and Centipede");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Hidden Chicken and Centipede"]) * 3;
             } else {
@@ -155,6 +158,7 @@ public class Payment {
             }
 
         } else {
+            Debug.LogError("Instant Payout: Chicken and Centipede");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Chicken and Centipede"]) * 3;
             } else {
@@ -177,7 +181,7 @@ public class Payment {
         } else {
             return;
         }
-
+        Debug.LogError("Instant Payout: Complete Animal Group Payout");
 
         if (player == PhotonNetwork.LocalPlayer) {
             playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Complete Animal Group Payout"]) * 3;
@@ -204,6 +208,7 @@ public class Payment {
 
         // Hidden Bonus Tile Match Seat Wind check
         if (isStartingHand) {
+            Debug.LogError("Instant Payout: Hidden Bonus Tile Match Seat Wind Pair");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Hidden Bonus Tile Match Seat Wind Pair"]) * 3;
             } else {
@@ -211,6 +216,7 @@ public class Payment {
             }
 
         } else {
+            Debug.LogError("Instant Payout: Bonus Tile Match Seat Wind Pair");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Bonus Tile Match Seat Wind Pair"]) * 3;
             } else {
@@ -235,7 +241,7 @@ public class Payment {
         } else {
             return;
         }
-
+        Debug.LogError("Instant Payout: Complete Season Group Payout");
 
         if (player == PhotonNetwork.LocalPlayer) {
             playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Complete Season Group Payout"]) * 3;
@@ -260,7 +266,7 @@ public class Payment {
         } else {
             return;
         }
-
+        Debug.LogError("Instant Payout: Complete Flower Group Payout");
 
         if (player == PhotonNetwork.LocalPlayer) {
             playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Complete Flower Group Payout"]) * 3;
@@ -302,7 +308,7 @@ public class Payment {
         // Concealed Kong vs Discard and Exposed Kong check
         if (kongTypeCount[3] > 0) {
             instantPaymentDict[player].Add("Concealed Kong");
-
+            Debug.LogError("Instant Payout: Concealed Kong");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong Payout"]) * 3;
             } else {
@@ -320,7 +326,7 @@ public class Payment {
         } else if (kongTypeCount[2] > 0) {
             instantPaymentDict[player].Add("Exposed Kong");
             latestKongPlayer = player;
-
+            Debug.LogError("Instant Payout: Exposed Kong");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
             } else {
@@ -330,7 +336,7 @@ public class Payment {
 
         } else {
             instantPaymentDict[player].Add("Discard Kong");
-
+            Debug.LogError("Instant Payout: Discard Kong");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
             } else {
@@ -419,6 +425,7 @@ public class Payment {
     /// Return payouts from Exposed Kong if the Kong caused a player to execute Robbing the Kong
     /// </summary>
     public void RevertKongPayout() {
+        Debug.LogError("Instant Payout: Revert Kong");
         if (latestKongPlayer == PhotonNetwork.LocalPlayer) {
             playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
         } else {

@@ -161,6 +161,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvPlayerWin = 15;
 
 
+
     /// <summary>
     /// Dictionary containing actor numbers and wind assignments
     /// </summary>
@@ -557,7 +558,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         Text pointsText = pointsGameObject.GetComponent<Text>();
-        pointsText.text = "200";
+        pointsText.text = playerManager.points + "";
     }
 
     #endregion
@@ -950,60 +951,106 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void DistributeTiles() {
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
-        //// DEBUG
-        //foreach (Player player in PhotonNetwork.PlayerList) {
-        //    if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.EAST) {
-        //        List<Tile> playerTiles = new List<Tile>();
-
-        //        for (int i = 0; i < 3; i++) {
-        //            playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-        //            playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-        //            playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
-        //            playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-        //        }
-        //        playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-        //        playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-
-
-
-        //        PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-
-        //    } else {
-        //        List<Tile> playerTiles = new List<Tile>();
-        //        for (int i = 0; i < 14; i++) {
-        //            // Choose a tile randomly from the complete tiles list and add it to the player's tiles
-        //            int randomIndex = RandomNumber(tiles.Count());
-        //            playerTiles.Add(tiles[randomIndex]);
-        //            tiles.Remove(tiles[randomIndex]);
-
-        //            // Don't give the 14th tile if the player is not the East Wind
-        //            if (i == 12 && (PlayerManager.Wind)windsDict[player.ActorNumber] != PlayerManager.Wind.EAST) {
-        //                break;
-        //            }
-        //        }
-
-        //        PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-        //    }
-        //}
-
-
+        // DEBUG
         foreach (Player player in PhotonNetwork.PlayerList) {
-            List<Tile> playerTiles = new List<Tile>();
+            if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.EAST) {
+                List<Tile> playerTiles = new List<Tile>();
 
-            for (int i = 0; i < 14; i++) {
-                // Choose a tile randomly from the complete tiles list and add it to the player's tiles
-                int randomIndex = RandomNumber(tiles.Count());
-                playerTiles.Add(tiles[randomIndex]);
-                tiles.Remove(tiles[randomIndex]);
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
 
-                // Don't give the 14th tile if the player is not the East Wind
-                if (i == 12 && (PlayerManager.Wind)windsDict[player.ActorNumber] != PlayerManager.Wind.EAST) {
-                    break;
-                }
+                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.Two));
+
+                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+
+            } else if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.SOUTH){
+                List<Tile> playerTiles = new List<Tile>();
+
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
+
+                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+            
+            } else if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.WEST) {
+                List<Tile> playerTiles = new List<Tile>();
+
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
+
+                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+            
+            } else if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.NORTH) {
+                List<Tile> playerTiles = new List<Tile>();
+
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
+
+                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             }
-
-            PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
         }
+
+
+        //foreach (Player player in PhotonNetwork.PlayerList) {
+        //    List<Tile> playerTiles = new List<Tile>();
+
+        //    for (int i = 0; i < 14; i++) {
+        //        // Choose a tile randomly from the complete tiles list and add it to the player's tiles
+        //        int randomIndex = RandomNumber(tiles.Count());
+        //        playerTiles.Add(tiles[randomIndex]);
+        //        tiles.Remove(tiles[randomIndex]);
+
+        //        // Don't give the 14th tile if the player is not the East Wind
+        //        if (i == 12 && (PlayerManager.Wind)windsDict[player.ActorNumber] != PlayerManager.Wind.EAST) {
+        //            break;
+        //        }
+        //    }
+
+        //    PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+        //}
 
         // Reinsert updated tiles list into Room Custom Properties
         Hashtable ht = new Hashtable();
