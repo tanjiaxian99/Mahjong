@@ -7,9 +7,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = System.Random;
 
@@ -751,40 +751,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     // We only care about the first turn
     public void OnTurnBegins(int turn) {
-        if (turn > 1) {
-            return;
-        }
-
-        if (!PhotonNetwork.IsMasterClient) {
-            return;
-        }
-
-        Debug.LogFormat("Turn {0} has begun", turn);
-
-        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
-
-        Player firstPlayer = playOrder[0];
-        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { firstPlayer.ActorNumber } }, SendOptions.SendReliable);
     }
 
     public void OnTurnCompleted(int turn) {
-        Debug.LogError("turn completed");
-        this.StartTurn();
     }
 
     // What the local client does when a remote player performs a move
     public void OnPlayerMove(Player player, int turn, object move) {
-        throw new System.NotImplementedException();
     }
 
     // What the local client does when a remote player finishes a move
     public void OnPlayerFinished(Player player, int turn, object move) {
-
     }
 
     // TODO: Does time refers to time of a single player's turn?
     public void OnTurnTimeEnds(int turn) {
-        throw new System.NotImplementedException();
     }
 
     #endregion Callbacks Callbacks
@@ -814,7 +795,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.DistributeTiles();
         //this.InstantiateDiscardTilesList();
         StartCoroutine("InitialInstantiation");
-        this.StartTurn();
+        yield return new WaitForSeconds(1f);
+        this.StartGame();
         yield return null;
     }
 
@@ -869,9 +851,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             int index = windsDict[actorNumber];
             playOrder[index] = PhotonNetwork.CurrentRoom.GetPlayer(actorNumber);
         }
-        foreach (Player player in playOrder) {
-            Debug.LogError(windsDict[player.ActorNumber]);
-        }
+
         Hashtable ht = new Hashtable();
         ht.Add(PlayOrderPropkey, playOrder);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
@@ -941,12 +921,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // DEBUG
         tiles = new List<Tile>() {
+            new Tile(Tile.Suit.Dot, Tile.Rank.One),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Two),
             new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-            new Tile(Tile.Suit.Animal, Tile.Rank.Two),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Three)
+            new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Six),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Eight)
         };
 
         // Add to Room Custom Properties
@@ -1037,8 +1019,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.Two));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             }
@@ -1077,9 +1059,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     IEnumerator InitialInstantiation() {
         foreach (Player player in (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey]) {
-            PhotonNetwork.RaiseEvent(EvInitialInstantiation, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             yield return new WaitForSeconds(0.2f);
+            PhotonNetwork.RaiseEvent(EvInitialInstantiation, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
         }
+    }
+
+
+    /// <summary>
+    /// Start the game with the East Wind
+    /// </summary>
+    public void StartGame() {
+        if (!PhotonNetwork.IsMasterClient) {
+            return;
+        }
+
+        //Debug.LogFormat("Turn {0} has begun", turn);
+
+        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
+
+        Player firstPlayer = playOrder[0];
+        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { firstPlayer.ActorNumber } }, SendOptions.SendReliable);
     }
 
     #endregion
@@ -1106,7 +1105,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
                 playerManager.canTouchHandTiles = true;
-                this.OnPlayerTurn();
+                StartCoroutine("OnPlayerTurn");
                 break;
 
             case EvWinUpdate:
@@ -1442,30 +1441,31 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called immediately when myTurn is set to true. The only times it is not called is when the East Wind makes the first move, or
     /// when the player Pong or Kong
     /// </summary>
-    public void OnPlayerTurn() {
+    IEnumerator OnPlayerTurn() {
         // If there are only 15 tiles left, end the game
         if (numberOfTilesLeft == 15) {
             this.EndRound();
-            return;
+            yield break;
         }
 
         List<Tile> hand = playerManager.hand;
-
         if (playerManager.playerWind == PlayerManager.Wind.EAST) {
+
             this.StartTurn();
-            Debug.LogFormat("We are at round {0}", turnManager.Turn);
+            // Needed for local turn value to update 
+            yield return new WaitForSeconds(0.1f);
             if (turnManager.Turn == 1) {
 
                 // Check to see if the player can win based on the East Wind's initial 14 tiles
                 if (this.CanWin()) {
                     this.WinUI();
-                    return;
+                    yield break;
                 }
 
                 if (playerManager.ConcealedKongTiles().Count != 0) {
                     this.KongUI(playerManager.ConcealedKongTiles());
                 }
-                return;
+                yield break;
             }
         }
 
@@ -1477,7 +1477,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         if (chowTiles.Count != 0) {
             this.ChowUI(chowTiles);
-            return;
+            yield break;
         }
 
         hand.Add(this.DrawTile());
@@ -1491,7 +1491,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Check to see if the player can win based on the drawn tile
         if (this.CanWin()) {
             this.WinUI();
-            return;
+            yield break;
         }
 
         if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {

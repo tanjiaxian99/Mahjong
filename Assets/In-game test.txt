@@ -1,9 +1,9 @@
 ### Instant Payout ###
 Hidden Cat and Rat [X]
-Cat and Rat []
+Cat and Rat [X]
 
-Hidden Chicken and Centipede []
-Chicken and Centipede
+Hidden Chicken and Centipede [X]
+Chicken and Centipede [X]
 
 Complete Animal Group Payout []
 
@@ -72,6 +72,7 @@ Winning on Last Available Tile []
 Winning on Last Available Tile Fail []
 Two Winning Combos []
 One Fan Non Winning []
+Self-pick []
 
 ### Fresh Tile Discard ###
 Tile in Chow Combo []

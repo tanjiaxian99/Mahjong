@@ -851,7 +851,7 @@ public class FanCalculator {
     /// </summary>
     /// <returns></returns>
     private string HeavenlyHandCheck(PlayerManager.Wind playerWind, int turn) {
-        if (playerWind == PlayerManager.Wind.EAST && turn == 2) {
+        if (playerWind == PlayerManager.Wind.EAST && turn == 1) {
             return "Heavenly Hand";
         }
         return null;
@@ -862,7 +862,7 @@ public class FanCalculator {
     /// Determine if the hand is a Earthly Hand
     /// </summary>
     private string EarthlyHandCheck(PlayerManager.Wind? discardPlayerWind, Tile discardTile, int turn) {
-        if (turn == 2 && discardPlayerWind == PlayerManager.Wind.EAST && discardTile != null) {
+        if (turn == 1 && discardPlayerWind == PlayerManager.Wind.EAST && discardTile != null) {
             return "Earthly Hand";
         }
 
@@ -879,7 +879,7 @@ public class FanCalculator {
     /// Determine if the hand is a Humanly Hand
     /// </summary>
     private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, Tile discardTile, int turn) {
-        if (turn == 2 && playerWind != PlayerManager.Wind.EAST && discardTile != null) {
+        if (turn == 1 && playerWind != PlayerManager.Wind.EAST && discardTile != null) {
             int numberOfComboTiles = 0;
             int numberOfConcealedKong = 0;
 
