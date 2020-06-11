@@ -644,6 +644,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Update local player's playerManager
             playerManager.playerWind = wind;
 
+            // Initialize Payment class 
+            this.payment = new Payment(PhotonNetwork.PlayerList.ToList(), handsToCheck, playerManager);
+
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
 
@@ -1337,8 +1340,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// player's hand and open tiles are instantiated.
     /// </summary>
     public void InitialLocalInstantiation() {
-        this.payment = new Payment(PhotonNetwork.PlayerList.ToList(), handsToCheck, playerManager);
-
         if (playerManager.hand == null) {
             Debug.LogError("The player's hand is empty.");
         }
