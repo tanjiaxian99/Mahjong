@@ -7,7 +7,7 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Pending: is InstantPayout called before Turn becomes 2?
+    // Ideas: Add StartingHand checks to no fan win. Replace Debug.LogError lines with UI code
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;

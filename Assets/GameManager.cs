@@ -838,7 +838,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PlayerManager.Wind playerWind;
 
         foreach (Player player in PhotonNetwork.PlayerList) {
-            int randomIndex = (int)PlayerManager.Wind.EAST;
+            int randomIndex = 0;
             if (numberOfPlayersToStart > 1) {
                 randomIndex = RandomNumber(winds.Count());
             }
@@ -864,12 +864,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Player[] playOrder = new Player[numberOfPlayersToStart];
 
         foreach (int actorNumber in windsDict.Keys) {
-            // The values of windsDict are PlayerManager.Wind types, which are order from East:0 to South: 3
+            // The values of windsDict are PlayerManager.Wind types, which are ordered from East:0 to North:4
             // The integer value of windsDict themselves is the order of play
             int index = windsDict[actorNumber];
             playOrder[index] = PhotonNetwork.CurrentRoom.GetPlayer(actorNumber);
         }
-
+        foreach (Player player in playOrder) {
+            Debug.LogError(windsDict[player.ActorNumber]);
+        }
         Hashtable ht = new Hashtable();
         ht.Add(PlayOrderPropkey, playOrder);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
@@ -937,6 +939,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             Debug.LogErrorFormat("{0} tiles have been created instead of 148", tiles.Count);
         }
 
+        // DEBUG
+        tiles = new List<Tile>() {
+            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+            new Tile(Tile.Suit.Animal, Tile.Rank.Two),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Three)
+        };
+
         // Add to Room Custom Properties
         Hashtable ht = new Hashtable();
         ht.Add(WallTileListPropKey, tiles);
@@ -968,9 +980,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
-
-                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
 
@@ -1027,7 +1038,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.One));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             }
@@ -1565,21 +1576,31 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Draw a new tile. No distinction made between front end or back end of Wall Tiles.
     /// </summary>
     public Tile DrawTile() {
+        // DEBUG 
         List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
 
-        int randomIndex = RandomNumber(tiles.Count());
-        Tile tile = tiles[randomIndex];
-        tiles.Remove(tiles[randomIndex]);
+        Tile tile = tiles[0];
+        tiles.Remove(tiles[0]);
 
         // Reinsert updated tiles list into Room Custom Properties
         Hashtable ht = new Hashtable();
         ht.Add(WallTileListPropKey, tiles);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
-        //// DEBUG
-        //return new Tile(Tile.Suit.Character, Tile.Rank.Nine);
-
         return tile;
+
+        //List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
+
+        //int randomIndex = RandomNumber(tiles.Count());
+        //Tile tile = tiles[randomIndex];
+        //tiles.Remove(tiles[randomIndex]);
+
+        //// Reinsert updated tiles list into Room Custom Properties
+        //Hashtable ht = new Hashtable();
+        //ht.Add(WallTileListPropKey, tiles);
+        //PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        //return tile;
     }
 
 

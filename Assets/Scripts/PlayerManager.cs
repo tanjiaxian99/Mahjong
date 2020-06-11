@@ -9,9 +9,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
     private int score;
     public enum Wind {
         EAST,
-        NORTH,
+        SOUTH,
         WEST,
-        SOUTH
+        NORTH
     }
 
     public Wind playerWind { get; set; }
