@@ -13,11 +13,12 @@ Hidden Bonus Tile Match Seat Wind Pair [X]
 Bonus Tile Match Seat Wind Pair, with 2nd tile drawn after initial hand [X]
 Bonus Tile Match Seat Wind Pair [X]
 
-Complete Season Group Payout []
-Complete Flower Group Payout []
+Complete Season Group Payout [X]
+Complete Flower Group Payout [X]
 
-Concealed Kong Payout []
-Discard and Exposed Kong Payout []
+Concealed Kong Payout [X]
+Exposed Kong Payout []
+Discard Kong Payout [X]
 
 ### Hand Fan + Payout ###
 Heavenly Hand []

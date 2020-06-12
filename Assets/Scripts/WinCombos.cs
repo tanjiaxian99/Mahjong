@@ -19,6 +19,8 @@ public class WinCombos {
     public List<List<string>> CheckWin(List<Tile> hand) {
         if (hand.Count != 14) {
             Debug.LogErrorFormat("The player's hand only contains {0} tiles", hand.Count);
+            Debug.LogError("The tiles in the player's hand are: ");
+            hand.ForEach(Debug.LogError);
             return null;
         }
 

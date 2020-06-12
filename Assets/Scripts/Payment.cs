@@ -11,6 +11,7 @@ public class Payment {
     // 1. Add StartingHand checks to no fan win. 
     // 2. Replace Debug.LogError lines with UI code. 
     // 3. UI from both local and remote. Pressing ok should only affect one UI. Otherwise, split screen.
+    // 4. 2 people winning with the same tile
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;

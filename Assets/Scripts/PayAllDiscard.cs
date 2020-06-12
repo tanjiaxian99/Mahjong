@@ -227,6 +227,10 @@ public class PayAllDiscard {
     /// </summary>
     private List<Tile> FullFlush(List<Tile> openTiles) {
         List<Tile> highRiskTiles = new List<Tile>();
+        if (openTiles.Count == 0) {
+            return highRiskTiles;
+        }
+
         Tile.Suit? referenceSuit = openTiles[openTiles.Count - 1].suit;
         int referenceSuitCount = 0;
 

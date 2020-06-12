@@ -16,16 +16,20 @@ public static class FreshTileDiscard {
                 continue;
             }
 
+            // Previous case was a Kong and it was the last case
+            if (i == allPlayersOpenTiles.Count - 1) {
+                break;
+            }
+
             // Chow case
             if (allPlayersOpenTiles[i + 1].rank == allPlayersOpenTiles[i].rank + 1 && allPlayersOpenTiles[i + 2].rank == allPlayersOpenTiles[i].rank + 2) {
                 i += 2;
                 continue;
             }
 
-
             // Pong case
             if (allPlayersOpenTiles[i + 1] == allPlayersOpenTiles[i] && allPlayersOpenTiles[i + 2] == allPlayersOpenTiles[i]) {
-                if (discardTile == allPlayersOpenTiles[i]) {
+                if (allPlayersOpenTiles[i] == discardTile) {
                     return false;
                 }
                 i += 2;

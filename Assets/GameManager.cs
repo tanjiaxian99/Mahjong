@@ -664,7 +664,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Item1 = -1 when the latest discard tile is to be removed, due to Chow, Pong, Kong or Win
             // Item1 = -2 when a player has drawn a tile and both discardPlayer and latestDiscardTile can be reset to null;
             // Item3 = 200 when Exposed Kong has been executed and Robbing the Kong is possible
-            // Item3 = 300 when Concealed Kong has been executed andRobbing the Kong is possible
+            // Item3 = 300 when Concealed Kong has been executed and Robbing the Kong is possible
             if (discardTileInfo.Item1 == -1) {
                 // Remove the last discard tile
                 GameObject lastDiscardTile = GameObject.FindGameObjectWithTag("Discard");
@@ -682,8 +682,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 if (this.CanWin()) {
                     this.WinUI();
-                    return;
                 }
+                return;
 
             } else if (discardTileInfo.Item3 == 300) {
                 discardPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
@@ -692,9 +692,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 if (this.CanWin()) {
                     if (playerManager.winningCombos.Contains("Thirteen Wonders")) {
                         this.WinUI();
-                        return;
                     }
                 }
+                return;
             }
 
             discardPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
@@ -927,11 +927,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // DEBUG
         tiles = new List<Tile>() {
-            
-            new Tile(Tile.Suit.Dot, Tile.Rank.One),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
             new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-            
             new Tile(Tile.Suit.Dot, Tile.Rank.Four),
             new Tile(Tile.Suit.Dot, Tile.Rank.Five),
             new Tile(Tile.Suit.Dot, Tile.Rank.Six),
@@ -986,9 +985,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
@@ -1005,9 +1004,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
@@ -1024,13 +1023,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             }
@@ -1532,16 +1530,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
-        // Check to see if the player can win based on the drawn tile
+        // Check if the player can win based on the drawn tile
         if (this.CanWin()) {
             this.WinUI();
             yield break;
         }
 
+        // Check if the player can Kong the drawn tile
         if (playerManager.ExposedKongTiles().Count != 0 || playerManager.ConcealedKongTiles().Count != 0) {
             this.KongUI(playerManager.ExposedKongTiles().Concat(playerManager.ConcealedKongTiles()).ToList());
         }
-
     }
 
 
