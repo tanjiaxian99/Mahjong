@@ -1,14 +1,17 @@
 ### Instant Payout ###
 Hidden Cat and Rat [X]
+Cat with Rat drawn after initial hand [X]
 Cat and Rat [X]
 
 Hidden Chicken and Centipede [X]
+Chicken with Centipede drawn after initial hand [X]
 Chicken and Centipede [X]
 
-Complete Animal Group Payout []
+Complete Animal Group Payout [X]
 
-Hidden Bonus Tile Match Seat Wind Pair []
-Bonus Tile Match Seat Wind Pair []
+Hidden Bonus Tile Match Seat Wind Pair [X]
+Bonus Tile Match Seat Wind Pair, with 2nd tile drawn after initial hand [X]
+Bonus Tile Match Seat Wind Pair [X]
 
 Complete Season Group Payout []
 Complete Flower Group Payout []

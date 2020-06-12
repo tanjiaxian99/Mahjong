@@ -7,7 +7,10 @@ using Photon.Realtime;
 using System.Security.Cryptography;
 
 public class Payment {
-    // Ideas: Add StartingHand checks to no fan win. Replace Debug.LogError lines with UI code
+    // Ideas: 
+    // 1. Add StartingHand checks to no fan win. 
+    // 2. Replace Debug.LogError lines with UI code. 
+    // 3. UI from both local and remote. Pressing ok should only affect one UI. Otherwise, split screen.
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;

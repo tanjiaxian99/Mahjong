@@ -129,36 +129,41 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public const byte EvDistributeTiles = 5;
 
     /// <summary>
+    /// The Hidden Payouts event message byte. Used internally for checking for Hidden Payouts in local and remote tiles.
+    /// </summary>
+    public const byte EvHiddenPayouts = 6;
+
+    /// <summary>
     /// The Initial Instantiation event message byte. Used internally for converting the local player's bonus tiles into normal tiles.
     /// Afterwards, instantiate the local player's hand and open tiles
     /// </summary>
-    public const byte EvInitialInstantiation = 6;
+    public const byte EvInitialInstantiation = 7;
 
     /// <summary>
     /// The Player Turn event message byte. Used internally by MasterClient to update the next player on his turn.
     /// </summary>
-    public const byte EvPlayerTurn = 11;
+    public const byte EvPlayerTurn = 8;
 
     /// <summary>
     /// The Win Update event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
     /// </summary>
-    public const byte EvWinUpdate = 12;
+    public const byte EvWinUpdate = 9;
 
     /// <summary>
     /// The Check Pong Kong event message byte. Used internally to check whether the local player can Pong/Kong.
     /// </summary>
-    public const byte EvCheckPongKong = 13;
+    public const byte EvCheckPongKong = 10;
 
     /// <summary>
     /// The Pong Kong Update event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
     /// the latest discard tile.
     /// </summary>
-    public const byte EvPongKongUpdate = 14;
+    public const byte EvPongKongUpdate = 11;
 
     /// <summary>
     /// The Player Win event message byte. Used internally by the local player when a remote player has won.
     /// </summary>
-    public const byte EvPlayerWin = 15;
+    public const byte EvPlayerWin = 12;
 
 
 
@@ -793,11 +798,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         // Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
         yield return new WaitForSeconds(1.5f);
         this.DistributeTiles();
-        //this.InstantiateDiscardTilesList();
+        this.HiddenPayouts();
+        yield return new WaitForSeconds(0.5f);
+        this.StartTurn();
+        yield return new WaitForSeconds(0.5f);
         StartCoroutine("InitialInstantiation");
-        yield return new WaitForSeconds(1f);
         this.StartGame();
-        yield return null;
     }
 
 
@@ -921,14 +927,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // DEBUG
         tiles = new List<Tile>() {
+            
             new Tile(Tile.Suit.Dot, Tile.Rank.One),
             new Tile(Tile.Suit.Dot, Tile.Rank.Two),
             new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+            
             new Tile(Tile.Suit.Dot, Tile.Rank.Four),
             new Tile(Tile.Suit.Dot, Tile.Rank.Five),
             new Tile(Tile.Suit.Dot, Tile.Rank.Six),
             new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Eight)
+            new Tile(Tile.Suit.Dot, Tile.Rank.Eight),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Nine)
         };
 
         // Add to Room Custom Properties
@@ -1019,6 +1028,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.Two));
 
@@ -1051,6 +1061,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
         Debug.Log("The tiles from the wall have been distributed");
+    }
+
+
+    /// <summary>
+    /// Raise an event to inform all players to update their initial open tiles
+    /// </summary>
+    public void HiddenPayouts() {
+        PhotonNetwork.RaiseEvent(EvHiddenPayouts, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
     }
 
 
@@ -1096,6 +1114,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             case EvDistributeTiles:
                 // Update local player's playerManager
                 playerManager.hand = (List<Tile>)photonEvent.CustomData;
+                break;
+
+            case EvHiddenPayouts:
+                this.LocalHiddenPayouts();
                 break;
 
             case EvInitialInstantiation:
@@ -1399,10 +1421,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Called by the local player during the initial instantiation of tiles. Bonus tiles are converted, before the
-    /// player's hand and open tiles are instantiated.
+    /// Called by the local player to display the initial hand before Bonus Tile have been converted
     /// </summary>
-    public void InitialLocalInstantiation() {
+    public void LocalHiddenPayouts() {
         if (playerManager.hand == null) {
             Debug.LogError("The player's hand is empty.");
         }
@@ -1410,6 +1431,28 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         if (playerManager.openTiles.Any()) {
             Debug.LogError("The player has open tiles leftover from the previous game.");
         }
+
+        List<Tile> initialOpenTiles = new List<Tile>();
+        foreach (Tile tile in playerManager.hand) {
+            if (tile.IsBonus()) {
+                initialOpenTiles.Add(tile);
+            }
+        }
+        // Local Hidden Payout check
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, initialOpenTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer, playerManager.playerWind);
+
+        // Remote Hidden Payout check
+        Hashtable ht = new Hashtable();
+        ht.Add(OpenTilesPropKey, initialOpenTiles);
+        PhotonNetwork.SetPlayerCustomProperties(ht);
+    }
+
+
+    /// <summary>
+    /// Called by the local player once Hidden Instant Payouts have been settled. Bonus tiles are converted
+    /// </summary>
+    public void InitialLocalInstantiation() {
+        
 
         // Check the local player's hand for bonus tiles. If there are, convert them to normal tiles.
         while (true) {
@@ -1451,11 +1494,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         List<Tile> hand = playerManager.hand;
         if (playerManager.playerWind == PlayerManager.Wind.EAST) {
 
-            this.StartTurn();
-            // Needed for local turn value to update 
-            yield return new WaitForSeconds(0.1f);
-            if (turnManager.Turn == 1) {
-
+            // Start of Turn 2 will definitely have at least one discard tile
+            if (turnManager.Turn == 1 && discardTiles.Count == 0) {
                 // Check to see if the player can win based on the East Wind's initial 14 tiles
                 if (this.CanWin()) {
                     this.WinUI();
@@ -1466,6 +1506,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     this.KongUI(playerManager.ConcealedKongTiles());
                 }
                 yield break;
+            } else {
+                this.StartTurn();
+                // The wait ensures the local player's turn number is updated
+                yield return new WaitForSeconds(0.2f);
             }
         }
 
