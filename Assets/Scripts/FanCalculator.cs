@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 
 /// <summary>
@@ -403,7 +404,7 @@ public class FanCalculator {
     /// </summary>
     private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind? discardPlayerWind, Tile discardTile, int turn) {
         if (handsToCheck["Heavenly Hand"] > 0) {
-            winningCombos.Add(HeavenlyHandCheck(playerWind, turn));
+            winningCombos.Add(HeavenlyHandCheck(playerWind, discardTile, turn));
 
             if (winningCombos.Contains("Heavenly Hand")) {
                 return;
@@ -419,7 +420,7 @@ public class FanCalculator {
         }
 
         if (handsToCheck["Humanly Hand"] > 0) {
-            winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, playerWind, discardTile, turn));
+            winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, discardTile, turn));
         }
 
     }
@@ -854,8 +855,8 @@ public class FanCalculator {
     /// Determine if the hand is a Heavenly Hand
     /// </summary>
     /// <returns></returns>
-    private string HeavenlyHandCheck(PlayerManager.Wind playerWind, int turn) {
-        if (playerWind == PlayerManager.Wind.EAST && turn == 1) {
+    private string HeavenlyHandCheck(PlayerManager.Wind playerWind, Tile discardTile, int turn) {
+        if (playerWind == PlayerManager.Wind.EAST && turn == 1 && discardTile == null) {
             return "Heavenly Hand";
         }
         return null;
@@ -882,11 +883,10 @@ public class FanCalculator {
     /// <summary>
     /// Determine if the hand is a Humanly Hand
     /// </summary>
-    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, Tile discardTile, int turn) {
-        if (turn == 1 && playerWind != PlayerManager.Wind.EAST && discardTile != null) {
+    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, Tile discardTile, int turn) {
+        if (turn == 1 && discardTile != null) {
             int numberOfComboTiles = 0;
             int numberOfConcealedKong = 0;
-
 
             foreach (Tile tile in allPlayersOpenTiles) {
                 if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower || tile.suit == Tile.Suit.Animal) {
@@ -894,7 +894,7 @@ public class FanCalculator {
                 }
                 numberOfComboTiles++;
 
-                if (tile.kongType == 2) {
+                if (tile.kongType == 3) {
                     numberOfConcealedKong++;
                 }
 

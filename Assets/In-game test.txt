@@ -22,8 +22,8 @@ Discard Kong Payout [X]
 
 ### Hand Fan + Payout ###
 Heavenly Hand [X]
-Earthly Hand []
-Humanly Hand []
+Earthly Hand [X]
+Humanly Hand [X]
 
 Bonus Tile Match Seat Wind []
 Animal []
@@ -34,7 +34,7 @@ Robbing the Eighth []
 All Flowers and Seasons []
 
 Player Wind Combo []
-Prevailing Wind Combo []
+Prevailing Wind Combo [X]
 Player and Prevailing Wind Combo []
 Dragon []
 
