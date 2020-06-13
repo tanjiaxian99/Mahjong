@@ -374,7 +374,9 @@ public class FanCalculator {
                 }
             }
 
-            if (!winningCombos.Contains("Thirteen Wonders") && !winningCombos.Contains("Four Great Blessings") && !winningCombos.Contains("Three Great Scholars")) {
+            if (!winningCombos.Contains("Thirteen Wonders") && !winningCombos.Contains("Four Great Blessings") && 
+                !winningCombos.Contains("Three Great Scholars") && !winningCombos.Contains("Robbing the Eighth") &&
+                !winningCombos.Contains("All Flowers and Seasons")) {
                 winningCombos.Clear();
             }
 
@@ -486,11 +488,15 @@ public class FanCalculator {
         if (handsToCheck["Robbing the Eighth"] > 0) {
             if (numberOfSeasonTiles + numberOfFlowerTiles == 7) {
                 foreach (Tile tile in allPlayersOpenTiles) {
-                    if ((tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) && !bonusTiles.Contains(tile)) {
+                    if (bonusTiles.Contains(tile)) {
+                        continue;
+                    }
+                    if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
                         winningCombos.Add("Robbing the Eighth");
                         winningCombos.Remove("Bonus Tile Match Seat Wind");
                         winningCombos.Remove("Complete Season Group");
                         winningCombos.Remove("Complete Flower Group");
+                        return;
                     }
                 }
             }

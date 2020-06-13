@@ -118,6 +118,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     public Tile latestKongTile;
 
+    public Player bonusPlayer;
+
+    public Tile latestBonusTile;
+
     #endregion
 
     #region OnEvent Fields
@@ -200,7 +204,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// <summary>
     /// The latest tile which was Konged
     /// </summary>
-    public static readonly string KongTilePropKey = "kt";
+    public static readonly string SpecialTilePropKey = "kt";
 
     /// <summary>
     /// Number of tiles in the player's hand
@@ -708,8 +712,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 PhotonNetwork.RaiseEvent(EvWinUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
             }
 
-        } else if (propertiesThatChanged.ContainsKey(KongTilePropKey)) {
-            Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[KongTilePropKey];
+        } else if (propertiesThatChanged.ContainsKey(SpecialTilePropKey)) {
+            Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[SpecialTilePropKey];
 
             if (discardTileInfo == null) {
                 kongPlayer = null;
@@ -717,7 +721,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 return;
             }
 
-            if (discardTileInfo.Item3 == 2) {
+            if (discardTileInfo.Item3 == 1) {
+                bonusPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
+                latestBonusTile = discardTileInfo.Item2;
+
+                if (bonusPlayer == PhotonNetwork.LocalPlayer) {
+                    return;
+                }
+
+                if (this.CanWin("Bonus")) {
+                    this.WinUI();
+                }
+                return;
+
+            } else if (discardTileInfo.Item3 == 2) {
                 kongPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
                 latestKongTile = discardTileInfo.Item2;
 
@@ -725,7 +742,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     return;
                 }
 
-                if (this.CanWin()) {
+                if (this.CanWin("Kong")) {
                     this.WinUI();
                 }
                 return;
@@ -738,7 +755,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     return;
                 }
 
-                if (this.CanWin()) {
+                if (this.CanWin("Kong")) {
                     if (playerManager.winningCombos.Contains("Thirteen Wonders")) {
                         this.WinUI();
                     }
@@ -748,7 +765,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             if (PhotonNetwork.IsMasterClient) {
                 Hashtable ht = new Hashtable();
-                ht.Add(KongTilePropKey, null);
+                ht.Add(SpecialTilePropKey, null);
                 PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
             }
 
@@ -962,11 +979,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // DEBUG
         tiles = new List<Tile>() {
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+            new Tile(Tile.Suit.Season, Tile.Rank.Two),
+            new Tile(Tile.Suit.Season, Tile.Rank.Three),
+            new Tile(Tile.Suit.Season, Tile.Rank.Four),
+            new Tile(Tile.Suit.Flower, Tile.Rank.One),
+            new Tile(Tile.Suit.Flower, Tile.Rank.Two),
+            new Tile(Tile.Suit.Flower, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+            new Tile(Tile.Suit.Flower, Tile.Rank.Four),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
@@ -974,16 +995,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-
         };
 
         // Add to Room Custom Properties
@@ -1006,19 +1017,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 List<Tile> playerTiles = new List<Tile>();
 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Season, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
 
@@ -1031,13 +1042,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four));
+                playerTiles.Add(new Tile(Tile.Suit.Season, Tile.Rank.One));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             
@@ -1045,18 +1056,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 List<Tile> playerTiles = new List<Tile>();
 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             
@@ -1064,18 +1075,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 List<Tile> playerTiles = new List<Tile>();
 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             }
@@ -1233,7 +1244,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             case EvPlayerWin:
                 Dictionary <int, string[]> winInfo = (Dictionary<int, string[]>)photonEvent.CustomData;
-                Debug.LogError(winInfo.Keys.ToList()[0]);
                 winInfo.Values.ToList()[0].ToList().ForEach(Debug.LogError);
                 Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
                 this.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
@@ -1683,6 +1693,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-2, new Tile(0, 0), 0));
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
+        // Inform remote players that the local player has drawn a bonus tile. 
+        if (tile.IsBonus()) {
+            ht = new Hashtable();
+            ht.Add(SpecialTilePropKey, new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, tile, 1));
+            PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        }
+        
+
         return tile;
 
         //List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
@@ -1970,6 +1988,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
         } else if (discardType == "Kong") {
             discardPlayerWind = (PlayerManager.Wind)windsDict[kongPlayer.ActorNumber];
+        } else if (discardType == "Bonus") {
+            discardPlayerWind = (PlayerManager.Wind)windsDict[bonusPlayer.ActorNumber];
         }
         
 
@@ -1979,8 +1999,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else if (discardType == "Kong") {
             (playerManager.fanTotal, playerManager.winningCombos) = fanCalculator.CalculateFan(
             playerManager, latestKongTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, this.AllPlayersOpenTiles());
+        } else if (discardType == "Bonus") {
+            List<Tile> allOpenTiles = this.AllPlayersOpenTiles();
+            allOpenTiles.Add(latestBonusTile);
+            (playerManager.fanTotal, playerManager.winningCombos) = fanCalculator.CalculateFan(
+            playerManager, latestBonusTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, allOpenTiles);
         }
-
 
         if (playerManager.fanTotal > 0) {
             return true;
@@ -2329,7 +2353,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             // Update discard tile properties to indicate to all players that Robbing the Kong is possible
             Hashtable ht = new Hashtable();
-            ht.Add(KongTilePropKey, new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, drawnTile, 2));
+            ht.Add(SpecialTilePropKey, new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, drawnTile, 2));
             PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
         } else if (playerManager.ConcealedKongTiles().Contains(kongTile)) {
@@ -2351,7 +2375,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             // Update kong tile properties to indicate to all players that Robbing the Kong is possible for Thirteen Wonders
             Hashtable ht = new Hashtable();
-            ht.Add(KongTilePropKey, new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, kongTileSpecial, 3));
+            ht.Add(SpecialTilePropKey, new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, kongTileSpecial, 3));
             PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
         }
         playerManager.numberOfKong++;
@@ -2461,6 +2485,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
         }
 
+        if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
+            Hashtable hashTable = new Hashtable();
+            hashTable.Add(PayAllDiscardPropKey, bonusPlayer);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
+        }
+
         // Raise an event to inform remote players of the win
         Dictionary<int, string[]> winInfo = new Dictionary<int, string[]>() {
             [playerManager.fanTotal] = playerManager.winningCombos.ToArray()
@@ -2477,8 +2507,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
         if (playerManager.winningCombos.Contains("Robbing the Kong")) {
-            payment.HandPayout(PhotonNetwork.LocalPlayer, null, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
+            payment.HandPayout(PhotonNetwork.LocalPlayer, kongPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
             payment.RevertKongPayout();
+        } else if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
+            payment.HandPayout(PhotonNetwork.LocalPlayer, bonusPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
         } else {
             payment.HandPayout(PhotonNetwork.LocalPlayer, discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
         }
@@ -2784,10 +2816,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void RemoteWin(Player winner, int fanTotal, List<string> winningCombos) {
         bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
-        
+
         if (winningCombos.Contains("Robbing the Kong")) {
             payment.HandPayout(winner, kongPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
             payment.RevertKongPayout();
+        } else if (winningCombos.Contains("Robbing the Eighth")) {
+            payment.HandPayout(winner, bonusPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
         } else {
             payment.HandPayout(winner, discardPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
         }

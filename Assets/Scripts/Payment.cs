@@ -14,6 +14,8 @@ public class Payment {
     // 4. 2 people winning with the same tile
     // 5. Winner shows his hand
     // 6. Win > Kong
+    // 7. Shooter Pay scenarios (e.g. PayAllDiscard, Robbing the Kong)
+    // 8. If player CanWin, other players should not be able to discard tile. Room property update which freezes all discards
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
@@ -381,8 +383,7 @@ public class Payment {
         } else {
             // If the local player is the loser
             Debug.LogError("Checkpoint 1");
-            Debug.LogError(numberOfTilesLeft);
-            Debug.LogError(isFreshTile);
+
             // Fresh Tile Mahjong Scenario
             if (numberOfTilesLeft < 20 && isFreshTile) {
                 // Only the player that discarded the Fresh Tile pays 
@@ -403,6 +404,7 @@ public class Payment {
                     Debug.LogError("Loser: Paying for all players, Non Self-Pick");
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
+                return;
             } else if (playerManager.payForAll == "Remote") {
                 return;
             }
