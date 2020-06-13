@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 
 public class Payment {
     // Ideas: 
-    // 1. Add StartingHand checks to no fan win. 
+    // 1. Player can't click anything for Robbing the Kong
     // 2. Replace Debug.LogError lines with UI code. 
     // 3. UI from both local and remote. Pressing ok should only affect one UI. Otherwise, split screen.
     // 4. 2 people winning with the same tile
@@ -369,57 +369,68 @@ public class Payment {
 
             if (discardPlayer == null) {
                 // Self-pick
+                Debug.LogError("Winner: Self-Pick");
                 playerManager.points += minPoint * (int)Math.Pow(2, fan - 1) * 2 * 3;
             } else {
+                Debug.LogError("Winner: Non Self-Pick");
                 playerManager.points += minPoint * (int)Math.Pow(2, fan - 1) * 4;
             }
 
         } else {
             // If the local player is the loser
-
+            Debug.LogError("Checkpoint 1");
+            Debug.LogError(numberOfTilesLeft);
+            Debug.LogError(isFreshTile);
             // Fresh Tile Mahjong Scenario
             if (numberOfTilesLeft < 20 && isFreshTile) {
                 // Only the player that discarded the Fresh Tile pays 
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {
+                    Debug.LogError("Loser: Discarded Fresh Tile For Win");
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
                 return;
             }
-
+            Debug.LogError("Checkpoint 2");
 
             // Paying for all players
             if (playerManager.payForAll == "Local") {
                 if (discardPlayer == null) {
+                    Debug.LogError("Loser: Paying for all players, Self-Pick");
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2 * 4;
                 } else {
+                    Debug.LogError("Loser: Paying for all players, Non Self-Pick");
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
             } else if (playerManager.payForAll == "Remote") {
                 return;
             }
-
+            Debug.LogError("Checkpoint 3");
 
             // Shooter pay
             if (shooterPay) {
                 // If local player is the shooter
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {
+                    Debug.LogError("Loser: Shooter Pay");
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
 
                 } else if (discardPlayer == null) {
                     // If the remote player self pick
+                    Debug.LogError("Loser: Shooter Pay, but Self-Pick");
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
                 }
                 return;
             }
 
-
+            Debug.LogError("Checkpoint 4");
             // Non-shooter pay
             if (discardPlayer == null || discardPlayer == PhotonNetwork.LocalPlayer) {
                 // If the winner self-pick or if the local player discarded the winning tile
+                Debug.LogError("Loser: Normal. Winner Self-Pick / Local Player discarded winning tile");
                 playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
 
             } else {
                 // If the local player is a loser
+                Debug.LogError("Loser: Normal.");
                 playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1);
             }
         }
@@ -430,6 +441,9 @@ public class Payment {
     /// Return payouts from Exposed Kong if the Kong caused a player to execute Robbing the Kong
     /// </summary>
     public void RevertKongPayout() {
+        if (latestKongPlayer == null) {
+            return;
+        }
         Debug.LogError("Instant Payout: Revert Kong");
         if (latestKongPlayer == PhotonNetwork.LocalPlayer) {
             playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;

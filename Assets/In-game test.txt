@@ -17,11 +17,11 @@ Complete Season Group Payout [X]
 Complete Flower Group Payout [X]
 
 Concealed Kong Payout [X]
-Exposed Kong Payout []
+Exposed Kong Payout [X]
 Discard Kong Payout [X]
 
 ### Hand Fan + Payout ###
-Heavenly Hand []
+Heavenly Hand [X]
 Earthly Hand []
 Humanly Hand []
 
@@ -96,5 +96,8 @@ Wind Tile Set []
 
 ### Miscellaneous ###
 Revert Kong Payout [] 
-Sacred Discard []
-Missed Discard []
+Sacred Discard for Pong []
+Sacred Discard for Win []
+Missed Discard for Pong [X]
+Missed Discard for Win []
+Shooter Pay []

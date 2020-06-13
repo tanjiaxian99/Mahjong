@@ -404,18 +404,22 @@ public class FanCalculator {
     private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind? discardPlayerWind, Tile discardTile, int turn) {
         if (handsToCheck["Heavenly Hand"] > 0) {
             winningCombos.Add(HeavenlyHandCheck(playerWind, turn));
+
+            if (winningCombos.Contains("Heavenly Hand")) {
+                return;
+            }
         }
 
         if (handsToCheck["Earthly Hand"] > 0) {
             winningCombos.Add(EarthlyHandCheck(discardPlayerWind, discardTile, turn));
+
+            if (winningCombos.Contains("Earthly Hand")) {
+                return;
+            }
         }
 
         if (handsToCheck["Humanly Hand"] > 0) {
             winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, playerWind, discardTile, turn));
-
-            if (winningCombos.Contains("Earthly Hand")) {
-                winningCombos.Remove("Humanly Hand");
-            }
         }
 
     }
