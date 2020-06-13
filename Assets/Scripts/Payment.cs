@@ -12,6 +12,8 @@ public class Payment {
     // 2. Replace Debug.LogError lines with UI code. 
     // 3. UI from both local and remote. Pressing ok should only affect one UI. Otherwise, split screen.
     // 4. 2 people winning with the same tile
+    // 5. Winner shows his hand
+    // 6. Win > Kong
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
