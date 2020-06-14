@@ -979,13 +979,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // DEBUG
         tiles = new List<Tile>() {
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
             new Tile(Tile.Suit.Dragon, Tile.Rank.One),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
@@ -1011,37 +1020,37 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 List<Tile> playerTiles = new List<Tile>();
 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
 
             } else if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.SOUTH){
                 List<Tile> playerTiles = new List<Tile>();
 
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Eight));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Six));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
@@ -2326,14 +2335,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
             List<Tile> combo = new List<Tile>();
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 3; i++) {
                 combo.Add(kongTile);
-
-                if (i < 3) {
-                    playerManager.hand.Remove(kongTile);
-                }
+                playerManager.hand.Remove(kongTile);
             }
-            combo[3].kongType = 1;
+            Tile markedTile = new Tile(kongTile.suit, kongTile.rank);
+            markedTile.kongType = 1;
+            combo.Add(markedTile);
             playerManager.comboTiles.Add(combo);
 
         } else if (playerManager.ExposedKongTiles().Contains(kongTile)) {

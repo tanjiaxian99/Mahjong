@@ -745,7 +745,9 @@ public class FanCalculator {
         if (handsToCheck["Four Lesser Blessings"] > 0 || handsToCheck["Four Great Blessings"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
-            winningCombos.Add(this.FourBlessingsCheck(combinedHand));
+            if (!winningCombos.Contains("All Honour")) {
+                winningCombos.Add(this.FourBlessingsCheck(combinedHand));
+            }
 
             if (winningCombos.Contains("Four Lesser Blessings")) {
                 if (handsToCheck["Four Lesser Blessings"] == 0) {
@@ -1222,19 +1224,10 @@ public class FanCalculator {
             thirteenWondersDict[tile]++;
         }
 
-        int duplicateCount = 0;
         foreach (int count in thirteenWondersDict.Values) {
-            if (count == 1) {
-                continue;
-            } else if (count == 2) {
-                duplicateCount++;
-            } else {
+            if (count != 1) {
                 return null;
             }
-        }
-
-        if (duplicateCount != 1) {
-            return null;
         }
 
         return "Thirteen Wonders";
