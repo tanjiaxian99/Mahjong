@@ -339,8 +339,7 @@ public class FanCalculator {
             combinedHand.Add(discardTile);
         }
         combinedHand = combinedHand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
-        //Debug.LogError("-----New Hand-----");
-        //combinedHand.ForEach(Debug.LogError);
+
         // Retrieve list of solution(s)
         List<List<string>> listOfCombos = winCombos.CheckWin(combinedHand);
         if (listOfCombos == null) {
@@ -351,6 +350,7 @@ public class FanCalculator {
             winningCombos = new List<string>();
 
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
+            this.RobbingTheKong(discardTile);
             winningCombos.Add(this.ThirteenWondersCheck(combinedHand));
 
             if (handsToCheck["Four Great Blessings"] > 0) {

@@ -16,11 +16,13 @@ public class Payment {
     // 6. Win > Kong
     // 7. Shooter Pay scenarios (e.g. PayAllDiscard, Robbing the Kong)
     // 8. If player CanWin, other players should not be able to discard tile. Room property update which freezes all discards
+    // 9. Replacement tile on Kong Pay All
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
     private Dictionary<PlayerManager.Wind, List<Tile>> windToTileDict;
     private Player latestKongPlayer;
+    private string latestKongType;
 
     private List<Tile> seasonGroupTiles;
     private List<Tile> flowerGroupTiles;
@@ -291,6 +293,7 @@ public class Payment {
     public void KongPayout(Player player, List<Tile> openTiles, int numberOfTilesLeft, bool isFreshTile, Player discardPlayer) {
         kongTypeCount = new Dictionary<int, int>();
         latestKongPlayer = null;
+        latestKongType = null;
 
         for (int i = 0; i < 4; i++) {
             kongTypeCount.Add(i, 0);
@@ -314,20 +317,15 @@ public class Payment {
             return;
         }
 
-        // Concealed Kong vs Discard and Exposed Kong check
+        // Concealed Kong, Exposed Kong and Discard Kong check
         if (kongTypeCount[3] > 0) {
             instantPaymentDict[player].Add("Concealed Kong");
+            latestKongPlayer = player;
+            latestKongType = "Concealed Kong";
             Debug.LogError("Instant Payout: Concealed Kong");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong Payout"]) * 3;
             } else {
-                if (numberOfTilesLeft < 22 && isFreshTile) {
-                    // Only the player that discarded the Fresh Tile pays 
-                    if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                        playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong Payout"]) * 3;
-                    }
-                    return;
-                }
                 playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong Payout"]);
             }
             return;
@@ -335,6 +333,7 @@ public class Payment {
         } else if (kongTypeCount[2] > 0) {
             instantPaymentDict[player].Add("Exposed Kong");
             latestKongPlayer = player;
+            latestKongType = "Exposed Kong";
             Debug.LogError("Instant Payout: Exposed Kong");
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
@@ -442,17 +441,26 @@ public class Payment {
 
 
     /// <summary>
-    /// Return payouts from Exposed Kong if the Kong caused a player to execute Robbing the Kong
+    /// Return payouts from Exposed and Concealed Kong if the Kong caused a player to execute Robbing the Kong
     /// </summary>
     public void RevertKongPayout() {
         if (latestKongPlayer == null) {
             return;
         }
         Debug.LogError("Instant Payout: Revert Kong");
-        if (latestKongPlayer == PhotonNetwork.LocalPlayer) {
-            playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
-        } else {
-            playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]);
+
+        if (latestKongType == "Concealed Kong") {
+            if (latestKongPlayer == PhotonNetwork.LocalPlayer) {
+                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong Payout"]) * 3;
+            } else {
+                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Concealed Kong Payout"]);
+            }
+        } else if (latestKongType == "Exposed Kong") {
+            if (latestKongPlayer == PhotonNetwork.LocalPlayer) {
+                playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
+            } else {
+                playerManager.points += minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]);
+            }
         }
     }
 }

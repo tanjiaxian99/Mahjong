@@ -165,10 +165,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
         foreach (List<Tile> combo in comboTiles) {
             if (ComboType(combo).Equals("Pong")) {
-                Debug.LogError("There is a pong combo");
-                Debug.LogError(combo[0]);
                 if (hand.Contains(combo[0])) {
-                    Debug.LogError("Hand contains combo[0]");
                     exposedKongTiles.Add(combo[0]);
                 }
             }
