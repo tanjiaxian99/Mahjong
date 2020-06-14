@@ -979,15 +979,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // DEBUG
         tiles = new List<Tile>() {
-            new Tile(Tile.Suit.Season, Tile.Rank.Two),
-            new Tile(Tile.Suit.Season, Tile.Rank.Three),
-            new Tile(Tile.Suit.Season, Tile.Rank.Four),
-            new Tile(Tile.Suit.Flower, Tile.Rank.One),
-            new Tile(Tile.Suit.Flower, Tile.Rank.Two),
-            new Tile(Tile.Suit.Flower, Tile.Rank.Three),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.One),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Flower, Tile.Rank.Four),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
@@ -1017,6 +1011,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 List<Tile> playerTiles = new List<Tile>();
 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
+
+                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
+
+            } else if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.SOUTH){
+                List<Tile> playerTiles = new List<Tile>();
+
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
@@ -1025,30 +1039,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Eight));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven));
-
-                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-
-            } else if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.SOUTH){
-                List<Tile> playerTiles = new List<Tile>();
-
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Season, Tile.Rank.One));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
             

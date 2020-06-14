@@ -1211,27 +1211,30 @@ public class FanCalculator {
     /// Determine if the hand is a Thirteen Wonders Hand
     /// </summary>
     private string ThirteenWondersCheck(List<Tile> combinedHand) {
-        List<Tile> thirteenWondersTiles = new List<Tile>() { 
-            new Tile(Tile.Suit.Character, Tile.Rank.One),
-            new Tile(Tile.Suit.Character, Tile.Rank.Nine),
-            new Tile(Tile.Suit.Dot, Tile.Rank.One),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-            new Tile(Tile.Suit.Wind, Tile.Rank.One),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Two),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Three),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Four),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
-        };
+        Dictionary<Tile, int> thirteenWondersDict = this.InstantiateThirteenWondersDict();
 
         HashSet<Tile> noDuplicateHand = new HashSet<Tile>(combinedHand);
         foreach (Tile tile in noDuplicateHand) {
-            if (!thirteenWondersTiles.Contains(tile)) {
+            if (!thirteenWondersDict.ContainsKey(tile)) {
                 return null;
             }
+
+            thirteenWondersDict[tile]++;
+        }
+
+        int duplicateCount = 0;
+        foreach (int count in thirteenWondersDict.Values) {
+            if (count == 1) {
+                continue;
+            } else if (count == 2) {
+                duplicateCount++;
+            } else {
+                return null;
+            }
+        }
+
+        if (duplicateCount != 1) {
+            return null;
         }
 
         return "Thirteen Wonders";
@@ -1278,6 +1281,23 @@ public class FanCalculator {
     #region Dictionary Instantiation
 
     /// <summary>
+    /// Instantiate the Honour Tiles Count Dict
+    /// </summary>
+    private void InstantiateHonourTilesCount() {
+        honourTilesCount = new Dictionary<Tile, int>();
+
+        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four), 0);
+
+        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three), 0);
+    }
+
+
+    /// <summary>
     /// Instantiate the NineGatesDict only if the hand is checked for Nine Gates
     /// </summary>
     private void InstantiateNineGatesDict() {
@@ -1314,19 +1334,26 @@ public class FanCalculator {
 
 
     /// <summary>
-    /// Instantiate the Honour Tiles Count Dict
+    /// Instantiate the ThirteenWondersDict only if the hand is checked for Thirteen Wonders
     /// </summary>
-    private void InstantiateHonourTilesCount() {
-        honourTilesCount = new Dictionary<Tile, int>();
+    private Dictionary<Tile, int> InstantiateThirteenWondersDict() {
+        Dictionary<Tile, int> thirteenWondersDict = new Dictionary<Tile, int>() {
+            [new Tile(Tile.Suit.Character, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Character, Tile.Rank.Nine)] = 0,
+            [new Tile(Tile.Suit.Dot, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Dot, Tile.Rank.Nine)] = 0,
+            [new Tile(Tile.Suit.Bamboo, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine)] = 0,
+            [new Tile(Tile.Suit.Wind, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Wind, Tile.Rank.Two)] = 0,
+            [new Tile(Tile.Suit.Wind, Tile.Rank.Three)] = 0,
+            [new Tile(Tile.Suit.Wind, Tile.Rank.Four)] = 0,
+            [new Tile(Tile.Suit.Dragon, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Dragon, Tile.Rank.Two)] = 0,
+            [new Tile(Tile.Suit.Dragon, Tile.Rank.Three)] = 0,
+        };
 
-        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four), 0);
-
-        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three), 0);
+        return thirteenWondersDict;
     }
 
     #endregion
