@@ -982,10 +982,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Season, Tile.Rank.Three),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Five),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Five),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
@@ -1043,7 +1042,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
@@ -2339,7 +2338,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
             List<Tile> combo = new List<Tile>();
             for (int i = 0; i < 3; i++) {
-                combo.Add(kongTile);
+                // Important! We cannot just add kongTile directly to combo, as that will result in 3 tiles with the same reference. Down the road,
+                // when winCombos set one of the tiles' isWinning to true, all 3 tiles will have isWinning == true. This will result in Eye combo having 3 tiles
+                Tile temp = new Tile(kongTile.suit, kongTile.rank);
+                combo.Add(temp);
                 playerManager.hand.Remove(kongTile);
             }
             Tile markedTile = new Tile(kongTile.suit, kongTile.rank);
@@ -2367,10 +2369,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             kongTileSpecial.kongType = 3;
             List<Tile> combo = new List<Tile>();
 
-            combo.Add(kongTile);
-            combo.Add(kongTile);
+            combo.Add(new Tile(spriteName));
+            combo.Add(new Tile(spriteName));
             combo.Add(kongTileSpecial);
-            combo.Add(kongTile);
+            combo.Add(new Tile(spriteName));
 
             for (int i = 0; i < 4; i++) {
                 playerManager.hand.Remove(kongTile);

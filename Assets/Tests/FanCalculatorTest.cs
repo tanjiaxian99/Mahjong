@@ -2276,5 +2276,6 @@ namespace Tests {
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
         }
+
     }
 }
