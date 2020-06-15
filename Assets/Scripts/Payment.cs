@@ -384,7 +384,7 @@ public class Payment {
             Debug.LogError("Checkpoint 1");
 
             // Fresh Tile Mahjong Scenario
-            if (numberOfTilesLeft < 20 && isFreshTile) {
+            if (numberOfTilesLeft < 20 && isFreshTile && discardPlayer != null) {
                 // Only the player that discarded the Fresh Tile pays 
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {
                     Debug.LogError("Loser: Discarded Fresh Tile For Win");
