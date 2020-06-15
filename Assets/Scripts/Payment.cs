@@ -8,15 +8,7 @@ using System.Security.Cryptography;
 
 public class Payment {
     // Ideas: 
-    // 1. Player can't click anything for Robbing the Kong
-    // 2. Replace Debug.LogError lines with UI code. 
-    // 3. UI from both local and remote. Pressing ok should only affect one UI. Otherwise, split screen.
-    // 4. 2 people winning with the same tile
-    // 5. Winner shows his hand
-    // 6. Win > Kong
-    // 7. Shooter Pay scenarios (e.g. PayAllDiscard, Robbing the Kong)
-    // 8. If player CanWin, other players should not be able to discard tile. Room property update which freezes all discards
-    // 9. Replacement tile on Kong Pay All
+    
 
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Dictionary<string, int> handsToCheck;
@@ -291,8 +283,6 @@ public class Payment {
     /// </summary>
     public void KongPayout(Player player, List<Tile> openTiles, int numberOfTilesLeft, bool isFreshTile, Player discardPlayer) {
         kongTypeCount = new Dictionary<int, int>();
-        latestKongPlayer = null;
-        latestKongType = null;
 
         for (int i = 0; i < 4; i++) {
             kongTypeCount.Add(i, 0);

@@ -775,8 +775,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
             numberOfTilesLeft = ((List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey]).Count;
 
-            //// DEBUG
-            //numberOfTilesLeft = 25;
+            // DEBUG
+            numberOfTilesLeft = 50;
 
             if (numberOfTilesLeft == 15) {
                 this.EndRound();
@@ -986,9 +986,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Character, Tile.Rank.Nine),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Six),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
@@ -1024,21 +1023,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.EAST) {
                 List<Tile> playerTiles = new List<Tile>();
 
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Eight));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
-
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
 
@@ -1050,12 +1048,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Six));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Six));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
 
@@ -1069,7 +1067,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Six));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
@@ -1519,7 +1517,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InitialLocalInstantiation() {
         
-
         // Check the local player's hand for bonus tiles. If there are, convert them to normal tiles.
         while (true) {
             bool haveBonusTile = false;
@@ -1692,7 +1689,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Tile tile = tiles[0];
         tiles.Remove(tiles[0]);
 
-        numberOfTilesLeft = tiles.Count;
+        numberOfTilesLeft = 50;
 
         // Reinsert updated tiles list into Room Custom Properties
         Hashtable ht = new Hashtable();
@@ -1718,6 +1715,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         //int randomIndex = RandomNumber(tiles.Count());
         //Tile tile = tiles[randomIndex];
         //tiles.Remove(tiles[randomIndex]);
+
+        //numberOfTilesLeft = tiles.Count;
 
         //// Reinsert updated tiles list into Room Custom Properties
         //Hashtable ht = new Hashtable();

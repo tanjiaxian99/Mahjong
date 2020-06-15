@@ -77,8 +77,7 @@ Robbing the Kong, Concealed [X]
 Winning on Last Available Tile [X]
 Winning on Last Available Tile, Flower Fail [X]
 Winning on Last Available Tile, Kong Fail [X]
-Two Winning Combos []
-One Fan Non Winning []
+Two Winning Combos [X]
 
 ### Fresh Tile Discard ###
 Tile in Chow Combo []
@@ -97,10 +96,10 @@ Pure Terminals []
 Wind Tile Set []
 
 ### Miscellaneous ###
-Revert Kong Payout, Exposed Kong [] 
+Revert Kong Payout, Exposed Kong [X] 
 Revert Kong Payout, Concealed Kong [X] 
-Sacred Discard for Pong []
-Sacred Discard for Win []
+Sacred Discard for Pong [X]
+Sacred Discard for Win [X]
 Missed Discard for Pong [X]
 Missed Discard for Win []
 Shooter Pay []
