@@ -752,8 +752,6 @@ public class FanCalculator {
             if (winningCombos.Contains("Four Lesser Blessings")) {
                 if (handsToCheck["Four Lesser Blessings"] == 0) {
                     winningCombos.Remove("Four Lesser Blessings");
-                } else {
-                    winningCombos.Remove("Half Flush");
                 }
             }
 

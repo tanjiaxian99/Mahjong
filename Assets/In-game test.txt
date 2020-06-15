@@ -80,12 +80,14 @@ Winning on Last Available Tile, Kong Fail [X]
 Two Winning Combos [X]
 
 ### Fresh Tile Discard ###
-Tile in Chow Combo []
-Tile not in Discard Pool [X]
-Tile in Pong Combo []
+Tile in Chow Combo is Fresh [X]
+Tile not in Discard Pool is Fresh [X]
+Tile in Pong Combo is not Fresh [X]
 
 ### Pay All Discard ###
-Dragon Tile Set []
+Dragon Tile Set [X]
+Wind Tile Set, Wind Tile High Risk []
+Wind Tile Set, Dragon Tile High Risk []
 Full Flush (1) []
 Full Flush (2) []
 Point Limit 4 Fan (1) []
@@ -93,7 +95,6 @@ Point Limit 4 Fan (2) []
 Point Limit 3 Fan (1) []
 Point Limit 3 Fan (2) []
 Pure Terminals []
-Wind Tile Set []
 
 ### Miscellaneous ###
 Revert Kong Payout, Exposed Kong [X] 
