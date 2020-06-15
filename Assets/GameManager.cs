@@ -122,6 +122,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     public Tile latestBonusTile;
 
+    public bool isFreshTile;
+
     #endregion
 
     #region OnEvent Fields
@@ -694,6 +696,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             latestDiscardTile = discardTileInfo.Item2;
             float hPos = discardTileInfo.Item3;
 
+            isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
             discardTiles.Add(latestDiscardTile);
 
             // Only instantiate the tile if a remote player threw it
@@ -982,6 +985,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
             new Tile(Tile.Suit.Character, Tile.Rank.Nine),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
@@ -1049,7 +1054,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Eight));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
@@ -1500,7 +1505,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             }
         }
         // Local Hidden Payout check
-        payment.InstantPayout(PhotonNetwork.LocalPlayer, initialOpenTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer, playerManager.playerWind);
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, initialOpenTiles, turnManager.Turn, numberOfTilesLeft, isFreshTile, discardPlayer, playerManager.playerWind);
 
         // Remote Hidden Payout check
         Hashtable ht = new Hashtable();
@@ -1789,7 +1794,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void InstantiateLocalOpenTiles() {
         playerManager.UpdateOpenTiles();
         this.UpdateAllPlayersOpenTiles(PhotonNetwork.LocalPlayer, playerManager.openTiles);
-        payment.InstantPayout(PhotonNetwork.LocalPlayer, playerManager.openTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer, playerManager.playerWind);
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, playerManager.openTiles, turnManager.Turn, numberOfTilesLeft, isFreshTile, discardPlayer, playerManager.playerWind);
 
         // Update the list of open tiles on the local player's custom properties
         Hashtable ht = new Hashtable();
@@ -2400,6 +2405,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
         }
         playerManager.numberOfKong++;
+        this.InstantiateLocalOpenTiles();
 
         // Always draw a tile regardless of Kong type
         hand.Add(this.DrawTile());
@@ -2529,7 +2535,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
         }
 
-        bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
         if (playerManager.winningCombos.Contains("Robbing the Kong")) {
             payment.HandPayout(PhotonNetwork.LocalPlayer, kongPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
             payment.RevertKongPayout();
@@ -2586,7 +2591,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         this.UpdateAllPlayersOpenTiles(remotePlayer, remoteOpenTiles);
         PlayerManager.Wind remotePlayerWind = (PlayerManager.Wind)windsDict[remotePlayer.ActorNumber];
-        payment.InstantPayout(remotePlayer, remoteOpenTiles, turnManager.Turn, numberOfTilesLeft, discardTiles, AllPlayersOpenTiles(), latestDiscardTile, discardPlayer, remotePlayerWind);
+        payment.InstantPayout(remotePlayer, remoteOpenTiles, turnManager.Turn, numberOfTilesLeft, isFreshTile, discardPlayer, remotePlayerWind);
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(wind + "_" + "Open");
@@ -2839,7 +2844,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the remote player when the local player has won.
     /// </summary>
     public void RemoteWin(Player winner, int fanTotal, List<string> winningCombos) {
-        bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
 
         if (winningCombos.Contains("Robbing the Kong")) {
             payment.HandPayout(winner, kongPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);

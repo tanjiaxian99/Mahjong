@@ -70,12 +70,11 @@ public class Payment {
     /// <summary>
     /// Determine the need for instant payments to a remote player/from other players. Called when instantiating either local or remote open tiles. 
     /// </summary>
-    public void InstantPayout(Player player, List<Tile> openTiles, int turn, int numberOfTilesLeft,
-                              List<Tile> discardTiles, List<Tile> allPlayersOpenTiles, Tile discardTile, Player discardPlayer, PlayerManager.Wind playerWind) {
+    public void InstantPayout(Player player, List<Tile> openTiles, int turn, int numberOfTilesLeft, bool isFreshTile, Player discardPlayer, PlayerManager.Wind playerWind) {
 
         // Turn 0: Hidden Instant Payout. Turn 1: Fan in First Round
         bool isStartingHand = turn == 0;
-        bool isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, allPlayersOpenTiles, discardTile);
+        
 
         if (handsToCheck["Hidden Cat and Rat"] > 0 && handsToCheck["Cat and Rat"] > 0) {
             this.CatAndRat(player, openTiles, isStartingHand);

@@ -74,14 +74,15 @@ Kong on Kong [X]
 Robbing the Kong, Exposed [X]
 Robbing the Kong, Concealed Fail [X]
 Robbing the Kong, Concealed [X]
-Winning on Last Available Tile []
-Winning on Last Available Tile Fail []
+Winning on Last Available Tile [X]
+Winning on Last Available Tile, Flower Fail [X]
+Winning on Last Available Tile, Kong Fail [X]
 Two Winning Combos []
 One Fan Non Winning []
 
 ### Fresh Tile Discard ###
 Tile in Chow Combo []
-Tile in Discard Pool []
+Tile not in Discard Pool [X]
 Tile in Pong Combo []
 
 ### Pay All Discard ###

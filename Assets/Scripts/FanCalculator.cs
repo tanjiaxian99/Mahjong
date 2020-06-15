@@ -393,7 +393,7 @@ public class FanCalculator {
             this.FanInHand(listOfCombos[i], combinedHand, hand, bonusTiles, comboTiles, playerWind, prevailingWind, discardTile);
             this.WinningOnReplacementTile(numberOfReplacementTiles, numberOfKong);
             this.RobbingTheKong(discardTile);
-            this.WinningOnTheLastAvailableTile(numberOfReplacementTiles, numberOfTilesLeft);
+            this.WinningOnTheLastAvailableTile(numberOfReplacementTiles, numberOfKong, numberOfTilesLeft);
 
             this.listOfWinningCombos.Add(winningCombos);
         }
@@ -849,8 +849,8 @@ public class FanCalculator {
     /// <summary>
     /// Determine if the player won on the last available tile
     /// </summary>
-    private void WinningOnTheLastAvailableTile(int numberOfReplacementTiles, int numberOfTilesLeft) {
-        if (numberOfReplacementTiles == 0 && numberOfTilesLeft == 15) {
+    private void WinningOnTheLastAvailableTile(int numberOfReplacementTiles, int numberOfKong, int numberOfTilesLeft) {
+        if (numberOfReplacementTiles == 0 && numberOfKong == 0 && numberOfTilesLeft == 15) {
             winningCombos.Add("Winning on Last Available Tile");
         }
     }
