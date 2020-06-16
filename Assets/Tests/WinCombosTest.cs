@@ -541,7 +541,9 @@ namespace Tests {
             hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
             
 
-            List<List<string>> expected = new List<List<string>>() { new List<string>() { "Chow", "Chow", "Chow", "Eye", "Eye" } };
+            List<List<string>> expected = new List<List<string>>() { 
+                new List<string>() {"Chow", "Chow", "Chow", "Eye", "Pong"},
+                new List<string>() { "Chow", "Chow", "Chow", "Eye", "Eye" } };
             List<List<string>> actual = testWin.CheckWin(hand);
 
             Assert.AreEqual(expected, actual);

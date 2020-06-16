@@ -1,18 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace Tests {
 
     public class PayAllDiscardTest {
+
         Dictionary<string, int> handsToCheck;
         PayAllDiscard payAllDiscard;
+        PlayerManager playerManager;
 
-        List<Tile> openTiles;
-        PlayerManager.Wind playerWind;
         PlayerManager.Wind prevailingWind;
 
         public PayAllDiscardTest() {
@@ -75,8 +74,9 @@ namespace Tests {
         }
 
         [Test]
-        public void DragonTileSetTest() {
-            openTiles = new List<Tile>() {
+        public void DragonTileSetTest_Pay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Four),
                 new Tile(Tile.Suit.Dragon, Tile.Rank.One),
@@ -88,17 +88,22 @@ namespace Tests {
                 new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
             };
 
-            playerWind = PlayerManager.Wind.EAST;
+            playerManager.playerWind = PlayerManager.Wind.EAST;
             prevailingWind = PlayerManager.Wind.WEST;
+            Tile discardTile = new Tile(Tile.Suit.Dragon, Tile.Rank.Three);
+            playerManager.winningCombos = new List<string>() {
+                "Three Lesser Scholars"
+            };
 
-            List<Tile> expectedHighRiskTiles = new List<Tile>() { new Tile(Tile.Suit.Dragon, Tile.Rank.Three) };
-            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
-            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+            bool expectedShouldPayForAll = true;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
-        public void WindTileSetTest() {
-            openTiles = new List<Tile>() {
+        public void WindTileSetTest_Pay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Four),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -113,21 +118,22 @@ namespace Tests {
                 new Tile(Tile.Suit.Wind, Tile.Rank.Three),
             };
 
-            playerWind = PlayerManager.Wind.EAST;
+            playerManager.playerWind = PlayerManager.Wind.EAST;
             prevailingWind = PlayerManager.Wind.WEST;
+            Tile discardTile = new Tile(Tile.Suit.Wind, Tile.Rank.Four);
+            playerManager.winningCombos = new List<string>() {
+                "Four Lesser Blessings"
+            };
 
-            List<Tile> expectedHighRiskTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Wind, Tile.Rank.Four),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.Three) };
-            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
-            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+            bool expectedShouldPayForAll = true;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
-        public void PointLimitTest_ThreeFan_One() {
-            openTiles = new List<Tile>() {
+        public void PointLimitTest_ThreeFan_One_Pay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Three),
                 new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
@@ -136,36 +142,45 @@ namespace Tests {
                 new Tile(Tile.Suit.Animal, Tile.Rank.One)
             };
 
-            playerWind = PlayerManager.Wind.EAST;
+            playerManager.playerWind = PlayerManager.Wind.EAST;
             prevailingWind = PlayerManager.Wind.EAST;
-
-            List<Tile> expectedHighRiskTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Wind, Tile.Rank.One)
+            Tile discardTile = new Tile(Tile.Suit.Wind, Tile.Rank.One);
+            playerManager.winningCombos = new List<string>() {
+                "Player Wind Combo", "Prevailing Wind Combo"
             };
-            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
-            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+
+            bool expectedShouldPayForAll = true;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
-        public void PointLimitTest_ThreeFan_Two() {
-            openTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Wind, Tile.Rank.One),
-                new Tile(Tile.Suit.Wind, Tile.Rank.One),
-                new Tile(Tile.Suit.Wind, Tile.Rank.One),
-                new Tile(Tile.Suit.Animal, Tile.Rank.One)
+        public void PointLimitTest_FourFan_Pay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Season, Tile.Rank.One),
+                new Tile(Tile.Suit.Animal, Tile.Rank.One),
+                new Tile(Tile.Suit.Animal, Tile.Rank.Two),
+                new Tile(Tile.Suit.Animal, Tile.Rank.Three)
+
             };
 
-            playerWind = PlayerManager.Wind.EAST;
+            playerManager.playerWind = PlayerManager.Wind.EAST;
             prevailingWind = PlayerManager.Wind.EAST;
+            Tile discardTile = new Tile(Tile.Suit.Wind, Tile.Rank.One);
+            playerManager.winningCombos = new List<string>() {
+                "Bonus Tile Match Seat Wind", "Animal", "Animal", "Animal", "Player Wind Combo", "Prevailing Wind Combo"
+            };
 
-            List<Tile> expectedHighRiskTiles = new List<Tile>() { };
-            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
-            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+            bool expectedShouldPayForAll = true;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
-        public void PointLimitTest_FourFan_One() {
-            openTiles = new List<Tile>() {
+        public void PointLimitTest_FourFan_NoPay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -173,44 +188,22 @@ namespace Tests {
                 new Tile(Tile.Suit.Animal, Tile.Rank.One)
             };
 
-            playerWind = PlayerManager.Wind.EAST;
+            playerManager.playerWind = PlayerManager.Wind.EAST;
             prevailingWind = PlayerManager.Wind.EAST;
-
-            List<Tile> expectedHighRiskTiles = new List<Tile>() { 
-                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.Three)};
-            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
-            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
-        }
-
-        [Test]
-        public void PointLimitTest_FourFan_Two() {
-            openTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Season, Tile.Rank.Two),
-                new Tile(Tile.Suit.Flower, Tile.Rank.Two),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
-                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
-                new Tile(Tile.Suit.Wind, Tile.Rank.Two)
+            Tile discardTile = new Tile(Tile.Suit.Dragon, Tile.Rank.One);
+            playerManager.winningCombos = new List<string>() {
+                "Bonus Tile Match Seat Wind", "Player Wind Combo", "Prevailing Wind Combo", "Animal"
             };
 
-            playerWind = PlayerManager.Wind.SOUTH;
-            prevailingWind = PlayerManager.Wind.EAST;
-
-            List<Tile> expectedHighRiskTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
-                new Tile(Tile.Suit.Wind, Tile.Rank.One)};
-            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
-            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+            bool expectedShouldPayForAll = false;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
-        public void FullFlushTest_One() {
-            openTiles = new List<Tile>() {
+        public void FullFlushTest_NominalTiles_Pay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Two),
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
@@ -226,24 +219,53 @@ namespace Tests {
                 new Tile(Tile.Suit.Dot, Tile.Rank.Four)
             };
 
-            playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.playerWind = PlayerManager.Wind.EAST;
             prevailingWind = PlayerManager.Wind.EAST;
+            Tile discardTile = new Tile(Tile.Suit.Dot, Tile.Rank.Nine);
+            playerManager.winningCombos = new List<string>() {
+                "Full Flush"
+            };
 
-            List<Tile> expectedHighRiskTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Dot, Tile.Rank.Two),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Six),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Eight),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Nine),};
-            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
-            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+            bool expectedShouldPayForAll = true;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
-        public void FullFlushTest_Two() {
-            openTiles = new List<Tile>() {
+        public void FullFlushTest_NominalTiles_NoPay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Season, Tile.Rank.Two),
+                new Tile(Tile.Suit.Flower, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four)
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.EAST;
+            prevailingWind = PlayerManager.Wind.EAST;
+            Tile discardTile = new Tile(Tile.Suit.Dot, Tile.Rank.Nine);
+            playerManager.winningCombos = new List<string>() {
+                ""
+            };
+
+            bool expectedShouldPayForAll = false;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
+        }
+
+        [Test]
+        public void FullFlushTest_HonourTiles_Pay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Flower, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -258,44 +280,98 @@ namespace Tests {
                 new Tile(Tile.Suit.Dragon, Tile.Rank.One),
             };
 
-            playerWind = PlayerManager.Wind.SOUTH;
-            prevailingWind = PlayerManager.Wind.EAST;
+            playerManager.playerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.WEST;
+            Tile discardTile = new Tile(Tile.Suit.Dragon, Tile.Rank.Two);
+            playerManager.winningCombos = new List<string>() {
+                "Dragon_One", "All Honour"
+            };
 
-            List<Tile> expectedHighRiskTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Wind, Tile.Rank.Three),
-                new Tile(Tile.Suit.Wind, Tile.Rank.Four),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-                new Tile(Tile.Suit.Dragon, Tile.Rank.Three)};
-
-            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
-            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+            bool expectedShouldPayForAll = true;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
-        public void PureTerminalsTest() {
-            openTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Character, Tile.Rank.One),
-                new Tile(Tile.Suit.Character, Tile.Rank.One),
-                new Tile(Tile.Suit.Character, Tile.Rank.One),
-                new Tile(Tile.Suit.Dot, Tile.Rank.One),
-                new Tile(Tile.Suit.Dot, Tile.Rank.One),
-                new Tile(Tile.Suit.Dot, Tile.Rank.One),
-                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        public void FullFlushTest_HonourTiles_NoPay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                new Tile(Tile.Suit.Dragon, Tile.Rank.One),
             };
 
-            playerWind = PlayerManager.Wind.SOUTH;
+            playerManager.playerWind = PlayerManager.Wind.EAST;
             prevailingWind = PlayerManager.Wind.EAST;
-
-            List<Tile> expectedHighRiskTiles = new List<Tile>() {
-                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
-                new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
-                new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+            Tile discardTile = new Tile(Tile.Suit.Dragon, Tile.Rank.Two);
+            playerManager.winningCombos = new List<string>() {
+                "Dragon_One", "Dragon_Two", "Triplets", "Half Flush"
             };
 
-            List<Tile> actualHighRiskTiles = payAllDiscard.PayAllCheck(openTiles, playerWind, prevailingWind);
-            Assert.AreEqual(expectedHighRiskTiles, actualHighRiskTiles);
+            bool expectedShouldPayForAll = false;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
+
+        [Test]
+        public void PureTerminalsTest_Pay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.WEST;
+            Tile discardTile = new Tile(Tile.Suit.Dot, Tile.Rank.Nine);
+            playerManager.winningCombos = new List<string>() {
+                "Pure Terminals"
+            };
+
+            bool expectedShouldPayForAll = true;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
+        }
+
+        [Test]
+        public void PureTerminalsTest_NoPay() {
+            playerManager = new PlayerManager();
+            playerManager.openTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+            };
+
+            playerManager.playerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.WEST;
+            Tile discardTile = new Tile(Tile.Suit.Dot, Tile.Rank.Nine);
+            playerManager.winningCombos = new List<string>() {
+                "Triplets"
+            };
+
+            bool expectedShouldPayForAll = false;
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, prevailingWind, discardTile, "Win");
+            Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
+        }
+
     }
 }
