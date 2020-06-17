@@ -54,12 +54,12 @@ public class FanCalculator {
     /// <summary>
     /// Calculates and returns the number of Fan the player's tiles contain
     /// </summary>
-    public (int, List<string>) CalculateFan(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
+    public (int, List<string>) CalculateFan(PlayerManager playerManager, TileManager tileManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
         fanLimit = handsToCheck["Fan Limit"];
         fanTotalList = new List<int>();
         listOfWinningCombos = new List<List<string>>();
 
-        this.TabulateCombos(playerManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+        this.TabulateCombos(playerManager, tileManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
         
         for (int i = 0; i < listOfWinningCombos.Count; i++) {
             listOfWinningCombos[i].RemoveAll(x => x == null);
@@ -315,11 +315,11 @@ public class FanCalculator {
     /// Tabulates all the combos the player has
     /// </summary>
     /// <param name="discardTile">The latest discard tile. Null if the tile is self-picked</param>
-    private void TabulateCombos(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
-        List<Tile> hand = playerManager.hand;
-        List<Tile> bonusTiles = playerManager.bonusTiles;
-        List<List<Tile>> comboTiles = playerManager.comboTiles;
-        PlayerManager.Wind playerWind = playerManager.playerWind;
+    private void TabulateCombos(PlayerManager playerManager, TileManager tileManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
+        List<Tile> hand = tileManager.hand;
+        List<Tile> bonusTiles = tileManager.bonusTiles;
+        List<List<Tile>> comboTiles = tileManager.comboTiles;
+        PlayerManager.Wind playerWind = playerManager.seatWind;
         int numberOfReplacementTiles = playerManager.numberOfReplacementTiles;
         int numberOfKong = playerManager.numberOfKong;
 

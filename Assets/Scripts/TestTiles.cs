@@ -75,11 +75,11 @@ public class TestTiles : MonoBehaviour {
     public void TestChowCombinations() {
         PlayerManager playerManager = new PlayerManager();
 
-        playerManager.hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-        playerManager.hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-        playerManager.hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
-        playerManager.hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
-        Tile discardTile = new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine);
+        //playerManager.hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+        //playerManager.hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+        //playerManager.hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+        //playerManager.hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+        //Tile discardTile = new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine);
 
         //List<object[]> chowCombos = ChowPongKong.Instance.ChowCombinations(discardTile);
 

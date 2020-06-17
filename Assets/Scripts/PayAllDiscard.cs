@@ -20,8 +20,8 @@ public class PayAllDiscard {
     /// <summary>
     /// Returns true if the player should Pay For All, given the discard tile
     /// </summary>
-    public bool shouldPayForAll(PlayerManager playerManager, PlayerManager.Wind prevailingWind, Tile discardTile, string actionType) {
-        List<Tile> dangerTiles = highRiskTiles.HighRiskDiscards(playerManager.openTiles, playerManager.playerWind, prevailingWind);
+    public bool shouldPayForAll(PlayerManager playerManager, TileManager tileManager, PlayerManager.Wind prevailingWind, Tile discardTile, string actionType) {
+        List<Tile> dangerTiles = highRiskTiles.HighRiskDiscards(tileManager.openTiles, playerManager.seatWind, prevailingWind);
         List<string> highRiskScenarios = highRiskTiles.HighRiskScenarios();
 
         if (!dangerTiles.Contains(discardTile)) {
@@ -43,7 +43,7 @@ public class PayAllDiscard {
 
         // Point Limit Scenario
         if (highRiskScenarios.Contains("Point Limit")) {
-            if (discardTile.suit == Tile.Suit.Wind && tileToWindDict[discardTile] == playerManager.playerWind) {
+            if (discardTile.suit == Tile.Suit.Wind && tileToWindDict[discardTile] == playerManager.seatWind) {
                 if (playerManager.winningCombos.Contains("Player Wind Combo")) {
                     return true;
                 }

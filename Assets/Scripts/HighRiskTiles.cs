@@ -10,7 +10,6 @@ public class HighRiskTiles {
     #region Private Fields
 
     private Dictionary<string, int> handsToCheck;
-    private Dictionary<Tile, PlayerManager.Wind> bonusTileToWindDict;
     private Dictionary<PlayerManager.Wind, List<Tile>> windToTileDict;
     private Dictionary<Tile.Suit?, List<Tile>> fullFlushDict;
 
@@ -29,7 +28,6 @@ public class HighRiskTiles {
 
     public HighRiskTiles(Dictionary<string, int> handsToCheck) {
         this.handsToCheck = handsToCheck;
-        this.bonusTileToWindDict = new Dictionary<Tile, PlayerManager.Wind>();
         this.windToTileDict = new Dictionary<PlayerManager.Wind, List<Tile>>();
 
         this.highRiskScenarios = new List<string>();
