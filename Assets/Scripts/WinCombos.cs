@@ -18,7 +18,7 @@ public class WinCombos {
     /// </summary>
     public List<List<string>> CheckWin(List<Tile> hand) {
         if (hand.Count != 14) {
-            Debug.LogErrorFormat("The player's hand only contains {0} tiles", hand.Count);
+            Debug.LogErrorFormat("The player's hand contains {0} tiles instead of 14", hand.Count);
             return null;
         }
 

@@ -1,6 +1,7 @@
 ﻿using Photon.Pun;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
+using UnityEngine;
 
 public class PlayerManager : MonoBehaviourPunCallbacks {
     #region Private Fields
@@ -8,9 +9,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
     private int score;
     public enum Wind {
         EAST,
-        NORTH,
+        SOUTH,
         WEST,
-        SOUTH
+        NORTH
     }
 
     public Wind playerWind { get; set; }
@@ -30,6 +31,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
     public int numberOfReplacementTiles { get; set; }
 
     public int numberOfKong { get; set; }
+
+    public int points = 200;
+
+    public string payForAll = "";
+
+    public Tile sacredDiscard;
+
+    public int fanTotal;
+
+    public List<string> winningCombos;
 
     #endregion
 
@@ -154,7 +165,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks {
 
         foreach (List<Tile> combo in comboTiles) {
             if (ComboType(combo).Equals("Pong")) {
-
                 if (hand.Contains(combo[0])) {
                     exposedKongTiles.Add(combo[0]);
                 }

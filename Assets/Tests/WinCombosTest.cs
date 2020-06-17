@@ -520,6 +520,35 @@ namespace Tests {
             Assert.AreEqual(expected, actual);
         }
 
+        [Test]
+        public void SameReferenceTileFail() {
+            hand = new List<Tile>();
+
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+            Tile special = new Tile(Tile.Suit.Character, Tile.Rank.Eight);
+            hand.Add(special);
+            hand.Add(special);
+            hand.Add(special);
+            hand.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
+            hand.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
+            hand.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
+            hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+            hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
+            hand.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
+            
+
+            List<List<string>> expected = new List<List<string>>() { 
+                new List<string>() {"Chow", "Chow", "Chow", "Eye", "Pong"},
+                new List<string>() { "Chow", "Chow", "Chow", "Eye", "Eye" } };
+            List<List<string>> actual = testWin.CheckWin(hand);
+
+            Assert.AreEqual(expected, actual);
+        }
+
         //// A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         //// `yield return null;` to skip a frame.
         //[UnityTest]
