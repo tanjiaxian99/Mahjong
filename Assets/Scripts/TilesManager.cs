@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Contains the player's hand, bonus and combo tiles.
+/// Container for player tiles and tiles-related methods
 /// </summary>
-public class TileManager {
+public class TilesManager {
 
     public List<Tile> hand { get; set; }
 
@@ -15,7 +15,7 @@ public class TileManager {
 
     public List<Tile> openTiles { get; set; }
 
-    public TileManager() {
+    public TilesManager() {
         hand = new List<Tile>();
         bonusTiles = new List<Tile>();
         comboTiles = new List<List<Tile>>();

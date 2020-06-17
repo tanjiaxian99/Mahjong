@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     private PlayerManager playerManager;
 
-    private TileManager tileManager;
+    private TilesManager tileManager;
 
     [Tooltip("The GameObject used to represent a physical Mahjong table")]
     [SerializeField]
@@ -608,7 +608,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public override void OnJoinedRoom() {
         // Initialize PlayerManager for local player
         playerManager = playerPrefab.GetComponent<PlayerManager>();
-        tileManager = new TileManager();
+        tileManager = new TilesManager();
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             // Players that disconnect and reconnect won't start the game at turn 0

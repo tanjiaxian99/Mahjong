@@ -15,7 +15,7 @@ namespace Tests {
         FanCalculator fanCalculator;
 
         PlayerManager playerManager;
-        TileManager tileManager;
+        TilesManager tileManager;
         Tile discardTile;
         PlayerManager.Wind discardPlayerWind;
         PlayerManager.Wind prevailingWind;
@@ -83,7 +83,7 @@ namespace Tests {
         [Test]
         public void HeavenlyHand() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
 
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -123,7 +123,7 @@ namespace Tests {
         [Test]
         public void EarthlyHand() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -162,7 +162,7 @@ namespace Tests {
         [Test]
         public void HumanlyHand() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -201,7 +201,7 @@ namespace Tests {
         [Test]
         public void BonusTileMatchSeatWind() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -243,7 +243,7 @@ namespace Tests {
         [Test]
         public void Animal() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -285,7 +285,7 @@ namespace Tests {
         [Test]
         public void CompleteAnimalGroup() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -329,7 +329,7 @@ namespace Tests {
         [Test]
         public void CompleteSeasonGroup() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -373,7 +373,7 @@ namespace Tests {
         [Test]
         public void CompleteFlowerGroup() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -417,7 +417,7 @@ namespace Tests {
         [Test]
         public void RobbingTheEighth() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -464,7 +464,7 @@ namespace Tests {
         [Test]
         public void AllFlowersAndSeasons() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -512,7 +512,7 @@ namespace Tests {
         [Test]
         public void PlayerWindCombo() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -552,7 +552,7 @@ namespace Tests {
         [Test]
         public void PrevailingWindCombo() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -592,7 +592,7 @@ namespace Tests {
         [Test]
         public void PlayerAndPrevailingWindCombo() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -632,7 +632,7 @@ namespace Tests {
         [Test]
         public void Dragon() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -671,7 +671,7 @@ namespace Tests {
         [Test]
         public void FullyConcealed() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -711,7 +711,7 @@ namespace Tests {
         [Test]
         public void Triplets() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Dot, Tile.Rank.Five),
                 new Tile(Tile.Suit.Dot, Tile.Rank.Five),
@@ -755,7 +755,7 @@ namespace Tests {
         [Test]
         public void HalfFlush() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -799,7 +799,7 @@ namespace Tests {
         [Test]
         public void FullFlush() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -843,7 +843,7 @@ namespace Tests {
         [Test]
         public void FullSequence() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -887,7 +887,7 @@ namespace Tests {
         [Test]
         public void FullSequence_67899() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
                 new Tile(Tile.Suit.Dot, Tile.Rank.Two),
@@ -931,7 +931,7 @@ namespace Tests {
         [Test]
         public void FullSequence_34567() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
                 new Tile(Tile.Suit.Character, Tile.Rank.Four),
@@ -975,7 +975,7 @@ namespace Tests {
         [Test]
         public void FullSequenceFail_PlayerWind() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1019,7 +1019,7 @@ namespace Tests {
         [Test]
         public void FullSequenceFail_PrevailingWind() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1063,7 +1063,7 @@ namespace Tests {
         [Test]
         public void FullSequenceFail_Dragon() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1107,7 +1107,7 @@ namespace Tests {
         [Test]
         public void FullSequenceFail_WaitingForEye() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1151,7 +1151,7 @@ namespace Tests {
         [Test]
         public void FullSequenceFail_WaitingForEdgeTile_One() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1195,7 +1195,7 @@ namespace Tests {
         [Test]
         public void FullSequenceFail_WaitingForEdgeTile_Two() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1239,7 +1239,7 @@ namespace Tests {
         [Test]
         public void FullSequenceFail_WaitingForMiddleTile() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1283,7 +1283,7 @@ namespace Tests {
         [Test]
         public void LesserSequence() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1327,7 +1327,7 @@ namespace Tests {
         [Test]
         public void MixedTerminals() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
@@ -1372,7 +1372,7 @@ namespace Tests {
         [Test]
         public void PureTerminals() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
@@ -1417,7 +1417,7 @@ namespace Tests {
         [Test]
         public void AllHonour() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -1462,7 +1462,7 @@ namespace Tests {
         [Test]
         public void HiddenTreasure() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1503,7 +1503,7 @@ namespace Tests {
         [Test]
         public void FullFlushTriplets() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
@@ -1546,7 +1546,7 @@ namespace Tests {
         [Test]
         public void FullFlushFullSequence() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1586,7 +1586,7 @@ namespace Tests {
         [Test]
         public void FullFlushLesserSequence() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -1629,7 +1629,7 @@ namespace Tests {
         [Test]
         public void NineGates() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
@@ -1672,7 +1672,7 @@ namespace Tests {
         [Test]
         public void FourLesserBlessings() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -1716,7 +1716,7 @@ namespace Tests {
         [Test]
         public void FourGreatBlessings() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -1760,7 +1760,7 @@ namespace Tests {
         [Test]
         public void PureGreenSuit() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
                 new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
@@ -1804,7 +1804,7 @@ namespace Tests {
         [Test]
         public void ThreeLesserScholars() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
@@ -1849,7 +1849,7 @@ namespace Tests {
         [Test]
         public void ThreeGreatScholars() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
@@ -1894,7 +1894,7 @@ namespace Tests {
         [Test]
         public void EighteenArhats() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Dragon, Tile.Rank.One),
                 new Tile(Tile.Suit.Dragon, Tile.Rank.One)};
@@ -1945,7 +1945,7 @@ namespace Tests {
         [Test]
         public void ThirteenWonders() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Nine),
@@ -1986,7 +1986,7 @@ namespace Tests {
         [Test]
         public void WinningOnReplacementTileForFlower() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -2028,7 +2028,7 @@ namespace Tests {
         [Test]
         public void WinningOnReplacementTileForKong() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -2071,7 +2071,7 @@ namespace Tests {
         [Test]
         public void KongOnKong() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -2116,7 +2116,7 @@ namespace Tests {
         [Test]
         public void RobbingTheKong() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -2159,7 +2159,7 @@ namespace Tests {
         [Test]
         public void WinningOnLastAvailableTile() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -2202,7 +2202,7 @@ namespace Tests {
         [Test]
         public void WinningOnLastAvailableTileFail() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
                 new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -2245,7 +2245,7 @@ namespace Tests {
         [Test]
         public void TwoWinningCombos() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),
@@ -2289,7 +2289,7 @@ namespace Tests {
         [Test]
         public void OneFanNonWinning() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.hand = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.Two),

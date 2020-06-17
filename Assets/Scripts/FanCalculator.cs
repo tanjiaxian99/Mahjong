@@ -54,7 +54,7 @@ public class FanCalculator {
     /// <summary>
     /// Calculates and returns the number of Fan the player's tiles contain
     /// </summary>
-    public (int, List<string>) CalculateFan(PlayerManager playerManager, TileManager tileManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
+    public (int, List<string>) CalculateFan(PlayerManager playerManager, TilesManager tileManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
         fanLimit = handsToCheck["Fan Limit"];
         fanTotalList = new List<int>();
         listOfWinningCombos = new List<List<string>>();
@@ -315,7 +315,7 @@ public class FanCalculator {
     /// Tabulates all the combos the player has
     /// </summary>
     /// <param name="discardTile">The latest discard tile. Null if the tile is self-picked</param>
-    private void TabulateCombos(PlayerManager playerManager, TileManager tileManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
+    private void TabulateCombos(PlayerManager playerManager, TilesManager tileManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
         List<Tile> hand = tileManager.hand;
         List<Tile> bonusTiles = tileManager.bonusTiles;
         List<List<Tile>> comboTiles = tileManager.comboTiles;

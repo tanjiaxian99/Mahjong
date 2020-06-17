@@ -20,7 +20,7 @@ public class PayAllDiscard {
     /// <summary>
     /// Returns true if the player should Pay For All, given the discard tile
     /// </summary>
-    public bool shouldPayForAll(PlayerManager playerManager, TileManager tileManager, PlayerManager.Wind prevailingWind, Tile discardTile, string actionType) {
+    public bool shouldPayForAll(PlayerManager playerManager, TilesManager tileManager, PlayerManager.Wind prevailingWind, Tile discardTile, string actionType) {
         List<Tile> dangerTiles = highRiskTiles.HighRiskDiscards(tileManager.openTiles, playerManager.seatWind, prevailingWind);
         List<string> highRiskScenarios = highRiskTiles.HighRiskScenarios();
 
@@ -32,79 +32,104 @@ public class PayAllDiscard {
             return true;
         }
 
-        // Dragon Tile Set Scenario
         if (highRiskScenarios.Contains("Dragon Tile Set")) {
-            if (discardTile.suit == Tile.Suit.Dragon) {
-                if (playerManager.winningCombos.Contains("Three Lesser Scholars") || playerManager.winningCombos.Contains("Three Great Scholars")) {
-                    return true;
-                }
+            if (this.IsDragonTileSet(playerManager, discardTile)) {
+                return true;
             }
         }        
 
-        // Point Limit Scenario
         if (highRiskScenarios.Contains("Point Limit")) {
-            if (discardTile.suit == Tile.Suit.Wind && tileToWindDict[discardTile] == playerManager.seatWind) {
-                if (playerManager.winningCombos.Contains("Player Wind Combo")) {
-                    return true;
-                }
-            } else if (discardTile.suit == Tile.Suit.Wind && tileToWindDict[discardTile] == prevailingWind) {
-                if (playerManager.winningCombos.Contains("Prevailing Wind Combo")) {
-                    return true;
-                }
-            } else if (discardTile.ToString() == "Dragon_One") {
-                if (playerManager.winningCombos.Contains("Dragon_One")) {
-                    return true;
-                }
-            } else if (discardTile.ToString() == "Dragon_Two") {
-                if (playerManager.winningCombos.Contains("Dragon_Two")) {
-                    return true;
-                }
-            } else if (discardTile.ToString() == "Dragon_Three") {
-                if (playerManager.winningCombos.Contains("Dragon_Three")) {
-                    return true;
-                }
+            if (this.IsPointLimit(playerManager, discardTile, prevailingWind)) {
+                return true;
             }
         }
 
-        // Wind Tile Set & Full Flush Scenario
         if (highRiskScenarios.Contains("Full Flush")) {
-
-            // Wind Tile Set Scenario
-            if (discardTile.suit == Tile.Suit.Wind) {
-                if (playerManager.winningCombos.Contains("Four Lesser Blessings") || playerManager.winningCombos.Contains("Four Great Blessings")) {
-                    return true;
-                }
+            if (this.IsWindTileSet(playerManager, discardTile)) {
+                return true;
             }
 
-            // Full Flush Scenario
-            if (discardTile.suit == Tile.Suit.Character || discardTile.suit == Tile.Suit.Dot || discardTile.suit == Tile.Suit.Bamboo) {
-                if (playerManager.winningCombos.Contains("Full Flush") ||
-                    playerManager.winningCombos.Contains("Full Flush Triplets") ||
-                    playerManager.winningCombos.Contains("Full Flush Full Sequence") ||
-                    playerManager.winningCombos.Contains("Full Flush Lesser Sequence")) {
-                    return true;
-                }
-            } else if (discardTile.suit == Tile.Suit.Wind || discardTile.suit == Tile.Suit.Dragon) {
-                if (playerManager.winningCombos.Contains("All Honour")) {
-                    return true;
-                }
+            if (this.IsFullFlush(playerManager, discardTile)) {
+                return true;
             }
         }
 
-        // Pure Terminals Scenario
         if (highRiskScenarios.Contains("Pure Terminals")) {
-            if (discardTile.rank == Tile.Rank.One || discardTile.rank == Tile.Rank.Nine) {
-                if (discardTile.suit == Tile.Suit.Character || discardTile.suit == Tile.Suit.Dot || discardTile.suit == Tile.Suit.Bamboo) {
-                    if (playerManager.winningCombos.Contains("Pure Terminals")) {
-                        return true;
-                    }
-                }
+            if (this.IsPureTerminals(playerManager, discardTile)) {
+                return true;
             }
         }
 
-        
-        
+        return false;
+    }
 
+    public bool IsDragonTileSet(PlayerManager playerManager, Tile discardTile) {
+        if (discardTile.suit == Tile.Suit.Dragon) {
+            if (playerManager.winningCombos.Contains("Three Lesser Scholars") || playerManager.winningCombos.Contains("Three Great Scholars")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool IsPointLimit(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind prevailingWind) {
+        if (discardTile.suit == Tile.Suit.Wind && tileToWindDict[discardTile] == playerManager.seatWind) {
+            if (playerManager.winningCombos.Contains("Player Wind Combo")) {
+                return true;
+            }
+        } else if (discardTile.suit == Tile.Suit.Wind && tileToWindDict[discardTile] == prevailingWind) {
+            if (playerManager.winningCombos.Contains("Prevailing Wind Combo")) {
+                return true;
+            }
+        } else if (discardTile.ToString() == "Dragon_One") {
+            if (playerManager.winningCombos.Contains("Dragon_One")) {
+                return true;
+            }
+        } else if (discardTile.ToString() == "Dragon_Two") {
+            if (playerManager.winningCombos.Contains("Dragon_Two")) {
+                return true;
+            }
+        } else if (discardTile.ToString() == "Dragon_Three") {
+            if (playerManager.winningCombos.Contains("Dragon_Three")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool IsWindTileSet(PlayerManager playerManager, Tile discardTile) {
+        if (discardTile.suit == Tile.Suit.Wind) {
+            if (playerManager.winningCombos.Contains("Four Lesser Blessings") || playerManager.winningCombos.Contains("Four Great Blessings")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool IsFullFlush(PlayerManager playerManager, Tile discardTile) {
+        if (discardTile.suit == Tile.Suit.Character || discardTile.suit == Tile.Suit.Dot || discardTile.suit == Tile.Suit.Bamboo) {
+            if (playerManager.winningCombos.Contains("Full Flush") ||
+                playerManager.winningCombos.Contains("Full Flush Triplets") ||
+                playerManager.winningCombos.Contains("Full Flush Full Sequence") ||
+                playerManager.winningCombos.Contains("Full Flush Lesser Sequence")) {
+                return true;
+            }
+        } else if (discardTile.suit == Tile.Suit.Wind || discardTile.suit == Tile.Suit.Dragon) {
+            if (playerManager.winningCombos.Contains("All Honour")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool IsPureTerminals(PlayerManager playerManager, Tile discardTile) {
+        if (discardTile.rank == Tile.Rank.One || discardTile.rank == Tile.Rank.Nine) {
+            if (discardTile.suit == Tile.Suit.Character || discardTile.suit == Tile.Suit.Dot || discardTile.suit == Tile.Suit.Bamboo) {
+                if (playerManager.winningCombos.Contains("Pure Terminals")) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 }

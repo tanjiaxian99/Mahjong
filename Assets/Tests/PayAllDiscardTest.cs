@@ -11,7 +11,7 @@ namespace Tests {
         Dictionary<string, int> handsToCheck;
         PayAllDiscard payAllDiscard;
         PlayerManager playerManager;
-        TileManager tileManager;
+        TilesManager tileManager;
 
         PlayerManager.Wind prevailingWind;
 
@@ -77,7 +77,7 @@ namespace Tests {
         [Test]
         public void DragonTileSetTest_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Four),
@@ -105,7 +105,7 @@ namespace Tests {
         [Test]
         public void WindTileSetTest_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Four),
@@ -136,7 +136,7 @@ namespace Tests {
         [Test]
         public void PointLimitTest_ThreeFan_One_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Three),
@@ -161,7 +161,7 @@ namespace Tests {
         [Test]
         public void PointLimitTest_FourFan_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Animal, Tile.Rank.One),
@@ -185,7 +185,7 @@ namespace Tests {
         [Test]
         public void PointLimitTest_FourFan_NoPay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -209,7 +209,7 @@ namespace Tests {
         [Test]
         public void FullFlushTest_NominalTiles_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Two),
@@ -241,7 +241,7 @@ namespace Tests {
         [Test]
         public void FullFlushTest_NominalTiles_NoPay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Two),
@@ -273,7 +273,7 @@ namespace Tests {
         [Test]
         public void FullFlushTest_HonourTiles_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Flower, Tile.Rank.One),
@@ -304,7 +304,7 @@ namespace Tests {
         [Test]
         public void FullFlushTest_HonourTiles_NoPay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Wind, Tile.Rank.Three),
                 new Tile(Tile.Suit.Wind, Tile.Rank.Three),
@@ -332,7 +332,7 @@ namespace Tests {
         [Test]
         public void PureTerminalsTest_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
@@ -360,7 +360,7 @@ namespace Tests {
         [Test]
         public void PureTerminalsTest_NoPay() {
             playerManager = new PlayerManager();
-            tileManager = new TileManager();
+            tileManager = new TilesManager();
             tileManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
