@@ -83,6 +83,8 @@ Two Winning Combos [X]
 Tile in Chow Combo is Fresh [X]
 Tile not in Discard Pool is Fresh [X]
 Tile in Pong Combo is not Fresh [X]
+Fresh Tile Kong [X]
+Fresh Tile Mahjong [X]
 
 ### Pay All Discard ###
 Dragon Tile Set, Pay [X]
@@ -99,6 +101,12 @@ Pure Terminals, Pay [X]
 Pure Terminals, No Pay [X] 
 Point Limit 2nd Player [X]
 
+### Shooter Pay ###
+Non-self-pick [X]
+Self-pick [X]
+Fresh Tile Mahjong [X]
+Pay For All Players [X]
+
 ### Miscellaneous ###
 Revert Kong Payout, Exposed Kong [X] 
 Revert Kong Payout, Concealed Kong [X] 
@@ -106,4 +114,6 @@ Sacred Discard for Pong [X]
 Sacred Discard for Win [X]
 Missed Discard for Pong [X]
 Missed Discard for Win []
-Shooter Pay []
+
+
+

@@ -341,6 +341,9 @@ public class Payment {
                     // Only the player that discarded the Fresh Tile pays 
                     if (discardPlayer == PhotonNetwork.LocalPlayer) {
                         playerManager.points -= minPoint * (int)Math.Pow(2, handsToCheck["Discard and Exposed Kong Payout"]) * 3;
+                        Debug.LogError("Instant Payout: Fresh Tile Discard Kong, Payer");
+                    } else {
+                        Debug.LogError("Instant Payout: Fresh Tile Discard Kong, Non-Payer");
                     }
                     return;
                 }
@@ -373,6 +376,9 @@ public class Payment {
             Debug.LogError("Checkpoint 1");
 
             // Fresh Tile Mahjong Scenario
+            Debug.LogError(numberOfTilesLeft);
+            Debug.LogError(isFreshTile);
+            Debug.LogError(discardPlayer);
             if (numberOfTilesLeft < 20 && isFreshTile && discardPlayer != null) {
                 // Only the player that discarded the Fresh Tile pays 
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {

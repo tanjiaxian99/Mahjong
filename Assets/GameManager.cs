@@ -775,8 +775,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
             numberOfTilesLeft = ((List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey]).Count;
 
-            // DEBUG
-            numberOfTilesLeft = 50;
+            //// DEBUG
+            //numberOfTilesLeft = 50;
 
             if (numberOfTilesLeft == 15) {
                 this.EndRound();
@@ -784,10 +784,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         } else if (propertiesThatChanged.ContainsKey(PayAllDiscardPropKey)) {
             Player player = (Player)PhotonNetwork.CurrentRoom.CustomProperties[PayAllDiscardPropKey];
-            Debug.LogError("Someone is paying for all");
-
             if (player == PhotonNetwork.LocalPlayer) {
-                Debug.LogError("This player is paying for all");
                 playerManager.payForAll = "Local";
             } else {
                 playerManager.payForAll = "Remote";
@@ -985,9 +982,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // DEBUG
         tiles = new List<Tile>() {
-            new Tile(Tile.Suit.Dot, Tile.Rank.Five),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Six),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
@@ -1030,17 +1028,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Six));
                 playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Season, Tile.Rank.One));
 
                 PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
 
@@ -1457,7 +1455,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         handsToCheck.Add("Pure Terminals Pay All", 1);
 
         handsToCheck.Add("Min Point", 1);
-        handsToCheck.Add("Shooter Pay", 0);
+        handsToCheck.Add("Shooter Pay", 1);
 
         handsToCheck.Add("Hidden Cat and Rat", 2);
         handsToCheck.Add("Cat and Rat", 1);
@@ -1695,7 +1693,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Tile tile = tiles[0];
         tiles.Remove(tiles[0]);
 
-        numberOfTilesLeft = 50;
+        numberOfTilesLeft = tiles.Count;
 
         // Reinsert updated tiles list into Room Custom Properties
         Hashtable ht = new Hashtable();
