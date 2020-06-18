@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TilesDict : MonoBehaviour{
+public class DictManager : MonoBehaviour {
 
     #region Tile Sprites
 
@@ -151,9 +151,14 @@ public class TilesDict : MonoBehaviour{
     /// </summary>
     public Dictionary<Tile, Sprite> spritesDict;
 
-    private static TilesDict _instance;
+    /// <summary>
+    /// Dictionary containing Tile objects and their respective winds
+    /// </summary>
+    public Dictionary<Tile, PlayerManager.Wind> tileToWindDict;
 
-    public static TilesDict Instance { get { return _instance; } }
+    private static DictManager _instance;
+
+    public static DictManager Instance { get { return _instance; } }
 
     private void Awake() {
         if (_instance != null && _instance != this) {
@@ -165,10 +170,11 @@ public class TilesDict : MonoBehaviour{
 
     private void Start() {
         this.InitializeSpritesDict();
+        this.InitializeTileToWindDict();
     }
 
     /// <summary>
-    /// Fill up the spritesDict with Tile objects and their respective sprites
+    /// Initialize the spritesDict with Tile objects and their respective sprites
     /// </summary>
     private void InitializeSpritesDict() {
         spritesDict = new Dictionary<Tile, Sprite>();
@@ -226,5 +232,28 @@ public class TilesDict : MonoBehaviour{
         spritesDict.Add(new Tile("Animal_Two"), Animal_Two_Sprite);
         spritesDict.Add(new Tile("Animal_Three"), Animal_Three_Sprite);
         spritesDict.Add(new Tile("Animal_Four"), Animal_Four_Sprite);
+    }
+
+
+    /// <summary>
+    /// Initialize the tileToWindDict with Tile objects and their respective winds
+    /// </summary>
+    private void InitializeTileToWindDict() {
+        tileToWindDict = new Dictionary<Tile, PlayerManager.Wind>();
+
+        tileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One), PlayerManager.Wind.EAST);
+        tileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
+        tileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three), PlayerManager.Wind.WEST);
+        tileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four), PlayerManager.Wind.NORTH);
+
+        tileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.One), PlayerManager.Wind.EAST);
+        tileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
+        tileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Three), PlayerManager.Wind.WEST);
+        tileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Four), PlayerManager.Wind.NORTH);
+
+        tileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.One), PlayerManager.Wind.EAST);
+        tileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
+        tileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Three), PlayerManager.Wind.WEST);
+        tileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Four), PlayerManager.Wind.NORTH);
     }
 }

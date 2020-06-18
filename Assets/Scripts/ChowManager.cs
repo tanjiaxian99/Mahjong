@@ -59,7 +59,7 @@ public class ChowManager : MonoBehaviour {
                 object[] tileAndStringArray = chowCombos[i];
                 Transform imageTransform = spritesPanel.GetChild(j);
                 Image image = imageTransform.GetComponent<Image>();
-                image.sprite = TilesDict.Instance.spritesDict[(Tile)tileAndStringArray[j]];
+                image.sprite = DictManager.Instance.spritesDict[(Tile)tileAndStringArray[j]];
 
                 // The drawn/discarded tile is painted yellow. The other tiles are updated with white.
                 if (j == 0 && ((string)tileAndStringArray[3]).Equals("First") || j == 1 && ((string)tileAndStringArray[3]).Equals("Second") || j == 2 && ((string)tileAndStringArray[3]).Equals("Third")) {

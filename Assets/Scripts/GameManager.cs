@@ -127,6 +127,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     public ChowManager chowManager;
 
+    public PongManager pongManager;
+
     #endregion
 
     #region OnEvent Fields
@@ -561,7 +563,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         this.fanCalculator = new FanCalculator(handsToCheck);
         this.openTilesDict = new Dictionary<Player, List<Tile>>();
-        this.payAllDiscard = new PayAllDiscard(handsToCheck);
         this.discardTiles = new List<Tile>();
 
         // Had to be called manually since PhotonNetwork wasn't calling it
@@ -607,6 +608,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         playerManager = scriptManager.GetComponent<PlayerManager>();
         tilesManager = scriptManager.GetComponent<TilesManager>();
         chowManager = scriptManager.GetComponent<ChowManager>();
+        pongManager = scriptManager.GetComponent<PongManager>();
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             // Players that disconnect and reconnect won't start the game at turn 0
@@ -1050,7 +1052,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
@@ -1900,12 +1902,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void CheckPongKong() {
         // Check for Pong/Kong against discard tile
         if (tilesManager.CanPong(latestDiscardTile)) {
-            this.PongUI(latestDiscardTile);
+            pongManager.PongUI(latestDiscardTile);
             return;
         }
 
         if (tilesManager.CanDiscardKong(latestDiscardTile)) {
-            this.PongUI(latestDiscardTile);
+            pongManager.PongUI(latestDiscardTile);
             this.KongUI(new List<Tile>() { latestDiscardTile });
             return;
         }
@@ -2062,94 +2064,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     #endregion
 
     #region UI Methods
-
-
-    /// <summary>
-    /// Called when the player can Pong
-    /// </summary>
-    public void PongUI(Tile discardTile) {
-        if (playerManager.sacredDiscard != null && playerManager.sacredDiscard == latestDiscardTile) {
-            this.SacredDiscardUI();
-            return;
-        }
-
-        if (this.IsMissedDiscard(latestDiscardTile)) {
-            this.MissedDiscardUI();
-            return;
-        }
-
-        Transform spritesPanel = PongCombo.transform.GetChild(0);
-
-        // Instantiate the tile sprites
-        for (int i = 0; i < 3; i++) {
-            Transform imageTransform = spritesPanel.GetChild(i);
-            Image image = imageTransform.GetComponent<Image>();
-            image.sprite = spritesDict[discardTile];
-        }
-        PongCombo.SetActive(true);
-    }
-
-
-    /// <summary>
-    /// Called when "Ok" is clicked for Pong Combo
-    /// </summary>
-    public void OnPongOk() {
-        // Update MasterClient that the player want to Pong
-        PhotonNetwork.RaiseEvent(EvPongKongUpdate, true, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
-
-        // Check if the discard tile is a high risk discard
-        if (payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, latestDiscardTile, "Pong")) {
-            Hashtable hashTable = new Hashtable();
-            hashTable.Add(PayAllDiscardPropKey, discardPlayer);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
-        }
-
-        PongCombo.SetActive(false);
-        KongComboZero.SetActive(false);
-        KongComboOne.SetActive(false);
-        KongComboTwo.SetActive(false);
-
-        // Update discard tile properties to indicate to all players to remove the latest discard tile
-        Hashtable ht = new Hashtable();
-        ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-
-        // Update both the player's hand and the combo tiles list. 2 tiles are removed from the player's hand and 3 tiles are
-        // added to combo tiles.
-        List<Tile> pongTiles = new List<Tile>();
-        for (int i = 0; i < 3; i++) {
-            pongTiles.Add(latestDiscardTile);
-
-            if (i < 2) {
-                tilesManager.hand.Remove(latestDiscardTile);
-            }
-        }
-        tilesManager.comboTiles.Add(pongTiles);
-
-        this.InstantiateLocalHand();
-        this.InstantiateLocalOpenTiles();
-
-        // The local player automatically update that it is his turn
-        playerManager.myTurn = true;
-        playerManager.canTouchHandTiles = true;
-    }
-
-
-    /// <summary>
-    /// Called when "Skip" button is clicked for Pong Combo
-    /// </summary>
-    public void OnPongSkip() {
-        // Update MasterClient that the player doesn't want to Pong
-        PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
-
-        this.UpdateMissedDiscard(discardPlayer, latestDiscardTile);
-
-        PongCombo.SetActive(false);
-        KongComboZero.SetActive(false);
-        KongComboOne.SetActive(false);
-        KongComboTwo.SetActive(false);
-    }
-
 
     /// <summary>
     /// Called when the player can Kong

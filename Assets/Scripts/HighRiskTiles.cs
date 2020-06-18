@@ -6,10 +6,13 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.XR;
 
-public class HighRiskTiles {
+public class HighRiskTiles : MonoBehaviour {
     #region Private Fields
 
-    private Dictionary<string, int> handsToCheck;
+    [SerializeField]
+    private GameObject scriptManager;
+
+    private Dictionary<string, int> settingsDict;
     private Dictionary<PlayerManager.Wind, List<Tile>> windToTileDict;
     private Dictionary<Tile.Suit?, List<Tile>> fullFlushDict;
 
@@ -26,8 +29,24 @@ public class HighRiskTiles {
 
     #endregion
 
-    public HighRiskTiles(Dictionary<string, int> handsToCheck) {
-        this.handsToCheck = handsToCheck;
+    private void Start() {
+        Settings settings = scriptManager.GetComponent<Settings>();
+        settingsDict = settings.settingsDict;
+        this.windToTileDict = new Dictionary<PlayerManager.Wind, List<Tile>>();
+
+        this.highRiskScenarios = new List<string>();
+
+        this.InitializeWindToTileDict();
+        this.InitializeFullFlushDict();
+        this.InitializeTiles();
+    }
+
+    /// <summary>
+    /// For Unit Testing. 
+    /// </summary>
+    public HighRiskTiles(Dictionary<string, int> settingsDict) {
+        this.settingsDict = settingsDict;
+
         this.windToTileDict = new Dictionary<PlayerManager.Wind, List<Tile>>();
 
         this.highRiskScenarios = new List<string>();
@@ -68,9 +87,9 @@ public class HighRiskTiles {
     private List<Tile> DragonTileSet(List<Tile> openTiles) {
         List<Tile> highRiskTiles = new List<Tile>();
 
-        if (handsToCheck["Dragon Tile Set Pay All"] == 0) {
+        if (settingsDict["Dragon Tile Set Pay All"] == 0) {
             return highRiskTiles;
-        } else if (handsToCheck["Three Lesser Scholars"] == 0 && handsToCheck["Three Great Scholars"] == 0) {
+        } else if (settingsDict["Three Lesser Scholars"] == 0 && settingsDict["Three Great Scholars"] == 0) {
             return highRiskTiles;
         }
 
@@ -96,11 +115,11 @@ public class HighRiskTiles {
     private List<Tile> WindTileSet(List<Tile> openTiles) {
         List<Tile> highRiskTiles = new List<Tile>();
 
-        if (handsToCheck["Wind Tile Set Pay All"] == 0) {
+        if (settingsDict["Wind Tile Set Pay All"] == 0) {
             return highRiskTiles;
         } 
 
-        if (handsToCheck["Four Lesser Blessings"] > 0 || handsToCheck["Four Great Blessings"] > 0) {
+        if (settingsDict["Four Lesser Blessings"] > 0 || settingsDict["Four Great Blessings"] > 0) {
             if (!openTiles.Contains(windOne) && openTiles.Contains(windTwo) && openTiles.Contains(windThree) && openTiles.Contains(windFour)) {
                 highRiskTiles.Add(windOne);
             } else if (openTiles.Contains(windOne) && !openTiles.Contains(windTwo) && openTiles.Contains(windThree) && openTiles.Contains(windFour)) {
@@ -114,7 +133,7 @@ public class HighRiskTiles {
             }
         }
 
-        if (handsToCheck["All Honour"] > 0) {
+        if (settingsDict["All Honour"] > 0) {
             highRiskTiles.Add(dragonOne);
             highRiskTiles.Add(dragonTwo);
             highRiskTiles.Add(dragonThree);
@@ -131,7 +150,7 @@ public class HighRiskTiles {
         List<Tile> highRiskTiles = new List<Tile>();
         int totalFan = 0;
 
-        if (handsToCheck["Point Limit Pay All"] == 0) {
+        if (settingsDict["Point Limit Pay All"] == 0) {
             return highRiskTiles;
         }
 
@@ -153,11 +172,11 @@ public class HighRiskTiles {
         foreach (Tile tile in openTiles) {
 
             if (tile == windToTileDict[playerWind][0] || tile == windToTileDict[playerWind][1]) {
-                totalFan += handsToCheck["Bonus Tile Match Seat Wind"];
+                totalFan += settingsDict["Bonus Tile Match Seat Wind"];
             }
 
             if (tile.suit == Tile.Suit.Animal) {
-                totalFan += handsToCheck["Animal"];
+                totalFan += settingsDict["Animal"];
             }
 
             if (tile.suit == Tile.Suit.Season) {
@@ -174,23 +193,23 @@ public class HighRiskTiles {
         }
 
         if (openTiles.Contains(windToTileDict[playerWind][2])) {
-            highRiskDict[windToTileDict[playerWind][2]] += handsToCheck["Player Wind Combo"];
+            highRiskDict[windToTileDict[playerWind][2]] += settingsDict["Player Wind Combo"];
         }
 
         if (openTiles.Contains(windToTileDict[prevailingWind][2])) {
-            highRiskDict[windToTileDict[prevailingWind][2]] += handsToCheck["Prevailing Wind Combo"];
+            highRiskDict[windToTileDict[prevailingWind][2]] += settingsDict["Prevailing Wind Combo"];
         }
 
         if (openTiles.Contains(dragonOne)) {
-            highRiskDict[dragonOne] += handsToCheck["Dragon"];
+            highRiskDict[dragonOne] += settingsDict["Dragon"];
         }
 
         if (openTiles.Contains(dragonTwo)) {
-            highRiskDict[dragonTwo] += handsToCheck["Dragon"];
+            highRiskDict[dragonTwo] += settingsDict["Dragon"];
         }
 
         if (openTiles.Contains(dragonThree)) {
-            highRiskDict[dragonThree] += handsToCheck["Dragon"];
+            highRiskDict[dragonThree] += settingsDict["Dragon"];
         }
 
 
@@ -199,28 +218,28 @@ public class HighRiskTiles {
         }
 
         if (seasonTilesCount == 4) {
-            totalFan += handsToCheck["Complete Season Group"];
-            totalFan -= handsToCheck["Bonus Tile Match Seat Wind"];
+            totalFan += settingsDict["Complete Season Group"];
+            totalFan -= settingsDict["Bonus Tile Match Seat Wind"];
         }
 
         if (flowerTilesCount == 4) {
-            totalFan += handsToCheck["Complete Flower Group"];
-            totalFan -= handsToCheck["Bonus Tile Match Seat Wind"];
+            totalFan += settingsDict["Complete Flower Group"];
+            totalFan -= settingsDict["Bonus Tile Match Seat Wind"];
         }
 
         if (animalTilesCount == 4) {
-            totalFan += handsToCheck["Complete Animal Group"];
-            totalFan -= handsToCheck["Animal"] * 4;
+            totalFan += settingsDict["Complete Animal Group"];
+            totalFan -= settingsDict["Animal"] * 4;
         }
 
         // If fan limit is 5, there are high risk discards only when there are at least 3 fan.
-        if (totalFan == handsToCheck["Fan Limit"] - 2) {
+        if (totalFan == settingsDict["Fan Limit"] - 2) {
             if (playerWind == prevailingWind && highRiskDict[windToTileDict[playerWind][2]] == 0) {
                 highRiskTiles.Add(windToTileDict[playerWind][2]);
                 return highRiskTiles;
             }
 
-        } else if (totalFan >= handsToCheck["Fan Limit"] - 1) {
+        } else if (totalFan >= settingsDict["Fan Limit"] - 1) {
             foreach (Tile tile in highRiskDict.Keys) {
                 if (highRiskDict[tile] == 0) {
                     highRiskTiles.Add(tile);
@@ -248,7 +267,7 @@ public class HighRiskTiles {
         Tile.Suit? referenceSuit = openTiles[openTiles.Count - 1].suit;
         int referenceSuitCount = 0;
 
-        if (handsToCheck["Full Flush Pay All"] == 0) {
+        if (settingsDict["Full Flush Pay All"] == 0) {
             return highRiskTiles;
         }
 
@@ -315,7 +334,7 @@ public class HighRiskTiles {
         Dictionary<Tile, int> pureTerminalsDict = new Dictionary<Tile, int>();
         int terminalsCount = 0;
 
-        if (handsToCheck["Pure Terminals Pay All"] == 0) {
+        if (settingsDict["Pure Terminals Pay All"] == 0) {
             return highRiskTiles;
         }
 

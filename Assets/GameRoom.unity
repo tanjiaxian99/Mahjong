@@ -4516,7 +4516,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1419168657}
         m_MethodName: OnPongOk
         m_Mode: 1
         m_Arguments:
@@ -4769,7 +4769,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1419168657}
         m_MethodName: OnPongSkip
         m_Mode: 1
         m_Arguments:
@@ -6351,8 +6351,12 @@ GameObject:
   - component: {fileID: 1419168653}
   - component: {fileID: 1419168652}
   - component: {fileID: 1419168651}
-  - component: {fileID: 1419168649}
   - component: {fileID: 1419168650}
+  - component: {fileID: 1419168649}
+  - component: {fileID: 1419168657}
+  - component: {fileID: 1419168656}
+  - component: {fileID: 1419168655}
+  - component: {fileID: 1419168654}
   m_Layer: 0
   m_Name: ScriptManager
   m_TagString: Untagged
@@ -6428,8 +6432,10 @@ MonoBehaviour:
   nonDiscardActorNumbers: 
   numberOfTilesLeft: 0
   prevailingWind: 0
+  payAllDiscard: {fileID: 0}
   isFreshTile: 0
   chowManager: {fileID: 0}
+  pongManager: {fileID: 0}
   Character_One: {fileID: -927199367670048503, guid: bc326ad653f9c0246b32a1431356ec7d,
     type: 3}
   Character_Two: {fileID: -927199367670048503, guid: 477a2a2671ba76f448726d75a27096de,
@@ -6603,6 +6609,61 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1419168654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d44a76754e02e9d41a29fc55d4f826d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptManager: {fileID: 1419168648}
+--- !u!114 &1419168655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb8d2a91f55bb804e8aa6b3947b149e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptManager: {fileID: 1419168648}
+--- !u!114 &1419168656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 664265f899e5c724391cddbacef4f933, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1419168657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 932b77f02f50fb140a0eea9c75de3327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PongCombo: {fileID: 1457008409}
+  KongComboZero: {fileID: 672664132}
+  KongComboOne: {fileID: 456702554}
+  KongComboTwo: {fileID: 1982182469}
+  scriptManager: {fileID: 1419168648}
 --- !u!1 &1457008409
 GameObject:
   m_ObjectHideFlags: 0

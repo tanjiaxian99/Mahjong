@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class PayAllDiscard {
+public class PayAllDiscard : MonoBehaviour {
+    [SerializeField]
+    private GameObject scriptManager;
+
     private HighRiskTiles highRiskTiles;
-    private Dictionary<Tile, PlayerManager.Wind> tileToWindDict;
 
-    public PayAllDiscard(Dictionary<string, int> handsToCheck) {
-        highRiskTiles = new HighRiskTiles(handsToCheck);
+    private void Start() {
+        highRiskTiles = scriptManager.GetComponent<HighRiskTiles>();
+    }
 
-        tileToWindDict = new Dictionary<Tile, PlayerManager.Wind>();
-        tileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One), PlayerManager.Wind.EAST);
-        tileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
-        tileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three), PlayerManager.Wind.WEST);
-        tileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four), PlayerManager.Wind.NORTH);
+    /// <summary>
+    /// For Unit Testing. 
+    /// </summary>
+    public PayAllDiscard(Dictionary<string, int> settingsDict) {
+        highRiskTiles = new HighRiskTiles(settingsDict);
     }
 
     /// <summary>
@@ -63,7 +66,7 @@ public class PayAllDiscard {
         return false;
     }
 
-    public bool IsDragonTileSet(PlayerManager playerManager, Tile discardTile) {
+    private bool IsDragonTileSet(PlayerManager playerManager, Tile discardTile) {
         if (discardTile.suit == Tile.Suit.Dragon) {
             if (playerManager.winningCombos.Contains("Three Lesser Scholars") || playerManager.winningCombos.Contains("Three Great Scholars")) {
                 return true;
@@ -72,12 +75,12 @@ public class PayAllDiscard {
         return false;
     }
 
-    public bool IsPointLimit(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind prevailingWind) {
-        if (discardTile.suit == Tile.Suit.Wind && tileToWindDict[discardTile] == playerManager.seatWind) {
+    private bool IsPointLimit(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind prevailingWind) {
+        if (discardTile.suit == Tile.Suit.Wind && DictManager.Instance.tileToWindDict[discardTile] == playerManager.seatWind) {
             if (playerManager.winningCombos.Contains("Player Wind Combo")) {
                 return true;
             }
-        } else if (discardTile.suit == Tile.Suit.Wind && tileToWindDict[discardTile] == prevailingWind) {
+        } else if (discardTile.suit == Tile.Suit.Wind && DictManager.Instance.tileToWindDict[discardTile] == prevailingWind) {
             if (playerManager.winningCombos.Contains("Prevailing Wind Combo")) {
                 return true;
             }
@@ -97,7 +100,7 @@ public class PayAllDiscard {
         return false;
     }
 
-    public bool IsWindTileSet(PlayerManager playerManager, Tile discardTile) {
+    private bool IsWindTileSet(PlayerManager playerManager, Tile discardTile) {
         if (discardTile.suit == Tile.Suit.Wind) {
             if (playerManager.winningCombos.Contains("Four Lesser Blessings") || playerManager.winningCombos.Contains("Four Great Blessings")) {
                 return true;
@@ -106,7 +109,7 @@ public class PayAllDiscard {
         return false;
     }
 
-    public bool IsFullFlush(PlayerManager playerManager, Tile discardTile) {
+    private bool IsFullFlush(PlayerManager playerManager, Tile discardTile) {
         if (discardTile.suit == Tile.Suit.Character || discardTile.suit == Tile.Suit.Dot || discardTile.suit == Tile.Suit.Bamboo) {
             if (playerManager.winningCombos.Contains("Full Flush") ||
                 playerManager.winningCombos.Contains("Full Flush Triplets") ||
@@ -122,7 +125,7 @@ public class PayAllDiscard {
         return false;
     }
 
-    public bool IsPureTerminals(PlayerManager playerManager, Tile discardTile) {
+    private bool IsPureTerminals(PlayerManager playerManager, Tile discardTile) {
         if (discardTile.rank == Tile.Rank.One || discardTile.rank == Tile.Rank.Nine) {
             if (discardTile.suit == Tile.Suit.Character || discardTile.suit == Tile.Suit.Dot || discardTile.suit == Tile.Suit.Bamboo) {
                 if (playerManager.winningCombos.Contains("Pure Terminals")) {
