@@ -156,6 +156,10 @@ public class DictManager : MonoBehaviour {
     /// </summary>
     public Dictionary<Tile, PlayerManager.Wind> tileToWindDict;
 
+    public Dictionary<PlayerManager.Wind, Tile> windToTileDict;
+
+    public Dictionary<PlayerManager.Wind, List<Tile>> windToBonusTilesDict;
+
     private static DictManager _instance;
 
     public static DictManager Instance { get { return _instance; } }
@@ -171,6 +175,8 @@ public class DictManager : MonoBehaviour {
     private void Start() {
         this.InitializeSpritesDict();
         this.InitializeTileToWindDict();
+        this.InitializeWindToTileDict();
+        this.InitializeWindToBonusTilesDict();
     }
 
     /// <summary>
@@ -236,7 +242,7 @@ public class DictManager : MonoBehaviour {
 
 
     /// <summary>
-    /// Initialize the tileToWindDict with Tile objects and their respective winds
+    /// Initialize the tileToWindDict with Tile objects and their respective Winds
     /// </summary>
     private void InitializeTileToWindDict() {
         tileToWindDict = new Dictionary<Tile, PlayerManager.Wind>();
@@ -255,5 +261,104 @@ public class DictManager : MonoBehaviour {
         tileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
         tileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Three), PlayerManager.Wind.WEST);
         tileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Four), PlayerManager.Wind.NORTH);
+    }
+
+
+    /// <summary>
+    /// Initialize the windToTileDict with Winds and their respective Wind Tiles
+    /// </summary>
+    private void InitializeWindToTileDict() {
+        windToTileDict = new Dictionary<PlayerManager.Wind, Tile>();
+
+        windToTileDict.Add(PlayerManager.Wind.EAST, new Tile(Tile.Suit.Wind, Tile.Rank.One));
+        windToTileDict.Add(PlayerManager.Wind.SOUTH, new Tile(Tile.Suit.Wind, Tile.Rank.Two));
+        windToTileDict.Add(PlayerManager.Wind.WEST, new Tile(Tile.Suit.Wind, Tile.Rank.Three));
+        windToTileDict.Add(PlayerManager.Wind.NORTH, new Tile(Tile.Suit.Wind, Tile.Rank.Four));
+    }
+
+
+    /// <summary>
+    /// Initialize the windToBonusTilesDict with Winds and the 2 bonus tiles paired to each Wind
+    /// </summary>
+    private void InitializeWindToBonusTilesDict() {
+        windToBonusTilesDict = new Dictionary<PlayerManager.Wind, List<Tile>>();
+
+        windToBonusTilesDict.Add(PlayerManager.Wind.EAST, new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.One), new Tile(Tile.Suit.Flower, Tile.Rank.One) });
+        windToBonusTilesDict.Add(PlayerManager.Wind.SOUTH, new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.Two), new Tile(Tile.Suit.Flower, Tile.Rank.Two) });
+        windToBonusTilesDict.Add(PlayerManager.Wind.WEST, new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.Three), new Tile(Tile.Suit.Flower, Tile.Rank.Three) });
+        windToBonusTilesDict.Add(PlayerManager.Wind.NORTH, new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.Four), new Tile(Tile.Suit.Flower, Tile.Rank.Four) });
+    }
+
+
+    public Dictionary<Tile, int> HonourTilesCountDict() {
+        Dictionary<Tile, int> honourTilesCount = new Dictionary<Tile, int>();
+
+        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four), 0);
+
+        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two), 0);
+        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three), 0);
+
+        return honourTilesCount;
+    }
+
+
+    public Dictionary<Tile, int> NineGatesDict() {
+        Dictionary<Tile, int> nineGatesDict = new Dictionary<Tile, int>();
+
+        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.One), 3);
+        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine), 3);
+
+        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One), 3);
+        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Four), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Six), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Eight), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine), 3);
+
+        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One), 3);
+        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Six), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight), 1);
+        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine), 3);
+
+        return nineGatesDict;
+    }
+
+
+    public Dictionary<Tile, int> ThirteenWondersDict() {
+        Dictionary<Tile, int> thirteenWondersDict = new Dictionary<Tile, int>() {
+            [new Tile(Tile.Suit.Character, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Character, Tile.Rank.Nine)] = 0,
+            [new Tile(Tile.Suit.Dot, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Dot, Tile.Rank.Nine)] = 0,
+            [new Tile(Tile.Suit.Bamboo, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine)] = 0,
+            [new Tile(Tile.Suit.Wind, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Wind, Tile.Rank.Two)] = 0,
+            [new Tile(Tile.Suit.Wind, Tile.Rank.Three)] = 0,
+            [new Tile(Tile.Suit.Wind, Tile.Rank.Four)] = 0,
+            [new Tile(Tile.Suit.Dragon, Tile.Rank.One)] = 0,
+            [new Tile(Tile.Suit.Dragon, Tile.Rank.Two)] = 0,
+            [new Tile(Tile.Suit.Dragon, Tile.Rank.Three)] = 0,
+        };
+        return thirteenWondersDict;
     }
 }

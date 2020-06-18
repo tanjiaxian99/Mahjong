@@ -379,7 +379,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1419168659}
         m_MethodName: OnWinOk
         m_Mode: 1
         m_Arguments:
@@ -6358,6 +6358,11 @@ GameObject:
   - component: {fileID: 1419168656}
   - component: {fileID: 1419168655}
   - component: {fileID: 1419168654}
+  - component: {fileID: 1419168663}
+  - component: {fileID: 1419168662}
+  - component: {fileID: 1419168661}
+  - component: {fileID: 1419168660}
+  - component: {fileID: 1419168659}
   m_Layer: 0
   m_Name: ScriptManager
   m_TagString: Untagged
@@ -6428,16 +6433,21 @@ MonoBehaviour:
   tableHeight: 0
   tableWidth: 0
   numberOfPlayersToStart: 4
+  turnManager: {fileID: 0}
   PongKongUpdateList: 
   winUpdateList: 
   nonDiscardActorNumbers: 
   numberOfTilesLeft: 0
   prevailingWind: 0
   payAllDiscard: {fileID: 0}
+  payment: {fileID: 0}
   isFreshTile: 0
   chowManager: {fileID: 0}
   pongManager: {fileID: 0}
   kongManager: {fileID: 0}
+  sacredDiscardManager: {fileID: 0}
+  missedDiscardManager: {fileID: 0}
+  winManager: {fileID: 0}
   Character_One: {fileID: -927199367670048503, guid: bc326ad653f9c0246b32a1431356ec7d,
     type: 3}
   Character_Two: {fileID: -927199367670048503, guid: 477a2a2671ba76f448726d75a27096de,
@@ -6527,68 +6537,6 @@ MonoBehaviour:
     type: 3}
   Animal_Four: {fileID: -927199367670048503, guid: ec70fed4e0979b54ea517ff8b81581e2,
     type: 3}
-  Character_One_Sprite: {fileID: 21300000, guid: 26f0d27a3f398484e812faa99c81e48f,
-    type: 3}
-  Character_Two_Sprite: {fileID: 21300000, guid: be765eb5c497c864fb5236db9f95470f,
-    type: 3}
-  Character_Three_Sprite: {fileID: 21300000, guid: 8dbbe3f4590b7cd4fbae2b70db02128e,
-    type: 3}
-  Character_Four_Sprite: {fileID: 21300000, guid: b82b226389ffbaa41a96ddd886fe2ec1,
-    type: 3}
-  Character_Five_Sprite: {fileID: 21300000, guid: 854e2883b6b5eb84ca77ec242f0158d7,
-    type: 3}
-  Character_Six_Sprite: {fileID: 21300000, guid: ddc19321f201c424daf67c1a44522026,
-    type: 3}
-  Character_Seven_Sprite: {fileID: 21300000, guid: fac7330cfe8cba9459bf4cec2208883a,
-    type: 3}
-  Character_Eight_Sprite: {fileID: 21300000, guid: 1d4276e2b3fd6f845a149cb750f254c6,
-    type: 3}
-  Character_Nine_Sprite: {fileID: 21300000, guid: fc44d92b3d415f14d8878f88dc2cbf67,
-    type: 3}
-  Dot_One_Sprite: {fileID: 21300000, guid: 936a20a1811930643a7e4e45e90b1c79, type: 3}
-  Dot_Two_Sprite: {fileID: 21300000, guid: 14a9cb5084495564481979ca1154bea7, type: 3}
-  Dot_Three_Sprite: {fileID: 21300000, guid: bfd68409f8a1ceb43bffcc3b7aed6515, type: 3}
-  Dot_Four_Sprite: {fileID: 21300000, guid: 299e0d1a71dc47646a1965657120074e, type: 3}
-  Dot_Five_Sprite: {fileID: 21300000, guid: 7e626b27eb259c84f9ec2505e31fe556, type: 3}
-  Dot_Six_Sprite: {fileID: 21300000, guid: 34f4a17d1547e5f429432e5cd0f4f509, type: 3}
-  Dot_Seven_Sprite: {fileID: 21300000, guid: da0834bb426078747bad6bf5f3f7fdfd, type: 3}
-  Dot_Eight_Sprite: {fileID: 21300000, guid: 6b61202d9e073ca4fae67622e806456f, type: 3}
-  Dot_Nine_Sprite: {fileID: 21300000, guid: 9e4bca830bcf1b84fa0e397daee733fb, type: 3}
-  Bamboo_One_Sprite: {fileID: 21300000, guid: 82897ecbd19db8d499c6c5dd76ab20ad, type: 3}
-  Bamboo_Two_Sprite: {fileID: 21300000, guid: c96203dce9c1bbd41acd26129f395ed1, type: 3}
-  Bamboo_Three_Sprite: {fileID: 21300000, guid: a560317de4d60914086ff1c3f0f842f4,
-    type: 3}
-  Bamboo_Four_Sprite: {fileID: 21300000, guid: 1173ebdbcd2fe3045950f6f3e3e64bd9, type: 3}
-  Bamboo_Five_Sprite: {fileID: 21300000, guid: fdc2251106b3a014b86a32f734771613, type: 3}
-  Bamboo_Six_Sprite: {fileID: 21300000, guid: eeb9a92f0ea2c4645a7ffe56dab5c119, type: 3}
-  Bamboo_Seven_Sprite: {fileID: 21300000, guid: 96d39b53ddc0d6940b093bcb7511aa6a,
-    type: 3}
-  Bamboo_Eight_Sprite: {fileID: 21300000, guid: 44aaa854cdad10c42a71c6dbac8d5438,
-    type: 3}
-  Bamboo_Nine_Sprite: {fileID: 21300000, guid: 3f348d2a54775884ca0dfcc3d473b075, type: 3}
-  Wind_One_Sprite: {fileID: 21300000, guid: 40dac27e74a8b884a8d401f39939997b, type: 3}
-  Wind_Two_Sprite: {fileID: 21300000, guid: e8fdf5bc698faf64d8ed90ee55820849, type: 3}
-  Wind_Three_Sprite: {fileID: 21300000, guid: 954d4249442ae7b4b917f011fb8ec91a, type: 3}
-  Wind_Four_Sprite: {fileID: 21300000, guid: edaf37b6899bdc64bb32e7eb36b6394b, type: 3}
-  Dragon_One_Sprite: {fileID: 21300000, guid: 57f809b6f2e878945b132210c168451a, type: 3}
-  Dragon_Two_Sprite: {fileID: 21300000, guid: a071e0fab123c6b4899d5778f67c933e, type: 3}
-  Dragon_Three_Sprite: {fileID: 21300000, guid: f7785297aae7a3d48ab13c4b3c6d4bb1,
-    type: 3}
-  Season_One_Sprite: {fileID: 21300000, guid: 8a14d9a56b497e04eb0148f91042647c, type: 3}
-  Season_Two_Sprite: {fileID: 21300000, guid: 201e27a870a95c84aa961b8cf191b400, type: 3}
-  Season_Three_Sprite: {fileID: 21300000, guid: a89b2d394b6ab9147b1a86e8b3985882,
-    type: 3}
-  Season_Four_Sprite: {fileID: 21300000, guid: 0b6e2e11261853b4d904b7f5f821ba7e, type: 3}
-  Flower_One_Sprite: {fileID: 21300000, guid: 3443ec490b407a84292443e213518b21, type: 3}
-  Flower_Two_Sprite: {fileID: 21300000, guid: cbaef0e44262f264ab420229eed316c2, type: 3}
-  Flower_Three_Sprite: {fileID: 21300000, guid: f9f1b5b85bd2f42498dda2cc86dc9de9,
-    type: 3}
-  Flower_Four_Sprite: {fileID: 21300000, guid: 1303c9b0130687d489bd162f329a5b3d, type: 3}
-  Animal_One_Sprite: {fileID: 21300000, guid: 6e52cb6539dec1f41b15cbebf280b837, type: 3}
-  Animal_Two_Sprite: {fileID: 21300000, guid: c31df601787115440903e57c5f3b2445, type: 3}
-  Animal_Three_Sprite: {fileID: 21300000, guid: ac22957fe04aed841b6383ae8618674a,
-    type: 3}
-  Animal_Four_Sprite: {fileID: 21300000, guid: ab3629fca376f4a41a0b22622acc7a91, type: 3}
   ChowComboZero: {fileID: 1311414061}
   ChowComboOne: {fileID: 1163502290}
   ChowComboTwo: {fileID: 146752697}
@@ -6683,6 +6631,69 @@ MonoBehaviour:
   KongComboOne: {fileID: 456702554}
   KongComboTwo: {fileID: 1982182469}
   scriptManager: {fileID: 1419168648}
+--- !u!114 &1419168659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54fc6cbe145a4a7478d537ffd1282d92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptManager: {fileID: 1419168648}
+--- !u!114 &1419168660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12bae3909ab53964ab8e86d2de96a09e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptManager: {fileID: 1419168648}
+--- !u!114 &1419168661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49ce18db26c9e10498048dd088b6ed75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptManager: {fileID: 1419168648}
+--- !u!114 &1419168662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d97d31dc0156fad4a860b259dce36829, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1419168663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0064d5fc2db557e489d13be11a7f6fe1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1457008409
 GameObject:
   m_ObjectHideFlags: 0

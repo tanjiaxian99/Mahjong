@@ -36,11 +36,14 @@ public class KongManager : MonoBehaviour {
 
     private PayAllDiscard payAllDiscard;
 
+    private WinManager winManager;
+
     private void Start() {
         gameManager = scriptManager.GetComponent<GameManager>();
         playerManager = scriptManager.GetComponent<PlayerManager>();
         tilesManager = scriptManager.GetComponent<TilesManager>();
         payAllDiscard = scriptManager.GetComponent<PayAllDiscard>();
+        winManager = scriptManager.GetComponent<WinManager>();
     }
 
 
@@ -175,8 +178,8 @@ public class KongManager : MonoBehaviour {
         playerManager.myTurn = true;
 
         // Check to see if the player can win based on the discard tile
-        if (gameManager.CanWin()) {
-            gameManager.WinUI();
+        if (winManager.CanWin()) {
+            winManager.WinUI();
             return;
         }
 

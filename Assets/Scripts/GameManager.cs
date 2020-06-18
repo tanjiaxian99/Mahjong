@@ -47,22 +47,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     private static readonly object syncLock = new object();
 
-    private PunTurnManager turnManager;
+    public PunTurnManager turnManager;
 
     /// <summary>
     /// Dictionary containing a player's actor number and his playerWind in integer form
     /// </summary>
-    private Dictionary<int, int> windsDict = new Dictionary<int, int>();
+    public Dictionary<int, int> windsDict = new Dictionary<int, int>();
 
     /// <summary>
     /// Dictionary containing Tile objects and their respective prefab
     /// </summary>
     private Dictionary<Tile, GameObject> tilesDict = new Dictionary<Tile, GameObject>();
-
-    /// <summary>
-    /// Dictionary containing Tile objects and their respective sprite
-    /// </summary>
-    private Dictionary<Tile, Sprite> spritesDict = new Dictionary<Tile, Sprite>();
 
     /// <summary>
     /// Cache for Chow Combinations return value
@@ -94,13 +89,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public int numberOfTilesLeft;
 
-    private Dictionary<Player, List<Tile>> missedDiscard = new Dictionary<Player, List<Tile>>();
-
     public Player discardPlayer;
 
     public Dictionary<string, int> handsToCheck;
-
-    public FanCalculator fanCalculator;
 
     /// <summary>
     /// The prevailing wind of the current round
@@ -130,6 +121,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public PongManager pongManager;
 
     public KongManager kongManager;
+
+    public SacredDiscardManager sacredDiscardManager;
+
+    public MissedDiscardManager missedDiscardManager;
+
+    public WinManager winManager;
 
     #endregion
 
@@ -378,148 +375,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #endregion
 
-    #region Tile Sprites
-
-    [SerializeField]
-    private Sprite Character_One_Sprite;
-
-    [SerializeField]
-    private Sprite Character_Two_Sprite;
-
-    [SerializeField]
-    private Sprite Character_Three_Sprite;
-
-    [SerializeField]
-    private Sprite Character_Four_Sprite;
-
-    [SerializeField]
-    private Sprite Character_Five_Sprite;
-
-    [SerializeField]
-    private Sprite Character_Six_Sprite;
-
-    [SerializeField]
-    private Sprite Character_Seven_Sprite;
-
-    [SerializeField]
-    private Sprite Character_Eight_Sprite;
-
-    [SerializeField]
-    private Sprite Character_Nine_Sprite;
-
-    [SerializeField]
-    private Sprite Dot_One_Sprite;
-
-    [SerializeField]
-    private Sprite Dot_Two_Sprite;
-
-    [SerializeField]
-    private Sprite Dot_Three_Sprite;
-
-    [SerializeField]
-    private Sprite Dot_Four_Sprite;
-
-    [SerializeField]
-    private Sprite Dot_Five_Sprite;
-
-    [SerializeField]
-    private Sprite Dot_Six_Sprite;
-
-    [SerializeField]
-    private Sprite Dot_Seven_Sprite;
-
-    [SerializeField]
-    private Sprite Dot_Eight_Sprite;
-
-    [SerializeField]
-    private Sprite Dot_Nine_Sprite;
-
-    [SerializeField]
-    private Sprite Bamboo_One_Sprite;
-
-    [SerializeField]
-    private Sprite Bamboo_Two_Sprite;
-
-    [SerializeField]
-    private Sprite Bamboo_Three_Sprite;
-
-    [SerializeField]
-    private Sprite Bamboo_Four_Sprite;
-
-    [SerializeField]
-    private Sprite Bamboo_Five_Sprite;
-
-    [SerializeField]
-    private Sprite Bamboo_Six_Sprite;
-
-    [SerializeField]
-    private Sprite Bamboo_Seven_Sprite;
-
-    [SerializeField]
-    private Sprite Bamboo_Eight_Sprite;
-
-    [SerializeField]
-    private Sprite Bamboo_Nine_Sprite;
-
-    [SerializeField]
-    private Sprite Wind_One_Sprite;
-
-    [SerializeField]
-    private Sprite Wind_Two_Sprite;
-
-    [SerializeField]
-    private Sprite Wind_Three_Sprite;
-
-    [SerializeField]
-    private Sprite Wind_Four_Sprite;
-
-    [SerializeField]
-    private Sprite Dragon_One_Sprite;
-
-    [SerializeField]
-    private Sprite Dragon_Two_Sprite;
-
-    [SerializeField]
-    private Sprite Dragon_Three_Sprite;
-
-    [SerializeField]
-    private Sprite Season_One_Sprite;
-
-    [SerializeField]
-    private Sprite Season_Two_Sprite;
-
-    [SerializeField]
-    private Sprite Season_Three_Sprite;
-
-    [SerializeField]
-    private Sprite Season_Four_Sprite;
-
-    [SerializeField]
-    private Sprite Flower_One_Sprite;
-
-    [SerializeField]
-    private Sprite Flower_Two_Sprite;
-
-    [SerializeField]
-    private Sprite Flower_Three_Sprite;
-
-    [SerializeField]
-    private Sprite Flower_Four_Sprite;
-
-    [SerializeField]
-    private Sprite Animal_One_Sprite;
-
-    [SerializeField]
-    private Sprite Animal_Two_Sprite;
-
-    [SerializeField]
-    private Sprite Animal_Three_Sprite;
-
-    [SerializeField]
-    private Sprite Animal_Four_Sprite;
-
-    #endregion
-
     #region UI fields
 
     [SerializeField]
@@ -560,10 +415,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         // Set up a dictionary for tiles prefabs and their sprites
         this.InstantiateTilesDict();
-        this.InstantiateSpritesDict();
         this.InstantiateHandsToCheck();
 
-        this.fanCalculator = new FanCalculator(handsToCheck);
         this.openTilesDict = new Dictionary<Player, List<Tile>>();
         this.discardTiles = new List<Tile>();
 
@@ -571,8 +424,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.OnJoinedRoom();
 
         // Register customType Tile and List<Tile>
-        PhotonPeer.RegisterType(typeof(List<Tile>), 255, SerializeTilesList, DeserializeTilesList);
-        PhotonPeer.RegisterType(typeof(Tuple<int, Tile, float>), 254, SerializeDiscardTileInfo, DeserializeDiscardTileInfo);
+        PhotonPeer.RegisterType(typeof(List<Tile>), 255, CustomTypes.SerializeTilesList, CustomTypes.DeserializeTilesList);
+        PhotonPeer.RegisterType(typeof(Tuple<int, Tile, float>), 254, CustomTypes.SerializeDiscardTileInfo, CustomTypes.DeserializeDiscardTileInfo);
     }
 
     void Update() {
@@ -612,6 +465,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         chowManager = scriptManager.GetComponent<ChowManager>();
         pongManager = scriptManager.GetComponent<PongManager>();
         kongManager = scriptManager.GetComponent<KongManager>();
+        sacredDiscardManager = scriptManager.GetComponent<SacredDiscardManager>();
+        missedDiscardManager = scriptManager.GetComponent<MissedDiscardManager>();
+        payment = scriptManager.GetComponent<Payment>();
+        winManager = scriptManager.GetComponent<WinManager>();
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
             // Players that disconnect and reconnect won't start the game at turn 0
@@ -677,8 +534,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Update local player's playerManager
             playerManager.seatWind = wind;
 
-            // Initialize Payment class 
-            this.payment = new Payment(PhotonNetwork.PlayerList.ToList(), handsToCheck, playerManager);
+            // Initialize Instant Payment dictionary
+            this.payment.InitializeInstantPaymentDict(PhotonNetwork.PlayerList.ToList());
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
@@ -713,8 +570,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             this.InstantiateRemoteDiscardTile(discardPlayer, latestDiscardTile, hPos);
 
             // Check to see if the player can win based on the discard tile
-            if (this.CanWin()) {
-                this.WinUI();
+            if (winManager.CanWin()) {
+                winManager.WinUI();
                 return;
             } else {
                 // Inform the Master Client that the player can't win
@@ -738,8 +595,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     return;
                 }
 
-                if (this.CanWin("Bonus")) {
-                    this.WinUI();
+                if (winManager.CanWin("Bonus")) {
+                    winManager.WinUI();
                 }
                 return;
 
@@ -751,8 +608,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     return;
                 }
 
-                if (this.CanWin("Kong")) {
-                    this.WinUI();
+                if (winManager.CanWin("Kong")) {
+                    winManager.WinUI();
                 }
                 return;
 
@@ -764,9 +621,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                     return;
                 }
 
-                if (this.CanWin("Kong")) {
+                if (winManager.CanWin("Kong")) {
                     if (playerManager.winningCombos.Contains("Thirteen Wonders")) {
-                        this.WinUI();
+                        winManager.WinUI();
                     }
                 }
                 return;
@@ -812,29 +669,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     }
 
     #endregion
-
-    #region IPunTurnManagerCallbacks Callbacks
-
-    // We only care about the first turn
-    public void OnTurnBegins(int turn) {
-    }
-
-    public void OnTurnCompleted(int turn) {
-    }
-
-    // What the local client does when a remote player performs a move
-    public void OnPlayerMove(Player player, int turn, object move) {
-    }
-
-    // What the local client does when a remote player finishes a move
-    public void OnPlayerFinished(Player player, int turn, object move) {
-    }
-
-    // TODO: Does time refers to time of a single player's turn?
-    public void OnTurnTimeEnds(int turn) {
-    }
-
-    #endregion Callbacks Callbacks
 
     #region Gameplay Methods
 
@@ -1033,7 +867,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
@@ -1261,7 +1095,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Dictionary <int, string[]> winInfo = (Dictionary<int, string[]>)photonEvent.CustomData;
                 winInfo.Values.ToList()[0].ToList().ForEach(Debug.LogError);
                 Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
-                this.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
+                winManager.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
                 break;
         }
     }
@@ -1337,66 +1171,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         tilesDict.Add(new Tile("Animal_Two"), Animal_Two);
         tilesDict.Add(new Tile("Animal_Three"), Animal_Three);
         tilesDict.Add(new Tile("Animal_Four"), Animal_Four);
-    }
-
-
-    /// <summary>
-    /// Fill up the spritesDict with Tile objects and their respective sprites
-    /// </summary>
-    public void InstantiateSpritesDict() {
-        spritesDict.Add(new Tile("Character_One"), Character_One_Sprite);
-        spritesDict.Add(new Tile("Character_Two"), Character_Two_Sprite);
-        spritesDict.Add(new Tile("Character_Three"), Character_Three_Sprite);
-        spritesDict.Add(new Tile("Character_Four"), Character_Four_Sprite);
-        spritesDict.Add(new Tile("Character_Five"), Character_Five_Sprite);
-        spritesDict.Add(new Tile("Character_Six"), Character_Six_Sprite);
-        spritesDict.Add(new Tile("Character_Seven"), Character_Seven_Sprite);
-        spritesDict.Add(new Tile("Character_Eight"), Character_Eight_Sprite);
-        spritesDict.Add(new Tile("Character_Nine"), Character_Nine_Sprite);
-
-        spritesDict.Add(new Tile("Dot_One"), Dot_One_Sprite);
-        spritesDict.Add(new Tile("Dot_Two"), Dot_Two_Sprite);
-        spritesDict.Add(new Tile("Dot_Three"), Dot_Three_Sprite);
-        spritesDict.Add(new Tile("Dot_Four"), Dot_Four_Sprite);
-        spritesDict.Add(new Tile("Dot_Five"), Dot_Five_Sprite);
-        spritesDict.Add(new Tile("Dot_Six"), Dot_Six_Sprite);
-        spritesDict.Add(new Tile("Dot_Seven"), Dot_Seven_Sprite);
-        spritesDict.Add(new Tile("Dot_Eight"), Dot_Eight_Sprite);
-        spritesDict.Add(new Tile("Dot_Nine"), Dot_Nine_Sprite);
-
-        spritesDict.Add(new Tile("Bamboo_One"), Bamboo_One_Sprite);
-        spritesDict.Add(new Tile("Bamboo_Two"), Bamboo_Two_Sprite);
-        spritesDict.Add(new Tile("Bamboo_Three"), Bamboo_Three_Sprite);
-        spritesDict.Add(new Tile("Bamboo_Four"), Bamboo_Four_Sprite);
-        spritesDict.Add(new Tile("Bamboo_Five"), Bamboo_Five_Sprite);
-        spritesDict.Add(new Tile("Bamboo_Six"), Bamboo_Six_Sprite);
-        spritesDict.Add(new Tile("Bamboo_Seven"), Bamboo_Seven_Sprite);
-        spritesDict.Add(new Tile("Bamboo_Eight"), Bamboo_Eight_Sprite);
-        spritesDict.Add(new Tile("Bamboo_Nine"), Bamboo_Nine_Sprite);
-
-        spritesDict.Add(new Tile("Wind_One"), Wind_One_Sprite);
-        spritesDict.Add(new Tile("Wind_Two"), Wind_Two_Sprite);
-        spritesDict.Add(new Tile("Wind_Three"), Wind_Three_Sprite);
-        spritesDict.Add(new Tile("Wind_Four"), Wind_Four_Sprite);
-
-        spritesDict.Add(new Tile("Dragon_One"), Dragon_One_Sprite);
-        spritesDict.Add(new Tile("Dragon_Two"), Dragon_Two_Sprite);
-        spritesDict.Add(new Tile("Dragon_Three"), Dragon_Three_Sprite);
-
-        spritesDict.Add(new Tile("Season_One"), Season_One_Sprite);
-        spritesDict.Add(new Tile("Season_Two"), Season_Two_Sprite);
-        spritesDict.Add(new Tile("Season_Three"), Season_Three_Sprite);
-        spritesDict.Add(new Tile("Season_Four"), Season_Four_Sprite);
-
-        spritesDict.Add(new Tile("Flower_One"), Flower_One_Sprite);
-        spritesDict.Add(new Tile("Flower_Two"), Flower_Two_Sprite);
-        spritesDict.Add(new Tile("Flower_Three"), Flower_Three_Sprite);
-        spritesDict.Add(new Tile("Flower_Four"), Flower_Four_Sprite);
-
-        spritesDict.Add(new Tile("Animal_One"), Animal_One_Sprite);
-        spritesDict.Add(new Tile("Animal_Two"), Animal_Two_Sprite);
-        spritesDict.Add(new Tile("Animal_Three"), Animal_Three_Sprite);
-        spritesDict.Add(new Tile("Animal_Four"), Animal_Four_Sprite);
     }
 
 
@@ -1568,8 +1342,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Start of Turn 2 will definitely have at least one discard tile
             if (turnManager.Turn == 1 && discardTiles.Count == 0) {
                 // Check to see if the player can win based on the East Wind's initial 14 tiles
-                if (this.CanWin()) {
-                    this.WinUI();
+                if (winManager.CanWin()) {
+                    winManager.WinUI();
                     yield break;
                 }
 
@@ -1606,8 +1380,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         this.InstantiateLocalOpenTiles();
 
         // Check if the player can win based on the drawn tile
-        if (this.CanWin()) {
-            this.WinUI();
+        if (winManager.CanWin()) {
+            winManager.WinUI();
             yield break;
         }
 
@@ -1652,7 +1426,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
                     this.InstantiateLocalHand();
                     this.DiscardTile(tile, hitObject.transform.position.x);
-                    this.ResetMissedDiscard();
+                    missedDiscardManager.ResetMissedDiscard();
                     this.nextPlayersTurn();
                 }
             }
@@ -1857,7 +1631,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
 
         // The tile is now the Sacred Discard
-        playerManager.sacredDiscard = tile;
+        sacredDiscardManager.sacredDiscard = tile;
 
         // Remove the tag of the tile discarded before the current tile
         GameObject previousDiscard = GameObject.FindGameObjectWithTag("Discard");
@@ -1915,7 +1689,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             return;
         }
 
-        this.UpdateMissedDiscard(discardPlayer, latestDiscardTile);
+        missedDiscardManager.UpdateMissedDiscard(discardPlayer, latestDiscardTile);
 
         // Inform Master Client that the local player can't Pong/Kong
         PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
@@ -1955,92 +1729,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
     /// <summary>
-    /// Updates the Missed Discard Dictionary with the tile the discardPlayer discarded
-    /// </summary>
-    public void UpdateMissedDiscard(Player discardPlayer, Tile discardTile) {
-        if (discardPlayer == PhotonNetwork.LocalPlayer) {
-            return;
-        }
-
-        if (!missedDiscard.ContainsKey(discardPlayer)) {
-            missedDiscard.Add(discardPlayer, new List<Tile>() { discardTile });
-            return;
-        }
-
-        missedDiscard[discardPlayer].Add(discardTile);
-    }
-
-
-    /// <summary>
-    /// Returns true if the tile is a Missed Discard
-    /// </summary>
-    public bool IsMissedDiscard(Tile discardTile) {
-        foreach (Player player in missedDiscard.Keys) {
-            foreach (Tile tile in missedDiscard[player]) {
-                if (tile == discardTile) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /// <summary>
-    /// Reset Missed Discard Dictionary. Called when the local player discards a tile
-    /// </summary>
-    public void ResetMissedDiscard() {
-        var playerList = missedDiscard.Keys;
-        foreach (Player player in playerList) {
-            missedDiscard[player].Clear();
-        }
-    }
-
-
-    /// <summary>
     /// Update the allPlayersOpenTiles dictionary
     /// </summary>
     public void UpdateAllPlayersOpenTiles(Player player, List<Tile> openTiles) {
         openTilesDict[player] = openTiles;
-    }
-
-
-    /// <summary>
-    /// Returns true if the local player can win. Called when a tile has been discarded, when the player draws a tile, and when
-    /// the player Kongs.
-    /// </summary>
-    public bool CanWin(string discardType = "Normal") {
-        PlayerManager.Wind? discardPlayerWind = null;
-        if (discardType == "Normal") {
-            if (discardPlayer == null) {
-                discardPlayerWind = null;
-            } else {
-                discardPlayerWind = (PlayerManager.Wind)windsDict[discardPlayer.ActorNumber];
-            }
-        } else if (discardType == "Kong") {
-            discardPlayerWind = (PlayerManager.Wind)windsDict[kongPlayer.ActorNumber];
-        } else if (discardType == "Bonus") {
-            discardPlayerWind = (PlayerManager.Wind)windsDict[bonusPlayer.ActorNumber];
-        }
-
-        if (discardType == "Normal") {
-            (playerManager.fanTotal, playerManager.winningCombos) = fanCalculator.CalculateFan(
-            playerManager, tilesManager, latestDiscardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, this.AllPlayersOpenTiles());
-        } else if (discardType == "Kong") {
-            (playerManager.fanTotal, playerManager.winningCombos) = fanCalculator.CalculateFan(
-            playerManager, tilesManager, latestKongTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, this.AllPlayersOpenTiles());
-        } else if (discardType == "Bonus") {
-            List<Tile> allOpenTiles = this.AllPlayersOpenTiles();
-            allOpenTiles.Add(latestBonusTile);
-            (playerManager.fanTotal, playerManager.winningCombos) = fanCalculator.CalculateFan(
-            playerManager, tilesManager, latestBonusTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turnManager.Turn, allOpenTiles);
-        }
-
-        if (playerManager.fanTotal > 0) {
-            return true;
-        }
-
-        return false;
     }
 
 
@@ -2062,108 +1754,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void EndRound() {
         // TODO
-    }
-
-    #endregion
-
-    #region UI Methods
-
-    /// <summary>
-    /// Called when the player can Pong/Win but the discard tile is a Sacred Discard
-    /// </summary>
-    public void SacredDiscardUI() {
-        Debug.LogError("Called SacredDiscardUI");
-        PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
-        // TODO
-    }
-
-
-    /// <summary>
-    /// Called when the player can Pong/Win but the discard tile is a Missed Discard
-    /// </summary>
-    public void MissedDiscardUI() {
-        Debug.LogError("Called MissedDiscardUI");
-        PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
-        // TODO
-    }
-
-
-    /// <summary>
-    /// Called when the player can win
-    /// </summary>
-    public void WinUI() {
-        if (playerManager.sacredDiscard != null && playerManager.sacredDiscard == latestDiscardTile) {
-            this.SacredDiscardUI();
-            return;
-        }
-
-        if (this.IsMissedDiscard(latestDiscardTile)) {
-            this.MissedDiscardUI();
-            return;
-        }
-
-        Debug.LogErrorFormat("The player can win with {0} fan and the following combos: ", playerManager.fanTotal);
-        playerManager.winningCombos.ForEach(Debug.LogError);
-        // TODO
-    }
-
-
-    /// <summary>
-    /// Called when "Ok" button is clicked for the win
-    /// </summary>
-    public void OnWinOk() {
-        // Check if the discard tile is a high risk discard
-        if (payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, latestDiscardTile, "Win")) {
-            Hashtable hashTable = new Hashtable();
-            hashTable.Add(PayAllDiscardPropKey, discardPlayer);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
-        }
-
-        if (playerManager.winningCombos.Contains("Robbing the Kong")) {
-            Hashtable hashTable = new Hashtable();
-            hashTable.Add(PayAllDiscardPropKey, kongPlayer);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
-        }
-
-        if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
-            Hashtable hashTable = new Hashtable();
-            hashTable.Add(PayAllDiscardPropKey, bonusPlayer);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
-        }
-
-        // Raise an event to inform remote players of the win
-        Dictionary<int, string[]> winInfo = new Dictionary<int, string[]>() {
-            [playerManager.fanTotal] = playerManager.winningCombos.ToArray()
-        };
-        PhotonNetwork.RaiseEvent(EvPlayerWin, winInfo, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
-
-        // Update DiscardTilesPropkey to remove the discard tile used for the win
-        if (latestDiscardTile != null) {
-            Hashtable ht = new Hashtable();
-            Tuple<int, Tile, float> discardTileInfo = new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0);
-            ht.Add(DiscardTilePropKey, discardTileInfo);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-        }
-
-        if (playerManager.winningCombos.Contains("Robbing the Kong")) {
-            payment.HandPayout(PhotonNetwork.LocalPlayer, kongPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
-            payment.RevertKongPayout();
-        } else if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
-            payment.HandPayout(PhotonNetwork.LocalPlayer, bonusPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
-        } else {
-            payment.HandPayout(PhotonNetwork.LocalPlayer, discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
-        }
-
-
-        // TODO: Show win screen
-    }
-    
-
-    /// <summary>
-    /// Called when "Skip" button is clicked for the win
-    /// </summary>
-    public void OnWinSkip() {
-        PhotonNetwork.RaiseEvent(EvWinUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
     }
 
     #endregion
@@ -2447,105 +2037,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         } else if (RelativePlayerPosition(remotePlayer).Equals("Opposite")) {
             rb.AddForce(new Vector3((float)hForce, 0f, (float)vForce), ForceMode.VelocityChange);
         }
-    }
-
-
-    /// <summary>
-    /// Called by the remote player when the local player has won.
-    /// </summary>
-    public void RemoteWin(Player winner, int fanTotal, List<string> winningCombos) {
-
-        if (winningCombos.Contains("Robbing the Kong")) {
-            payment.HandPayout(winner, kongPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
-            payment.RevertKongPayout();
-        } else if (winningCombos.Contains("Robbing the Eighth")) {
-            payment.HandPayout(winner, bonusPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
-        } else {
-            payment.HandPayout(winner, discardPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
-        }
-    }
+    }  
 
     #endregion
 
-    #region Custom Types
+    #region IPunTurnManagerCallbacks Callbacks
 
-    /// <summary>
-    /// Serialize List<Tile> into a byteStream
-    /// </summary>
-    public static byte[] SerializeTilesList(object customType) {
-        var tilesList = (List<Tile>)customType;
-        byte[] byteArray = new byte[tilesList.Count * 2];
-
-        for (int i = 0; i < tilesList.Count; i++) {
-            byteArray[i * 2] = tilesList[i].Id[0];
-            byteArray[i * 2 + 1] = tilesList[i].Id[1]; 
-        }
-        return byteArray;
+    public void OnTurnBegins(int turn) {
     }
 
-
-    /// <summary>
-    /// Deserialize the byteStream into a List<Tile>
-    /// </summary>
-    public static object DeserializeTilesList(byte[] data) {
-        List<Tile> tilesList = new List<Tile>();
-
-        for (int i = 0; i < data.Length / 2; i++) {
-            Tile tile = new Tile(0, 0);
-            tile.Id = new byte[2] { data[i * 2], data[i * 2 + 1] };
-            tilesList.Add(tile);
-        }
-
-        return tilesList;
+    public void OnTurnCompleted(int turn) {
     }
 
-
-    /// <summary>
-    /// Serialize Tuple<int, Tile, float> into a byteStream. sizeof(memTuple) = sizeof(int) + sizeof(short) + sizeof(short) + sizeof(int)
-    /// </summary>
-    public static readonly byte[] memTuple = new byte[12];
-    public static short SerializeDiscardTileInfo(StreamBuffer outStream, object customobject) {
-        var tuple = (Tuple<int, Tile, float>)customobject;
-
-        lock (memTuple) {
-            byte[] bytes = memTuple;
-            int index = 0;
-
-            Protocol.Serialize(tuple.Item1, bytes, ref index);
-            Protocol.Serialize(tuple.Item2.Id[0], bytes, ref index);
-            Protocol.Serialize(tuple.Item2.Id[1], bytes, ref index);
-            Protocol.Serialize(tuple.Item3, bytes, ref index);
-            outStream.Write(bytes, 0, 12);
-        }
-
-        return 12;
+    public void OnPlayerMove(Player player, int turn, object move) {
     }
 
+    public void OnPlayerFinished(Player player, int turn, object move) {
+    }
 
-    /// <summary>
-    /// Deserialize the byteStream into a Tuple<int, Tile, float>
-    /// </summary>
-    public static object DeserializeDiscardTileInfo(StreamBuffer inStream, short length) {
-        Tuple<int, Tile, float> tuple = new Tuple<int, Tile, float>(0, new Tile(0, 0), 0f);
-        int actorNumber;
-        short tileIdOne;
-        short tileIdTwo;
-        Tile tile = new Tile(0, 0);
-        float pos;
-
-        lock (memTuple) {
-            inStream.Read(memTuple, 0, 12);
-            int index = 0;
-
-            Protocol.Deserialize(out actorNumber, memTuple, ref index);
-            Protocol.Deserialize(out tileIdOne, memTuple, ref index);
-            Protocol.Deserialize(out tileIdTwo, memTuple, ref index);
-            Protocol.Deserialize(out pos, memTuple, ref index);
-
-
-            tile.Id = new byte[2] { (byte)tileIdOne, (byte)tileIdTwo };
-        }
-        return new Tuple<int, Tile, float>(actorNumber, tile, pos);
+    public void OnTurnTimeEnds(int turn) {
     }
 
     #endregion

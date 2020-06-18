@@ -20,8 +20,6 @@ public class PlayerManager : MonoBehaviour {
 
     public int numberOfKong { get; set; }
 
-    public Tile sacredDiscard;
-
     public int points = 200;
 
     public string payForAll = "";

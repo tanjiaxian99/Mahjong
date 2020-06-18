@@ -31,11 +31,14 @@ public class ChowManager : MonoBehaviour {
 
     private KongManager kongManager;
 
+    private WinManager winManager;
+
     private void Start() {
         gameManager = scriptManager.GetComponent<GameManager>();
         playerManager = scriptManager.GetComponent<PlayerManager>();
         tilesManager = scriptManager.GetComponent<TilesManager>();
         kongManager = scriptManager.GetComponent<KongManager>();
+        winManager = scriptManager.GetComponent<WinManager>();
     }
 
 
@@ -157,8 +160,8 @@ public class ChowManager : MonoBehaviour {
         gameManager.InstantiateLocalOpenTiles();
 
         // Check to see if the player can win based on the drawn tile
-        if (gameManager.CanWin()) {
-            gameManager.WinUI();
+        if (winManager.CanWin()) {
+            winManager.WinUI();
             return;
         }
 

@@ -9,45 +9,32 @@ using UnityEngine;
 /// <summary>
 /// Calculates the number of Fan the player has
 /// </summary>
-public class FanCalculator {
+public class FanCalculator : MonoBehaviour {
+    [SerializeField]
+    private GameObject scriptManager;
+
+    private Dictionary<string, int> settingsDict;
     private int fanTotal;
     private int fanLimit;
-    private WinCombos winCombos = new WinCombos();
-
-    private Dictionary<Tile, PlayerManager.Wind> bonusTileToWindDict = new Dictionary<Tile, PlayerManager.Wind>();
-    private Dictionary<Tile, int> nineGatesDict;
-    private Dictionary<string, int> handsToCheck;
-    private Dictionary<Tile, int> honourTilesCount;
-    private Dictionary<PlayerManager.Wind, Tile> windToTileDict = new Dictionary<PlayerManager.Wind, Tile>();
-
+    private WinCombos winCombos;
+  
     private List<string> winningCombos;
     private List<List<string>> listOfWinningCombos;
     private List<int> fanTotalList;
 
-    /// <param name="handsToCheck">A dictionary containing each Fan-contributing combination and the number of Fan it should have.
-    /// Includes the Fan Limit</param>
-    public FanCalculator(Dictionary<string, int> handsToCheck) {
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One), PlayerManager.Wind.EAST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three), PlayerManager.Wind.WEST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four), PlayerManager.Wind.NORTH);
+    private void Start() {
+        Settings settings = scriptManager.GetComponent<Settings>();
+        settingsDict = settings.settingsDict;
+        winCombos = new WinCombos();
+    }
 
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.One), PlayerManager.Wind.EAST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Three), PlayerManager.Wind.WEST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Season, Tile.Rank.Four), PlayerManager.Wind.NORTH);
-
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.One), PlayerManager.Wind.EAST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Two), PlayerManager.Wind.SOUTH);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Three), PlayerManager.Wind.WEST);
-        bonusTileToWindDict.Add(new Tile(Tile.Suit.Flower, Tile.Rank.Four), PlayerManager.Wind.NORTH);
-
-        windToTileDict.Add(PlayerManager.Wind.EAST, new Tile(Tile.Suit.Wind, Tile.Rank.One));
-        windToTileDict.Add(PlayerManager.Wind.SOUTH, new Tile(Tile.Suit.Wind, Tile.Rank.Two));
-        windToTileDict.Add(PlayerManager.Wind.WEST, new Tile(Tile.Suit.Wind, Tile.Rank.Three));
-        windToTileDict.Add(PlayerManager.Wind.NORTH, new Tile(Tile.Suit.Wind, Tile.Rank.Four));
-
-        this.handsToCheck = handsToCheck;
+    
+    /// <summary>
+    /// For Unit Testing
+    /// </summary>
+    public FanCalculator(Dictionary<string, int> settingsDict) {
+        this.settingsDict = settingsDict;
+        winCombos = new WinCombos();
     }
 
 
@@ -55,7 +42,7 @@ public class FanCalculator {
     /// Calculates and returns the number of Fan the player's tiles contain
     /// </summary>
     public (int, List<string>) CalculateFan(PlayerManager playerManager, TilesManager tileManager, Tile discardTile, PlayerManager.Wind? discardPlayerWind, PlayerManager.Wind prevailingWind, int numberOfTilesLeft, int turn, List<Tile> allPlayersOpenTiles) {
-        fanLimit = handsToCheck["Fan Limit"];
+        fanLimit = settingsDict["Fan Limit"];
         fanTotalList = new List<int>();
         listOfWinningCombos = new List<List<string>>();
 
@@ -95,7 +82,7 @@ public class FanCalculator {
             if (winningCombos.Contains("Bonus Tile Match Seat Wind")) {
                 foreach (string winCombo in winningCombos) {
                     if (winCombo == "Bonus Tile Match Seat Wind") {
-                        fanTotal += handsToCheck["Bonus Tile Match Seat Wind"];
+                        fanTotal += settingsDict["Bonus Tile Match Seat Wind"];
                     }
                 }
 
@@ -104,21 +91,21 @@ public class FanCalculator {
             if (winningCombos.Contains("Animal")) {
                 foreach (string winCombo in winningCombos) {
                     if (winCombo == "Animal") {
-                        fanTotal += handsToCheck["Animal"];
+                        fanTotal += settingsDict["Animal"];
                     }
                 }
             }
 
             if (winningCombos.Contains("Complete Animal Group")) {
-                fanTotal += handsToCheck["Complete Animal Group"];
+                fanTotal += settingsDict["Complete Animal Group"];
             }
 
             if (winningCombos.Contains("Complete Season Group")) {
-                fanTotal += handsToCheck["Complete Season Group"];
+                fanTotal += settingsDict["Complete Season Group"];
             }
 
             if (winningCombos.Contains("Complete Flower Group")) {
-                fanTotal += handsToCheck["Complete Flower Group"];
+                fanTotal += settingsDict["Complete Flower Group"];
             }
 
             if (winningCombos.Contains("Robbing the Eighth")) {
@@ -138,16 +125,16 @@ public class FanCalculator {
             #region Fan in Honour Tiles
 
             if (winningCombos.Contains("Player Wind Combo")) {
-                fanTotal += handsToCheck["Player Wind Combo"];
+                fanTotal += settingsDict["Player Wind Combo"];
             }
 
             if (winningCombos.Contains("Prevailing Wind Combo")) {
-                fanTotal += handsToCheck["Prevailing Wind Combo"];
+                fanTotal += settingsDict["Prevailing Wind Combo"];
             }
 
             foreach (string winCombo in winningCombos) {
                 if (winCombo.Contains("Dragon")) {
-                    fanTotal += handsToCheck["Dragon"];
+                    fanTotal += settingsDict["Dragon"];
                 }
             }
 
@@ -156,31 +143,31 @@ public class FanCalculator {
             #region Fan in Hand
 
             if (winningCombos.Contains("Fully Concealed")) {
-                fanTotal += handsToCheck["Fully Concealed"];
+                fanTotal += settingsDict["Fully Concealed"];
             }
 
             if (winningCombos.Contains("Triplets")) {
-                fanTotal += handsToCheck["Triplets"];
+                fanTotal += settingsDict["Triplets"];
             }
 
             if (winningCombos.Contains("Half Flush")) {
-                fanTotal += handsToCheck["Half Flush"];
+                fanTotal += settingsDict["Half Flush"];
             }
 
             if (winningCombos.Contains("Full Flush")) {
-                fanTotal += handsToCheck["Full Flush"];
+                fanTotal += settingsDict["Full Flush"];
             }
 
             if (winningCombos.Contains("Lesser Sequence")) {
-                fanTotal += handsToCheck["Lesser Sequence"];
+                fanTotal += settingsDict["Lesser Sequence"];
             }
 
             if (winningCombos.Contains("Full Sequence")) {
-                fanTotal += handsToCheck["Full Sequence"];
+                fanTotal += settingsDict["Full Sequence"];
             }
 
             if (winningCombos.Contains("Mixed Terminals")) {
-                fanTotal += handsToCheck["Mixed Terminals"];
+                fanTotal += settingsDict["Mixed Terminals"];
             }
 
             if (winningCombos.Contains("Pure Terminals")) {
@@ -214,7 +201,7 @@ public class FanCalculator {
             }
 
             if (winningCombos.Contains("Full Flush Lesser Sequence")) {
-                fanTotal += handsToCheck["Full Flush Lesser Sequence"];
+                fanTotal += settingsDict["Full Flush Lesser Sequence"];
             }
 
             if (winningCombos.Contains("Nine Gates")) {
@@ -224,7 +211,7 @@ public class FanCalculator {
             }
 
             if (winningCombos.Contains("Four Lesser Blessings")) {
-                fanTotal += handsToCheck["Four Lesser Blessings"];
+                fanTotal += settingsDict["Four Lesser Blessings"];
             }
 
             if (winningCombos.Contains("Four Great Blessings")) {
@@ -234,11 +221,11 @@ public class FanCalculator {
             }
 
             if (winningCombos.Contains("Pure Green Suit")) {
-                fanTotal += handsToCheck["Pure Green Suit"];
+                fanTotal += settingsDict["Pure Green Suit"];
             }
 
             if (winningCombos.Contains("Three Lesser Scholars")) {
-                fanTotal += handsToCheck["Three Lesser Scholars"];
+                fanTotal += settingsDict["Three Lesser Scholars"];
             }
 
             if (winningCombos.Contains("Three Great Scholars")) {
@@ -266,13 +253,13 @@ public class FanCalculator {
             if (winningCombos.Contains("Winning on Replacement Tile for Flower")) {
                 foreach (string winCombo in winningCombos) {
                     if (winCombo == "Winning on Replacement Tile for Flower") {
-                        fanTotal += handsToCheck["Winning on Replacement Tile for Flower"];
+                        fanTotal += settingsDict["Winning on Replacement Tile for Flower"];
                     }
                 }
             }
 
             if (winningCombos.Contains("Winning on Replacement Tile for Kong")) {
-                fanTotal += handsToCheck["Winning on Replacement Tile for Kong"];
+                fanTotal += settingsDict["Winning on Replacement Tile for Kong"];
             }
 
             if (winningCombos.Contains("Kong on Kong")) {
@@ -284,11 +271,11 @@ public class FanCalculator {
             #endregion
 
             if (winningCombos.Contains("Robbing the Kong")) {
-                fanTotal += handsToCheck["Robbing the Kong"];
+                fanTotal += settingsDict["Robbing the Kong"];
             }
 
             if (winningCombos.Contains("Winning on Last Available Tile")) {
-                fanTotal += handsToCheck["Winning on Last Available Tile"];
+                fanTotal += settingsDict["Winning on Last Available Tile"];
             }
 
             fanTotalList.Add(fanTotal);
@@ -353,7 +340,7 @@ public class FanCalculator {
             this.RobbingTheKong(discardTile);
             winningCombos.Add(this.ThirteenWondersCheck(combinedHand));
 
-            if (handsToCheck["Four Great Blessings"] > 0) {
+            if (settingsDict["Four Great Blessings"] > 0) {
                 List<string> winCombos = new List<string>(winningCombos);
 
                 winningCombos.Add(this.FourBlessingsCheck(combinedHand));
@@ -364,7 +351,7 @@ public class FanCalculator {
                 }
             }
 
-            if (handsToCheck["Three Great Scholars"] > 0) {
+            if (settingsDict["Three Great Scholars"] > 0) {
                 winningCombos.Add(this.ThreeScholarsCheck(combinedHand));
 
                 if (winningCombos.Contains("Three Great Scholars")) {
@@ -405,7 +392,7 @@ public class FanCalculator {
     /// Container for Heavenly, Earthly and Humanly Hands
     /// </summary>
     private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind? discardPlayerWind, Tile discardTile, int turn) {
-        if (handsToCheck["Heavenly Hand"] > 0) {
+        if (settingsDict["Heavenly Hand"] > 0) {
             winningCombos.Add(HeavenlyHandCheck(playerWind, discardTile, turn));
 
             if (winningCombos.Contains("Heavenly Hand")) {
@@ -413,7 +400,7 @@ public class FanCalculator {
             }
         }
 
-        if (handsToCheck["Earthly Hand"] > 0) {
+        if (settingsDict["Earthly Hand"] > 0) {
             winningCombos.Add(EarthlyHandCheck(discardPlayerWind, discardTile, turn));
 
             if (winningCombos.Contains("Earthly Hand")) {
@@ -421,7 +408,7 @@ public class FanCalculator {
             }
         }
 
-        if (handsToCheck["Humanly Hand"] > 0) {
+        if (settingsDict["Humanly Hand"] > 0) {
             winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, discardTile, turn));
         }
 
@@ -437,10 +424,10 @@ public class FanCalculator {
         int numberOfAnimalTiles = 0;
 
         foreach (Tile bonusTile in bonusTiles) {
-            if (bonusTileToWindDict.ContainsKey(bonusTile)) {
+            if (DictManager.Instance.tileToWindDict.ContainsKey(bonusTile)) {
 
-                if (handsToCheck["Bonus Tile Match Seat Wind"] > 0) {
-                    if (bonusTileToWindDict[bonusTile] == playerWind) {
+                if (settingsDict["Bonus Tile Match Seat Wind"] > 0) {
+                    if (DictManager.Instance.tileToWindDict[bonusTile] == playerWind) {
                         winningCombos.Add("Bonus Tile Match Seat Wind");
                     }
 
@@ -453,7 +440,7 @@ public class FanCalculator {
                 }
 
             } else {
-                if (handsToCheck["Animal"] > 0) {
+                if (settingsDict["Animal"] > 0) {
                     winningCombos.Add("Animal");
                     numberOfAnimalTiles++;
                 }
@@ -461,7 +448,7 @@ public class FanCalculator {
         }
 
         // Complete Animal Group
-        if (handsToCheck["Complete Animal Group"] > 0) {
+        if (settingsDict["Complete Animal Group"] > 0) {
             if (numberOfAnimalTiles == 4) {
                 winningCombos.Add("Complete Animal Group");
                 winningCombos.RemoveAll(x => x == "Animal");
@@ -469,7 +456,7 @@ public class FanCalculator {
         }
 
         // Complete Season Group
-        if (handsToCheck["Complete Season Group"] > 0) {
+        if (settingsDict["Complete Season Group"] > 0) {
             if (numberOfSeasonTiles == 4) {
                 winningCombos.Add("Complete Season Group");
                 winningCombos.Remove("Bonus Tile Match Seat Wind");
@@ -477,7 +464,7 @@ public class FanCalculator {
         }
 
         // Complete Flower Group
-        if (handsToCheck["Complete Flower Group"] > 0) {
+        if (settingsDict["Complete Flower Group"] > 0) {
             if (numberOfFlowerTiles == 4) {
                 winningCombos.Add("Complete Flower Group");
                 winningCombos.Remove("Bonus Tile Match Seat Wind");
@@ -485,7 +472,7 @@ public class FanCalculator {
         }            
 
         // Robbing the Eighth
-        if (handsToCheck["Robbing the Eighth"] > 0) {
+        if (settingsDict["Robbing the Eighth"] > 0) {
             if (numberOfSeasonTiles + numberOfFlowerTiles == 7) {
                 foreach (Tile tile in allPlayersOpenTiles) {
                     if (bonusTiles.Contains(tile)) {
@@ -503,7 +490,7 @@ public class FanCalculator {
         }
 
         // All Flowers and Seasons
-        if (handsToCheck["All Flowers and Seasons"] > 0) {
+        if (settingsDict["All Flowers and Seasons"] > 0) {
             if (numberOfSeasonTiles + numberOfFlowerTiles == 8) {
                 winningCombos.Add("All Flowers and Seasons");
                 winningCombos.Remove("Complete Season Group");
@@ -517,7 +504,7 @@ public class FanCalculator {
     /// Calculate the number of Fan in the player's hand due to honour tiles
     /// </summary>
     private void FanInHonourTiles(List<Tile> combinedhand, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind) {
-        this.InstantiateHonourTilesCount();
+        Dictionary<Tile, int> honourTilesCount = DictManager.Instance.HonourTilesCountDict();
 
         foreach (Tile tile in combinedhand) {
             if (honourTilesCount.ContainsKey(tile)) {
@@ -528,19 +515,19 @@ public class FanCalculator {
         foreach (Tile tile in honourTilesCount.Keys) {
             if (honourTilesCount[tile] == 3) {
 
-                if (handsToCheck["Player Wind Combo"] > 0) {
-                    if (tile.suit == Tile.Suit.Wind && bonusTileToWindDict[tile] == playerWind) {
+                if (settingsDict["Player Wind Combo"] > 0) {
+                    if (tile.suit == Tile.Suit.Wind && DictManager.Instance.tileToWindDict[tile] == playerWind) {
                         winningCombos.Add("Player Wind Combo");
                     }
                 }
 
-                if (handsToCheck["Prevailing Wind Combo"] > 0) {
-                    if (tile.suit == Tile.Suit.Wind && bonusTileToWindDict[tile] == prevailingWind) {
+                if (settingsDict["Prevailing Wind Combo"] > 0) {
+                    if (tile.suit == Tile.Suit.Wind && DictManager.Instance.tileToWindDict[tile] == prevailingWind) {
                         winningCombos.Add("Prevailing Wind Combo");
                     }
                 }
 
-                if (handsToCheck["Dragon"] > 0) {
+                if (settingsDict["Dragon"] > 0) {
                     if (tile.suit == Tile.Suit.Dragon) {
                         winningCombos.Add(tile.ToString());
                     }
@@ -557,46 +544,46 @@ public class FanCalculator {
         HashSet<string> comboListNoDuplicate = new HashSet<string>(listOfCombos);
 
         // Fully Concealed Hand check
-        if (handsToCheck["Fully Concealed"] > 0) {
+        if (settingsDict["Fully Concealed"] > 0) {
             winningCombos.Add(this.FullyConcealedHandCheck(comboTiles, discardTile));
         }
 
         // Triplets Hand check
-        if (handsToCheck["Triplets"] > 0) {
+        if (settingsDict["Triplets"] > 0) {
             winningCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
         }
 
         // Half Flush & Full Flush check
-        if (handsToCheck["Half Flush"] > 0 || handsToCheck["Full Flush"] > 0) {
+        if (settingsDict["Half Flush"] > 0 || settingsDict["Full Flush"] > 0) {
             winningCombos.Add(this.FlushHandCheck(combinedHand));
 
             if (winningCombos.Contains("Half Flush")) {
-                if (handsToCheck["Half Flush"] == 0) {
+                if (settingsDict["Half Flush"] == 0) {
                     winningCombos.Remove("Half Flush");
                 }
             }
 
             if (winningCombos.Contains("Full Flush")) {
-                if (handsToCheck["Full Flush"] == 0) {
+                if (settingsDict["Full Flush"] == 0) {
                     winningCombos.Remove("Full Flush");
                 }
             }
         }
 
         // Sequence Hand check.
-        if (handsToCheck["Full Sequence"] > 0 || handsToCheck["Lesser Sequence"] > 0) {
+        if (settingsDict["Full Sequence"] > 0 || settingsDict["Lesser Sequence"] > 0) {
             string sequenceHandCheck = this.SequenceHandCheck(comboListNoDuplicate, combinedHand, originalHand, playerWind, prevailingWind, discardTile);
 
             if (sequenceHandCheck != null) {
 
                 if (sequenceHandCheck.Equals("Sequence")) {
                     if (bonusTiles.Count > 0) {
-                        if (handsToCheck["Lesser Sequence"] > 0) {
+                        if (settingsDict["Lesser Sequence"] > 0) {
                             winningCombos.Add("Lesser Sequence");
                         }
 
                     } else {
-                        if (handsToCheck["Lesser Sequence"] > 0) {
+                        if (settingsDict["Lesser Sequence"] > 0) {
                             winningCombos.Add("Full Sequence");
                         }
                     }
@@ -605,10 +592,10 @@ public class FanCalculator {
         }
 
         // Mixed and Pure Terminals check. Prerequisite: Triplets
-        if (handsToCheck["Mixed Terminals"] > 0 || handsToCheck["Pure Terminals"] > 0) {
+        if (settingsDict["Mixed Terminals"] > 0 || settingsDict["Pure Terminals"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
-            if (handsToCheck["Triplets"] == 0) {
+            if (settingsDict["Triplets"] == 0) {
                 winCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
             }
 
@@ -619,7 +606,7 @@ public class FanCalculator {
             if (winningCombos.Contains("Mixed Terminals")) {
                 winningCombos.Remove("Triplets");
 
-                if (handsToCheck["Mixed Terminals"] == 0) {
+                if (settingsDict["Mixed Terminals"] == 0) {
                     winningCombos.Remove("Mixed Terminals");
                     winningCombos.Add("Triplets");
                 }
@@ -628,7 +615,7 @@ public class FanCalculator {
             if (winningCombos.Contains("Pure Terminals")) {
                 winningCombos.Remove("Triplets");
 
-                if (handsToCheck["Pure Terminals"] == 0) {
+                if (settingsDict["Pure Terminals"] == 0) {
                     winningCombos.Remove("Pure Terminals");
                     winningCombos.Add("Triplets");
                 }
@@ -636,10 +623,10 @@ public class FanCalculator {
         }
 
         // All Honour check. Prerequisite: Triplets
-        if (handsToCheck["All Honour"] > 0) {
+        if (settingsDict["All Honour"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
-            if (handsToCheck["Triplets"] == 0) {
+            if (settingsDict["Triplets"] == 0) {
                 winCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
             }
 
@@ -658,14 +645,14 @@ public class FanCalculator {
         }
 
         // Hidden Treasure check. Prerequisite: Triplets, Fully Concealed Hand
-        if (handsToCheck["Hidden Treasure"] > 0) {
+        if (settingsDict["Hidden Treasure"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
-            if (handsToCheck["Triplets"] == 0) {
+            if (settingsDict["Triplets"] == 0) {
                 winCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
             }
 
-            if (handsToCheck["Fully Concealed"] == 0) {
+            if (settingsDict["Fully Concealed"] == 0) {
                 winCombos.Add(this.FullyConcealedHandCheck(comboTiles, discardTile));
             }
 
@@ -677,14 +664,14 @@ public class FanCalculator {
         }
 
         // Full Flush Triplets check. Prerequisite: Full Flush, Triplets
-        if (handsToCheck["Full Flush Triplets"] > 0) {
+        if (settingsDict["Full Flush Triplets"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
-            if (handsToCheck["Full Flush"] == 0) {
+            if (settingsDict["Full Flush"] == 0) {
                 winCombos.Add(this.FlushHandCheck(combinedHand));
             }
 
-            if (handsToCheck["Triplets"] == 0) {
+            if (settingsDict["Triplets"] == 0) {
                 winCombos.Add(this.TripletsHandCheck(comboListNoDuplicate));
             }
 
@@ -696,18 +683,18 @@ public class FanCalculator {
         }
 
         // Full Flush Full/Lesser Sequence Hand check. Prerequisite: Full Flush, Full Sequence/Lesser Sequence
-        if (handsToCheck["Full Flush Full Sequence"] > 0 || handsToCheck["Full Flush Lesser Sequence"] > 0) {
+        if (settingsDict["Full Flush Full Sequence"] > 0 || settingsDict["Full Flush Lesser Sequence"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
-            if (handsToCheck["Full Flush"] == 0) {
+            if (settingsDict["Full Flush"] == 0) {
                 winCombos.Add(this.FlushHandCheck(combinedHand));
             }
 
-            if (handsToCheck["Full Sequence"] == 0 && handsToCheck["Lesser Sequence"] == 0) {
+            if (settingsDict["Full Sequence"] == 0 && settingsDict["Lesser Sequence"] == 0) {
                 winCombos.Add(this.SequenceHandCheck(comboListNoDuplicate, combinedHand, originalHand, playerWind, prevailingWind, discardTile));
             }
 
-            if (handsToCheck["Full Flush Full Sequence"] > 0) {
+            if (settingsDict["Full Flush Full Sequence"] > 0) {
                 if (winCombos.Contains("Full Flush") && (winCombos.Contains("Full Sequence"))) {
                     winningCombos.Add("Full Flush Full Sequence");
                     winningCombos.Remove("Full Flush");
@@ -715,7 +702,7 @@ public class FanCalculator {
                 }
             }
 
-            if (handsToCheck["Full Flush Lesser Sequence"] > 0) {
+            if (settingsDict["Full Flush Lesser Sequence"] > 0) {
                 if (winCombos.Contains("Full Flush") && winCombos.Contains("Lesser Sequence")) {
                     winningCombos.Add("Full Flush Lesser Sequence");
                     winningCombos.Remove("Full Flush");
@@ -725,10 +712,10 @@ public class FanCalculator {
         }
 
         // Nine Gates Check. Prerequisite: Full Flush
-        if (handsToCheck["Nine Gates"] > 0) {
+        if (settingsDict["Nine Gates"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
-            if (handsToCheck["Full Flush"] == 0) {
+            if (settingsDict["Full Flush"] == 0) {
                 winCombos.Add(this.FlushHandCheck(combinedHand));
             }
 
@@ -742,7 +729,7 @@ public class FanCalculator {
         }
 
         // Four Lesser Blessings and Four Great Blessings check. 
-        if (handsToCheck["Four Lesser Blessings"] > 0 || handsToCheck["Four Great Blessings"] > 0) {
+        if (settingsDict["Four Lesser Blessings"] > 0 || settingsDict["Four Great Blessings"] > 0) {
             List<string> winCombos = new List<string>(winningCombos);
 
             if (!winningCombos.Contains("All Honour")) {
@@ -750,13 +737,13 @@ public class FanCalculator {
             }
 
             if (winningCombos.Contains("Four Lesser Blessings")) {
-                if (handsToCheck["Four Lesser Blessings"] == 0) {
+                if (settingsDict["Four Lesser Blessings"] == 0) {
                     winningCombos.Remove("Four Lesser Blessings");
                 }
             }
 
             if (winningCombos.Contains("Four Great Blessings")) {
-                if (handsToCheck["Four Great Blessings"] == 0) {
+                if (settingsDict["Four Great Blessings"] == 0) {
                     winningCombos.Remove("Four Great Blessings");
                 } else {
                     winningCombos.Remove("Player Wind Combo");
@@ -766,7 +753,7 @@ public class FanCalculator {
         }
 
         // Pure Green Suit check. Prerequisite-ish: Half Flush
-        if (handsToCheck["Pure Green Suit"] > 0) {
+        if (settingsDict["Pure Green Suit"] > 0) {
             winningCombos.Add(this.PureGreenSuitCheck(combinedHand));
 
             if (winningCombos.Contains("Pure Green Suit")) {
@@ -775,11 +762,11 @@ public class FanCalculator {
         }
 
         // Three Lesser Scholars and Three Great Scholars check. 
-        if (handsToCheck["Three Lesser Scholars"] > 0 || handsToCheck["Three Great Scholars"] > 0) {
+        if (settingsDict["Three Lesser Scholars"] > 0 || settingsDict["Three Great Scholars"] > 0) {
             winningCombos.Add(this.ThreeScholarsCheck(combinedHand));
 
             if (winningCombos.Contains("Three Lesser Scholars")) {
-                if (handsToCheck["Three Lesser Scholars"] == 0) {
+                if (settingsDict["Three Lesser Scholars"] == 0) {
                     winningCombos.Remove("Three Lesser Scholars");
                 } else {
                     winningCombos.Remove("Dragon_One");
@@ -789,7 +776,7 @@ public class FanCalculator {
             }
 
             if (winningCombos.Contains("Three Great Scholars")) {
-                if (handsToCheck["Three Great Scholars"] == 0) {
+                if (settingsDict["Three Great Scholars"] == 0) {
                     winningCombos.Remove("Three Great Scholars");
                 } else {
                     winningCombos.Remove("Dragon_One");
@@ -800,7 +787,7 @@ public class FanCalculator {
         }
 
         // Eighteen Arhats check
-        if (handsToCheck["Eighteen Arhats"] > 0) {
+        if (settingsDict["Eighteen Arhats"] > 0) {
             winningCombos.Add(this.EighteenArhatsCheck(comboTiles));
 
             if (winningCombos.Contains("Eighteen Arhats")) {
@@ -814,17 +801,17 @@ public class FanCalculator {
     /// Container for Replacement Tile Win checks
     /// </summary>
     private void WinningOnReplacementTile(int numberOfReplacementTiles, int numberOfKong) {
-        if (handsToCheck["Winning on Replacement Tile for Flower"] > 0) {
+        if (settingsDict["Winning on Replacement Tile for Flower"] > 0) {
             for (int i = 0; i < numberOfReplacementTiles; i++) {
                 winningCombos.Add("Winning on Replacement Tile for Flower");
             }
         }
 
-        if (handsToCheck["Winning on Replacement Tile for Kong"] > 0) {
+        if (settingsDict["Winning on Replacement Tile for Kong"] > 0) {
             winningCombos.Add(WinningOnReplacementTileForKong(numberOfKong));
         }
 
-        if (handsToCheck["Kong on Kong"] > 0) {
+        if (settingsDict["Kong on Kong"] > 0) {
             winningCombos.Add(KongOnKong(numberOfKong));
         }
     }
@@ -1003,8 +990,8 @@ public class FanCalculator {
         }
 
         List<Tile> forbiddenTiles = new List<Tile>() {
-            windToTileDict[playerWind],
-            windToTileDict[prevailingWind],
+            DictManager.Instance.windToTileDict[playerWind],
+            DictManager.Instance.windToTileDict[prevailingWind],
             new Tile(Tile.Suit.Dragon, Tile.Rank.One),
             new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
             new Tile(Tile.Suit.Dragon, Tile.Rank.Three)
@@ -1091,8 +1078,7 @@ public class FanCalculator {
     /// Determine if the hand is a Nine Gates Hand
     /// </summary>
     private string NineGatesCheck(List<Tile> combinedHand) {
-        nineGatesDict = new Dictionary<Tile, int>();
-        this.InstantiateNineGatesDict();
+        Dictionary<Tile, int> nineGatesDict = DictManager.Instance.NineGatesDict();
 
         foreach (Tile tile in combinedHand) {
             nineGatesDict[tile]--;
@@ -1211,7 +1197,7 @@ public class FanCalculator {
     /// Determine if the hand is a Thirteen Wonders Hand
     /// </summary>
     private string ThirteenWondersCheck(List<Tile> combinedHand) {
-        Dictionary<Tile, int> thirteenWondersDict = this.InstantiateThirteenWondersDict();
+        Dictionary<Tile, int> thirteenWondersDict = DictManager.Instance.ThirteenWondersDict();
 
         HashSet<Tile> noDuplicateHand = new HashSet<Tile>(combinedHand);
         foreach (Tile tile in noDuplicateHand) {
@@ -1265,86 +1251,6 @@ public class FanCalculator {
             return "Kong on Kong";
         }
         return null;
-    }
-
-    #endregion
-
-    #region Dictionary Instantiation
-
-    /// <summary>
-    /// Instantiate the Honour Tiles Count Dict
-    /// </summary>
-    private void InstantiateHonourTilesCount() {
-        honourTilesCount = new Dictionary<Tile, int>();
-
-        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four), 0);
-
-        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two), 0);
-        honourTilesCount.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three), 0);
-    }
-
-
-    /// <summary>
-    /// Instantiate the NineGatesDict only if the hand is checked for Nine Gates
-    /// </summary>
-    private void InstantiateNineGatesDict() {
-        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.One), 3);
-        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine), 3);
-
-        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One), 3);
-        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Four), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Six), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Eight), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine), 3);
-
-        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One), 3);
-        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Four), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Six), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight), 1);
-        nineGatesDict.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine), 3);
-    }
-
-
-    /// <summary>
-    /// Instantiate the ThirteenWondersDict only if the hand is checked for Thirteen Wonders
-    /// </summary>
-    private Dictionary<Tile, int> InstantiateThirteenWondersDict() {
-        Dictionary<Tile, int> thirteenWondersDict = new Dictionary<Tile, int>() {
-            [new Tile(Tile.Suit.Character, Tile.Rank.One)] = 0,
-            [new Tile(Tile.Suit.Character, Tile.Rank.Nine)] = 0,
-            [new Tile(Tile.Suit.Dot, Tile.Rank.One)] = 0,
-            [new Tile(Tile.Suit.Dot, Tile.Rank.Nine)] = 0,
-            [new Tile(Tile.Suit.Bamboo, Tile.Rank.One)] = 0,
-            [new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine)] = 0,
-            [new Tile(Tile.Suit.Wind, Tile.Rank.One)] = 0,
-            [new Tile(Tile.Suit.Wind, Tile.Rank.Two)] = 0,
-            [new Tile(Tile.Suit.Wind, Tile.Rank.Three)] = 0,
-            [new Tile(Tile.Suit.Wind, Tile.Rank.Four)] = 0,
-            [new Tile(Tile.Suit.Dragon, Tile.Rank.One)] = 0,
-            [new Tile(Tile.Suit.Dragon, Tile.Rank.Two)] = 0,
-            [new Tile(Tile.Suit.Dragon, Tile.Rank.Three)] = 0,
-        };
-
-        return thirteenWondersDict;
     }
 
     #endregion

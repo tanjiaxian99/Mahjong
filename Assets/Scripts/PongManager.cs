@@ -34,11 +34,17 @@ public class PongManager : MonoBehaviour {
 
     private PayAllDiscard payAllDiscard;
 
+    private SacredDiscardManager sacredDiscardManager;
+
+    private MissedDiscardManager missedDiscardManager;
+
     private void Start() {
         gameManager = scriptManager.GetComponent<GameManager>();
         playerManager = scriptManager.GetComponent<PlayerManager>();
         tilesManager = scriptManager.GetComponent<TilesManager>();
         payAllDiscard = scriptManager.GetComponent<PayAllDiscard>();
+        sacredDiscardManager = scriptManager.GetComponent<SacredDiscardManager>();
+        missedDiscardManager = scriptManager.GetComponent<MissedDiscardManager>();
     }
 
 
@@ -46,13 +52,13 @@ public class PongManager : MonoBehaviour {
     /// Called when the player can Pong
     /// </summary>
     public void PongUI(Tile discardTile) {
-        if (playerManager.sacredDiscard != null && playerManager.sacredDiscard == discardTile) {
-            gameManager.SacredDiscardUI();
+        if (sacredDiscardManager.sacredDiscard != null && sacredDiscardManager.sacredDiscard == discardTile) {
+            sacredDiscardManager.SacredDiscardUI();
             return;
         }
 
-        if (gameManager.IsMissedDiscard(discardTile)) {
-            gameManager.MissedDiscardUI();
+        if (missedDiscardManager.IsMissedDiscard(discardTile)) {
+            missedDiscardManager.MissedDiscardUI();
             return;
         }
 
@@ -118,7 +124,7 @@ public class PongManager : MonoBehaviour {
         // Update MasterClient that the player doesn't want to Pong
         EventsManager.EventPongKong(false);
 
-        gameManager.UpdateMissedDiscard(gameManager.discardPlayer, gameManager.latestDiscardTile);
+        missedDiscardManager.UpdateMissedDiscard(gameManager.discardPlayer, gameManager.latestDiscardTile);
 
         PongCombo.SetActive(false);
         KongComboZero.SetActive(false);
