@@ -16,6 +16,11 @@ public static class PropertiesManager {
     public static readonly string DiscardTilePropKey = "dt";
 
     /// <summary>
+    /// The latest tile which was Konged
+    /// </summary>
+    public static readonly string SpecialTilePropKey = "kt";
+
+    /// <summary>
     /// The player that has to pay for all players
     /// </summary>
     public static readonly string PayAllDiscardPropKey = "pa";
@@ -27,6 +32,12 @@ public static class PropertiesManager {
     public static void UpdateDiscardTile(Tuple<int, Tile, float> tuple) {
         Hashtable ht = new Hashtable();
         ht.Add(DiscardTilePropKey, tuple);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
+    public static void UpdateSpecialTile(Tuple<int, Tile, float> tuple) {
+        Hashtable ht = new Hashtable();
+        ht.Add(SpecialTilePropKey, tuple);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 

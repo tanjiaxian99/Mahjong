@@ -1457,7 +1457,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1419168658}
         m_MethodName: OnKongSkip
         m_Mode: 1
         m_Arguments:
@@ -2243,7 +2243,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1419168658}
         m_MethodName: OnKongOk
         m_Mode: 1
         m_Arguments:
@@ -5727,7 +5727,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1419168658}
         m_MethodName: OnKongOk
         m_Mode: 1
         m_Arguments:
@@ -5980,7 +5980,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1419168658}
         m_MethodName: OnKongOk
         m_Mode: 1
         m_Arguments:
@@ -6354,6 +6354,7 @@ GameObject:
   - component: {fileID: 1419168650}
   - component: {fileID: 1419168649}
   - component: {fileID: 1419168657}
+  - component: {fileID: 1419168658}
   - component: {fileID: 1419168656}
   - component: {fileID: 1419168655}
   - component: {fileID: 1419168654}
@@ -6436,6 +6437,7 @@ MonoBehaviour:
   isFreshTile: 0
   chowManager: {fileID: 0}
   pongManager: {fileID: 0}
+  kongManager: {fileID: 0}
   Character_One: {fileID: -927199367670048503, guid: bc326ad653f9c0246b32a1431356ec7d,
     type: 3}
   Character_Two: {fileID: -927199367670048503, guid: 477a2a2671ba76f448726d75a27096de,
@@ -6664,6 +6666,23 @@ MonoBehaviour:
   KongComboOne: {fileID: 456702554}
   KongComboTwo: {fileID: 1982182469}
   scriptManager: {fileID: 1419168648}
+--- !u!114 &1419168658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aed06fa672c7d754dadbaaf116990d52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PongCombo: {fileID: 1457008409}
+  KongComboZero: {fileID: 672664132}
+  KongComboOne: {fileID: 456702554}
+  KongComboTwo: {fileID: 1982182469}
+  scriptManager: {fileID: 1419168648}
 --- !u!1 &1457008409
 GameObject:
   m_ObjectHideFlags: 0
@@ -6869,7 +6888,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1419168658}
         m_MethodName: OnKongSkip
         m_Mode: 1
         m_Arguments:
@@ -8249,7 +8268,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1419168658}
         m_MethodName: OnKongSkip
         m_Mode: 1
         m_Arguments:

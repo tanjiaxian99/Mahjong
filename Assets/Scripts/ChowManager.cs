@@ -29,10 +29,13 @@ public class ChowManager : MonoBehaviour {
 
     private TilesManager tilesManager;
 
+    private KongManager kongManager;
+
     private void Start() {
         gameManager = scriptManager.GetComponent<GameManager>();
         playerManager = scriptManager.GetComponent<PlayerManager>();
         tilesManager = scriptManager.GetComponent<TilesManager>();
+        kongManager = scriptManager.GetComponent<KongManager>();
     }
 
 
@@ -161,7 +164,7 @@ public class ChowManager : MonoBehaviour {
 
         // Check if the player can Kong the drawn tile
         if (tilesManager.ExposedKongTiles().Count != 0 || tilesManager.ConcealedKongTiles().Count != 0) {
-            gameManager.KongUI(tilesManager.ExposedKongTiles().Concat(tilesManager.ConcealedKongTiles()).ToList());
+            kongManager.KongUI(tilesManager.ExposedKongTiles().Concat(tilesManager.ConcealedKongTiles()).ToList());
             return;
         }
 
