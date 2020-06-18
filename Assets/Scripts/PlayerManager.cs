@@ -1,9 +1,7 @@
-﻿using Photon.Pun;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviourPunCallbacks {
+public class PlayerManager : MonoBehaviour {
 
     public enum Wind {
         EAST,

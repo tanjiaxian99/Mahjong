@@ -11,7 +11,7 @@ namespace Tests {
         Dictionary<string, int> handsToCheck;
         PayAllDiscard payAllDiscard;
         PlayerManager playerManager;
-        TilesManager tileManager;
+        TilesManager tilesManager;
 
         PlayerManager.Wind prevailingWind;
 
@@ -77,8 +77,8 @@ namespace Tests {
         [Test]
         public void DragonTileSetTest_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Four),
                 new Tile(Tile.Suit.Dragon, Tile.Rank.One),
@@ -98,15 +98,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = true;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void WindTileSetTest_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Four),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -129,15 +129,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = true;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void PointLimitTest_ThreeFan_One_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Three),
                 new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
@@ -154,15 +154,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = true;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void PointLimitTest_FourFan_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Animal, Tile.Rank.One),
                 new Tile(Tile.Suit.Animal, Tile.Rank.Two),
@@ -178,15 +178,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = true;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void PointLimitTest_FourFan_NoPay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -202,15 +202,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = false;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void FullFlushTest_NominalTiles_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Two),
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
@@ -234,15 +234,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = true;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void FullFlushTest_NominalTiles_NoPay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.Two),
                 new Tile(Tile.Suit.Flower, Tile.Rank.Two),
                 new Tile(Tile.Suit.Dot, Tile.Rank.One),
@@ -266,15 +266,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = false;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void FullFlushTest_HonourTiles_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Season, Tile.Rank.One),
                 new Tile(Tile.Suit.Flower, Tile.Rank.One),
                 new Tile(Tile.Suit.Wind, Tile.Rank.One),
@@ -297,15 +297,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = true;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void FullFlushTest_HonourTiles_NoPay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Wind, Tile.Rank.Three),
                 new Tile(Tile.Suit.Wind, Tile.Rank.Three),
                 new Tile(Tile.Suit.Wind, Tile.Rank.Three),
@@ -325,15 +325,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = false;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void PureTerminalsTest_Pay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
@@ -353,15 +353,15 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = true;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 
         [Test]
         public void PureTerminalsTest_NoPay() {
             playerManager = new PlayerManager();
-            tileManager = new TilesManager();
-            tileManager.openTiles = new List<Tile>() {
+            tilesManager = new TilesManager();
+            tilesManager.openTiles = new List<Tile>() {
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
                 new Tile(Tile.Suit.Character, Tile.Rank.One),
@@ -381,7 +381,7 @@ namespace Tests {
             };
 
             bool expectedShouldPayForAll = false;
-            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tileManager, prevailingWind, discardTile, "Win");
+            bool actualShouldPayForAll = payAllDiscard.shouldPayForAll(playerManager, tilesManager, prevailingWind, discardTile, "Win");
             Assert.AreEqual(expectedShouldPayForAll, actualShouldPayForAll);
         }
 

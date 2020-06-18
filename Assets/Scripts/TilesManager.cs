@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Container for player tiles and tiles-related methods
 /// </summary>
-public class TilesManager {
+public class TilesManager : MonoBehaviour {
 
     public List<Tile> hand { get; set; }
 
