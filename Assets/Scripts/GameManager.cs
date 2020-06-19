@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     [Tooltip("Debugging: The number of players required to start a game")]
     [SerializeField]
-    private int numberOfPlayersToStart = 4;
+    private int numberOfPlayers = 4;
 
     [Tooltip("The factor by which to scale the tiles such that they fill different screen sizes proportionately")]
     private float scaleFactor = 1f;
@@ -53,11 +53,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Dictionary containing a player's actor number and his playerWind in integer form
     /// </summary>
     public Dictionary<int, int> windsDict = new Dictionary<int, int>();
-
-    /// <summary>
-    /// Dictionary containing Tile objects and their respective prefab
-    /// </summary>
-    private Dictionary<Tile, GameObject> tilesDict = new Dictionary<Tile, GameObject>();
 
     /// <summary>
     /// Cache for Chow Combinations return value
@@ -91,7 +86,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     public Player discardPlayer;
 
-    public Dictionary<string, int> handsToCheck;
+    public Dictionary<string, int> settingsDict;
 
     /// <summary>
     /// The prevailing wind of the current round
@@ -152,7 +147,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// The Initial Instantiation event message byte. Used internally for converting the local player's bonus tiles into normal tiles.
     /// Afterwards, instantiate the local player's hand and open tiles
     /// </summary>
-    public const byte EvInitialInstantiation = 7;
+    public const byte EvPlayerInitialization = 7;
 
     /// <summary>
     /// The Player Turn event message byte. Used internally by MasterClient to update the next player on his turn.
@@ -234,169 +229,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #endregion
 
-    #region Tile 3D Prefabs
-    [SerializeField]
-    private GameObject Character_One;
-
-    [SerializeField]
-    private GameObject Character_Two;
-
-    [SerializeField]
-    private GameObject Character_Three;
-
-    [SerializeField]
-    private GameObject Character_Four;
-
-    [SerializeField]
-    private GameObject Character_Five;
-
-    [SerializeField]
-    private GameObject Character_Six;
-
-    [SerializeField]
-    private GameObject Character_Seven;
-
-    [SerializeField]
-    private GameObject Character_Eight;
-
-    [SerializeField]
-    private GameObject Character_Nine;
-
-    [SerializeField]
-    private GameObject Dot_One;
-
-    [SerializeField]
-    private GameObject Dot_Two;
-
-    [SerializeField]
-    private GameObject Dot_Three;
-
-    [SerializeField]
-    private GameObject Dot_Four;
-
-    [SerializeField]
-    private GameObject Dot_Five;
-
-    [SerializeField]
-    private GameObject Dot_Six;
-
-    [SerializeField]
-    private GameObject Dot_Seven;
-
-    [SerializeField]
-    private GameObject Dot_Eight;
-
-    [SerializeField]
-    private GameObject Dot_Nine;
-
-    [SerializeField]
-    private GameObject Bamboo_One;
-
-    [SerializeField]
-    private GameObject Bamboo_Two;
-
-    [SerializeField]
-    private GameObject Bamboo_Three;
-
-    [SerializeField]
-    private GameObject Bamboo_Four;
-
-    [SerializeField]
-    private GameObject Bamboo_Five;
-
-    [SerializeField]
-    private GameObject Bamboo_Six;
-
-    [SerializeField]
-    private GameObject Bamboo_Seven;
-
-    [SerializeField]
-    private GameObject Bamboo_Eight;
-
-    [SerializeField]
-    private GameObject Bamboo_Nine;
-
-    [SerializeField]
-    private GameObject Wind_One;
-
-    [SerializeField]
-    private GameObject Wind_Two;
-
-    [SerializeField]
-    private GameObject Wind_Three;
-
-    [SerializeField]
-    private GameObject Wind_Four;
-
-    [SerializeField]
-    private GameObject Dragon_One;
-
-    [SerializeField]
-    private GameObject Dragon_Two;
-
-    [SerializeField]
-    private GameObject Dragon_Three;
-
-    [SerializeField]
-    private GameObject Season_One;
-
-    [SerializeField]
-    private GameObject Season_Two;
-
-    [SerializeField]
-    private GameObject Season_Three;
-
-    [SerializeField]
-    private GameObject Season_Four;
-
-    [SerializeField]
-    private GameObject Flower_One;
-
-    [SerializeField]
-    private GameObject Flower_Two;
-
-    [SerializeField]
-    private GameObject Flower_Three;
-
-    [SerializeField]
-    private GameObject Flower_Four;
-
-    [SerializeField]
-    private GameObject Animal_One;
-
-    [SerializeField]
-    private GameObject Animal_Two;
-
-    [SerializeField]
-    private GameObject Animal_Three;
-
-    [SerializeField]
-    private GameObject Animal_Four;
-
-    #endregion
-
     #region UI fields
-
-    [SerializeField]
-    private GameObject ChowComboZero;
-
-    [SerializeField]
-    private GameObject ChowComboOne;
-
-    [SerializeField]
-    private GameObject ChowComboTwo;
-
-    [SerializeField]
-    private GameObject PongCombo;
-
-    [SerializeField]
-    private GameObject KongComboZero;
-
-    [SerializeField]
-    private GameObject KongComboOne;
-
-    [SerializeField]
-    private GameObject KongComboTwo;
 
     [SerializeField]
     private GameObject pointsGameObject;
@@ -412,10 +245,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         turnManager = this.gameObject.AddComponent<PunTurnManager>();
         turnManager.TurnManagerListener = this;
         this.turnManager.TurnDuration = 1000f;
-
-        // Set up a dictionary for tiles prefabs and their sprites
-        this.InstantiateTilesDict();
-        this.InstantiateHandsToCheck();
 
         this.openTilesDict = new Dictionary<Player, List<Tile>>();
         this.discardTiles = new List<Tile>();
@@ -470,7 +299,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         payment = scriptManager.GetComponent<Payment>();
         winManager = scriptManager.GetComponent<WinManager>();
 
-        if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
+        Settings settings = scriptManager.GetComponent<Settings>();
+        settingsDict = settings.settingsDict;
+
+        if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayers) {
             // Players that disconnect and reconnect won't start the game at turn 0
             // Game is initialized by MasterClient
             if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
@@ -486,7 +318,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public override void OnPlayerEnteredRoom(Player newPlayer) {
         Debug.Log("A new player has arrived");
 
-        if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayersToStart) {
+        if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayers) {
             if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
                 StartCoroutine("InitializeGame");
             }
@@ -686,322 +518,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     IEnumerator InitializeGame() {
         // At this point, Start hasn't been called yet. Wait a frame before proceeding with the Coroutine
         yield return null;
-        this.AssignPlayerWind();
-        this.DeterminePlayOrder();
-        this.ScreenViewAdjustment();
-        this.GenerateTiles();
+        InitializeRound.AssignPlayerWind(numberOfPlayers);
+        InitializeRound.DeterminePlayOrder(numberOfPlayers);
+        InitializeRound.ScreenViewAdjustment();
+        InitializeRound.GenerateTiles();
         // Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
         yield return new WaitForSeconds(1.5f);
-        this.DistributeTiles();
-        this.HiddenPayouts();
+        InitializeRound.DistributeTiles();
+        InitializeRound.HiddenPayouts();
         yield return new WaitForSeconds(0.5f);
         this.StartTurn();
         yield return new WaitForSeconds(0.5f);
-        StartCoroutine("InitialInstantiation");
-        this.StartGame();
-    }
-
-
-    /// <summary>
-    /// Create a Room Custom Property with a list of discard tiles
-    /// </summary>
-    // TODO: For the local client to keep track of discard tiles and their positions?
-    //public void InstantiateDiscardTilesList() {
-    //    Hashtable ht = new Hashtable();
-    //    ht.Add(DiscardTilePropKey, new List<Tile>());
-    //    PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-    //}
-
-
-    /// <summary>
-    /// Called by MasterClient to assign a wind to each player
-    /// </summary>
-    public void AssignPlayerWind() {
-        List<PlayerManager.Wind> winds = ((PlayerManager.Wind[])Enum.GetValues(typeof(PlayerManager.Wind))).ToList();
-        PlayerManager.Wind playerWind;
-
-        foreach (Player player in PhotonNetwork.PlayerList) {
-            int randomIndex = 0;
-            if (numberOfPlayersToStart > 1) {
-                randomIndex = RandomNumber(winds.Count());
-            }
-
-            playerWind = winds[randomIndex];
-            winds.Remove(winds[randomIndex]);
-            windsDict.Add(player.ActorNumber, (int)playerWind);
-        }
-
-        Hashtable ht = new Hashtable();
-        ht.Add(WindDictPropKey, windsDict);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-
-        Debug.LogFormat("The 4 winds have been assigned to each player");
-    }
-
-
-    /// <summary>
-    /// Update the room's custom properties with the play order. Play order starts from East Wind and ends at South.
-    /// </summary>
-    public void DeterminePlayOrder() {
-        // TODO: An array containing the nicknames might be sufficient.
-        Player[] playOrder = new Player[numberOfPlayersToStart];
-
-        foreach (int actorNumber in windsDict.Keys) {
-            // The values of windsDict are PlayerManager.Wind types, which are ordered from East:0 to North:4
-            // The integer value of windsDict themselves is the order of play
-            int index = windsDict[actorNumber];
-            playOrder[index] = PhotonNetwork.CurrentRoom.GetPlayer(actorNumber);
-        }
-
-        Hashtable ht = new Hashtable();
-        ht.Add(PlayOrderPropkey, playOrder);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-    }
-
-
-    /// <summary>
-    /// Raise an event telling all players to point their camera towards the GameTable and stretch the GameTable
-    /// </summary>
-    public void ScreenViewAdjustment() {
-        PhotonNetwork.RaiseEvent(EvScreenViewAdjustment, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
-    }
-
-
-    /// <summary>
-    /// Create 4 copies of each tile, giving 148 tiles
-    /// </summary>
-    public void GenerateTiles() {
-        List<Tile> tiles = new List<Tile>();
-
-        foreach (Tile.Suit suit in Enum.GetValues(typeof(Tile.Suit))) {
-
-            switch (suit) {
-                // Generate the tiles for Character, Dot and Bamboo suits
-                case Tile.Suit.Character:
-                case Tile.Suit.Dot:
-                case Tile.Suit.Bamboo:
-                    foreach (Tile.Rank rank in Enum.GetValues(typeof(Tile.Rank))) {
-                        for (int i = 0; i < 4; i++) {
-                            tiles.Add(new Tile(suit, rank));
-                        }
-                    }
-                    break;
-
-                // Generate the tiles for Wind suit
-                case Tile.Suit.Wind:
-                    foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(4)) {
-                        for (int i = 0; i < 4; i++) {
-                            tiles.Add(new Tile(suit, rank));
-                        }
-                    }
-                    break;
-
-                // Generate the tiles for Dragon suit
-                case Tile.Suit.Dragon:
-                    foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(3)) {
-                        for (int i = 0; i < 4; i++) {
-                            tiles.Add(new Tile(suit, rank));
-                        }
-                    }
-                    break;
-
-                // Generate the tiles for Season, Flower and Animal suits. Only generates 1 tile for each rank.
-                case Tile.Suit.Season:
-                case Tile.Suit.Flower:
-                case Tile.Suit.Animal:
-                    foreach (Tile.Rank rank in ((Tile.Rank[])Enum.GetValues(typeof(Tile.Rank))).Take(4)) {
-                        tiles.Add(new Tile(suit, rank));
-                    }
-                    break;
-            }
-        }
-
-        if (tiles.Count != 148) {
-            Debug.LogErrorFormat("{0} tiles have been created instead of 148", tiles.Count);
-        }
-
-        // DEBUG
-        tiles = new List<Tile>() {
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-        };
-
-        // Add to Room Custom Properties
-        Hashtable ht = new Hashtable();
-        ht.Add(WallTileListPropKey, tiles);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-    }
-
-
-    /// <summary>
-    /// Distribute tiles to each player depending on the wind seat. The player with the East Wind receives 14 tiles
-    /// while the rest receives 13
-    /// </summary>
-    public void DistributeTiles() {
-        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
-
-        // DEBUG
-        foreach (Player player in PhotonNetwork.PlayerList) {
-            if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.EAST) {
-                List<Tile> playerTiles = new List<Tile>();
-
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Six));
-                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.One));
-
-                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-
-            } else if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.SOUTH) {
-                List<Tile> playerTiles = new List<Tile>();
-
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
-
-                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-
-            } else if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.WEST) {
-                List<Tile> playerTiles = new List<Tile>();
-
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
-
-                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-
-            } else if ((PlayerManager.Wind)windsDict[player.ActorNumber] == PlayerManager.Wind.NORTH) {
-                List<Tile> playerTiles = new List<Tile>();
-
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
-
-                PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-            }
-        }
-
-
-        //foreach (Player player in PhotonNetwork.PlayerList) {
-        //    List<Tile> playerTiles = new List<Tile>();
-
-        //    for (int i = 0; i < 14; i++) {
-        //        // Choose a tile randomly from the complete tiles list and add it to the player's tiles
-        //        int randomIndex = RandomNumber(tiles.Count());
-        //        playerTiles.Add(tiles[randomIndex]);
-        //        tiles.Remove(tiles[randomIndex]);
-
-        //        // Don't give the 14th tile if the player is not the East Wind
-        //        if (i == 12 && (PlayerManager.Wind)windsDict[player.ActorNumber] != PlayerManager.Wind.EAST) {
-        //            break;
-        //        }
-        //    }
-
-        //    PhotonNetwork.RaiseEvent(EvDistributeTiles, playerTiles, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-        //}
-
-        // Reinsert updated tiles list into Room Custom Properties
-        Hashtable ht = new Hashtable();
-        ht.Add(WallTileListPropKey, tiles);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-
-        Debug.Log("The tiles from the wall have been distributed");
-    }
-
-
-    /// <summary>
-    /// Raise an event to inform all players to update their initial open tiles
-    /// </summary>
-    public void HiddenPayouts() {
-        PhotonNetwork.RaiseEvent(EvHiddenPayouts, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
-    }
-
-
-    /// <summary>
-    /// Convert the bonus tiles to normal tiles and instantiate the local player's hand and open tiles. Done in playOrder sequence.
-    /// </summary>
-    IEnumerator InitialInstantiation() {
-        foreach (Player player in (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey]) {
-            yield return new WaitForSeconds(0.2f);
-            PhotonNetwork.RaiseEvent(EvInitialInstantiation, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
-        }
-    }
-
-
-    /// <summary>
-    /// Start the game with the East Wind
-    /// </summary>
-    public void StartGame() {
-        if (!PhotonNetwork.IsMasterClient) {
-            return;
-        }
-
-        //Debug.LogFormat("Turn {0} has begun", turn);
-
-        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
-
-        Player firstPlayer = playOrder[0];
-        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { firstPlayer.ActorNumber } }, SendOptions.SendReliable);
+        StartCoroutine(InitializeRound.InitialInitialization());
+        InitializeRound.StartGame();
     }
 
     #endregion
@@ -1025,7 +554,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 this.LocalHiddenPayouts();
                 break;
 
-            case EvInitialInstantiation:
+            case EvPlayerInitialization:
                 this.InitialLocalInstantiation();
                 break;
 
@@ -1114,142 +643,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
     }
 
-    /// <summary>
-    /// Fill up the tilesDict with Tile objects and their respective prefabs
-    /// </summary>
-    public void InstantiateTilesDict() {
-        tilesDict.Add(new Tile("Character_One"), Character_One);
-        tilesDict.Add(new Tile("Character_Two"), Character_Two);
-        tilesDict.Add(new Tile("Character_Three"), Character_Three);
-        tilesDict.Add(new Tile("Character_Four"), Character_Four);
-        tilesDict.Add(new Tile("Character_Five"), Character_Five);
-        tilesDict.Add(new Tile("Character_Six"), Character_Six);
-        tilesDict.Add(new Tile("Character_Seven"), Character_Seven);
-        tilesDict.Add(new Tile("Character_Eight"), Character_Eight);
-        tilesDict.Add(new Tile("Character_Nine"), Character_Nine);
-
-        tilesDict.Add(new Tile("Dot_One"), Dot_One);
-        tilesDict.Add(new Tile("Dot_Two"), Dot_Two);
-        tilesDict.Add(new Tile("Dot_Three"), Dot_Three);
-        tilesDict.Add(new Tile("Dot_Four"), Dot_Four);
-        tilesDict.Add(new Tile("Dot_Five"), Dot_Five);
-        tilesDict.Add(new Tile("Dot_Six"), Dot_Six);
-        tilesDict.Add(new Tile("Dot_Seven"), Dot_Seven);
-        tilesDict.Add(new Tile("Dot_Eight"), Dot_Eight);
-        tilesDict.Add(new Tile("Dot_Nine"), Dot_Nine);
-
-        tilesDict.Add(new Tile("Bamboo_One"), Bamboo_One);
-        tilesDict.Add(new Tile("Bamboo_Two"), Bamboo_Two);
-        tilesDict.Add(new Tile("Bamboo_Three"), Bamboo_Three);
-        tilesDict.Add(new Tile("Bamboo_Four"), Bamboo_Four);
-        tilesDict.Add(new Tile("Bamboo_Five"), Bamboo_Five);
-        tilesDict.Add(new Tile("Bamboo_Six"), Bamboo_Six);
-        tilesDict.Add(new Tile("Bamboo_Seven"), Bamboo_Seven);
-        tilesDict.Add(new Tile("Bamboo_Eight"), Bamboo_Eight);
-        tilesDict.Add(new Tile("Bamboo_Nine"), Bamboo_Nine);
-
-        tilesDict.Add(new Tile("Wind_One"), Wind_One);
-        tilesDict.Add(new Tile("Wind_Two"), Wind_Two);
-        tilesDict.Add(new Tile("Wind_Three"), Wind_Three);
-        tilesDict.Add(new Tile("Wind_Four"), Wind_Four);
-
-        tilesDict.Add(new Tile("Dragon_One"), Dragon_One);
-        tilesDict.Add(new Tile("Dragon_Two"), Dragon_Two);
-        tilesDict.Add(new Tile("Dragon_Three"), Dragon_Three);
-
-        tilesDict.Add(new Tile("Season_One"), Season_One);
-        tilesDict.Add(new Tile("Season_Two"), Season_Two);
-        tilesDict.Add(new Tile("Season_Three"), Season_Three);
-        tilesDict.Add(new Tile("Season_Four"), Season_Four);
-
-        tilesDict.Add(new Tile("Flower_One"), Flower_One);
-        tilesDict.Add(new Tile("Flower_Two"), Flower_Two);
-        tilesDict.Add(new Tile("Flower_Three"), Flower_Three);
-        tilesDict.Add(new Tile("Flower_Four"), Flower_Four);
-
-        tilesDict.Add(new Tile("Animal_One"), Animal_One);
-        tilesDict.Add(new Tile("Animal_Two"), Animal_Two);
-        tilesDict.Add(new Tile("Animal_Three"), Animal_Three);
-        tilesDict.Add(new Tile("Animal_Four"), Animal_Four);
-    }
-
-
-    /// <summary>
-    /// Instantiates the handsToCheck dictionary.
-    /// </summary>
-    // TODO: Toggled in UI by Master Client
-    public void InstantiateHandsToCheck() {
-        this.handsToCheck = new Dictionary<string, int>();
-
-        handsToCheck.Add("Fan Limit", 5);
-
-        handsToCheck.Add("Heavenly Hand", 10);
-        handsToCheck.Add("Earthly Hand", 10);
-        handsToCheck.Add("Humanly Hand", 10);
-
-        handsToCheck.Add("Bonus Tile Match Seat Wind", 1);
-        handsToCheck.Add("Animal", 1);
-        handsToCheck.Add("Complete Animal Group", 5);
-        handsToCheck.Add("Complete Season Group", 2);
-        handsToCheck.Add("Complete Flower Group", 2);
-        handsToCheck.Add("Robbing the Eighth", 10);
-        handsToCheck.Add("All Flowers and Seasons", 10);
-
-        handsToCheck.Add("Player Wind Combo", 1);
-        handsToCheck.Add("Prevailing Wind Combo", 1);
-        handsToCheck.Add("Dragon", 1);
-
-        handsToCheck.Add("Fully Concealed", 1);
-        handsToCheck.Add("Triplets", 2);
-        handsToCheck.Add("Half Flush", 2);
-        handsToCheck.Add("Full Flush", 4);
-        handsToCheck.Add("Lesser Sequence", 1);
-        handsToCheck.Add("Full Sequence", 4);
-        handsToCheck.Add("Mixed Terminals", 4);
-        handsToCheck.Add("Pure Terminals", 10);
-        handsToCheck.Add("All Honour", 10);
-        handsToCheck.Add("Hidden Treasure", 10);
-        handsToCheck.Add("Full Flush Triplets", 10);
-        handsToCheck.Add("Full Flush Full Sequence", 10);
-        handsToCheck.Add("Full Flush Lesser Sequence", 5);
-        handsToCheck.Add("Nine Gates", 10);
-        handsToCheck.Add("Four Lesser Blessings", 2);
-        handsToCheck.Add("Four Great Blessings", 10);
-        handsToCheck.Add("Pure Green Suit", 4);
-        handsToCheck.Add("Three Lesser Scholars", 3);
-        handsToCheck.Add("Three Great Scholars", 10);
-        handsToCheck.Add("Eighteen Arhats", 10);
-        handsToCheck.Add("Thirteen Wonders", 10);
-
-        handsToCheck.Add("Winning on Replacement Tile for Flower", 1);
-        handsToCheck.Add("Winning on Replacement Tile for Kong", 1);
-        handsToCheck.Add("Kong on Kong", 10);
-
-        handsToCheck.Add("Robbing the Kong", 1);
-        handsToCheck.Add("Winning on Last Available Tile", 1);
-
-        handsToCheck.Add("Dragon Tile Set Pay All", 1);
-        handsToCheck.Add("Wind Tile Set Pay All", 1);
-        handsToCheck.Add("Point Limit Pay All", 1);
-        handsToCheck.Add("Full Flush Pay All", 1);
-        handsToCheck.Add("Pure Terminals Pay All", 1);
-
-        handsToCheck.Add("Min Point", 1);
-        handsToCheck.Add("Shooter Pay", 1);
-
-        handsToCheck.Add("Hidden Cat and Rat", 2);
-        handsToCheck.Add("Cat and Rat", 1);
-        handsToCheck.Add("Hidden Chicken and Centipede", 2);
-        handsToCheck.Add("Chicken and Centipede", 1);
-        handsToCheck.Add("Complete Animal Group Payout", 2);
-        handsToCheck.Add("Hidden Bonus Tile Match Seat Wind Pair", 2);
-        handsToCheck.Add("Bonus Tile Match Seat Wind Pair", 1);
-        handsToCheck.Add("Complete Season Group Payout", 2);
-        handsToCheck.Add("Complete Flower Group Payout", 2);
-        handsToCheck.Add("Concealed Kong Payout", 2);
-        handsToCheck.Add("Discard and Exposed Kong Payout", 1);
-    }
-
 
     /// <summary>
     /// Point the camera towards the GameTable and stretch the GameTable to fill up the screen
@@ -1298,7 +691,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player once Hidden Instant Payouts have been settled. Bonus tiles are converted
     /// </summary>
     public void InitialLocalInstantiation() {
-        
+
         // Check the local player's hand for bonus tiles. If there are, convert them to normal tiles.
         while (true) {
             bool haveBonusTile = false;
@@ -1561,8 +954,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             if (i == handSize - 1 && (handSize + 1) % 3 == 0) {
                 xPosHand += xOffset;
             }
-
-            GameObject newTile = Instantiate(tilesDict[tilesManager.hand[i]], new Vector3(xPosHand, 0.85f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
+            
+            GameObject newTile = Instantiate(DictManager.Instance.tilesDict[tilesManager.hand[i]], new Vector3(xPosHand, 0.85f, -4.4f), Quaternion.Euler(270f, 180f, 0f));
             newTile.tag = "Hand";
 
             xPosHand += xSepHand;
@@ -1607,9 +1000,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Instantiate the last Concealed Kong tile one tile above the other 3 Concealed Kong tiles.
             if (tile.kongType == 3) {
                 xPosOpen -= xSepOpen;
-                newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f + 0.3f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 1f + 0.3f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             } else {
-                newTile = Instantiate(tilesDict[tile], new Vector3(xPosOpen, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             }
 
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -1642,9 +1035,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         GameObject tileGameObject;
         // For the edge case where the local client aspect ratio is 4:3 and the 14th tile is discarded
         if (tableWidth / tableHeight < 1.34 && xPos > 0.83 * 6 + 0.30) {
-            tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.65f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+            tileGameObject = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPos, 0.65f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
         } else {
-            tileGameObject = Instantiate(tilesDict[tile], new Vector3(xPos, 0.65f, -2.8f), Quaternion.Euler(270f, 180f, 0f));
+            tileGameObject = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPos, 0.65f, -2.8f), Quaternion.Euler(270f, 180f, 0f));
         }
 
         tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -1900,8 +1293,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
                 Debug.LogError("Invalid tile type. Only accepted tile types are 'Hand' and 'Open'");
                 return;
             }
-
-            GameObject newTile = Instantiate(tilesDict[remoteTiles[i]], position, rotation);
+            GameObject newTile = Instantiate(DictManager.Instance.tilesDict[remoteTiles[i]], position, rotation);
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
             newTile.tag = wind + "_" + tileType;
 
@@ -2018,7 +1410,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
 
-        GameObject tileGameObject = Instantiate(tilesDict[discardedTile], position, rotation);
+        GameObject tileGameObject = Instantiate(DictManager.Instance.tilesDict[discardedTile], position, rotation);
         tileGameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         // Tagging is necessary to reference the last tile discarded when Chow/Pong/Kong is called
         tileGameObject.tag = "Discard";

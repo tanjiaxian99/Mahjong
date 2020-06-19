@@ -146,10 +146,158 @@ public class DictManager : MonoBehaviour {
 
     #endregion
 
+    #region Tile 3D Prefabs
+    [SerializeField]
+    private GameObject Character_One;
+
+    [SerializeField]
+    private GameObject Character_Two;
+
+    [SerializeField]
+    private GameObject Character_Three;
+
+    [SerializeField]
+    private GameObject Character_Four;
+
+    [SerializeField]
+    private GameObject Character_Five;
+
+    [SerializeField]
+    private GameObject Character_Six;
+
+    [SerializeField]
+    private GameObject Character_Seven;
+
+    [SerializeField]
+    private GameObject Character_Eight;
+
+    [SerializeField]
+    private GameObject Character_Nine;
+
+    [SerializeField]
+    private GameObject Dot_One;
+
+    [SerializeField]
+    private GameObject Dot_Two;
+
+    [SerializeField]
+    private GameObject Dot_Three;
+
+    [SerializeField]
+    private GameObject Dot_Four;
+
+    [SerializeField]
+    private GameObject Dot_Five;
+
+    [SerializeField]
+    private GameObject Dot_Six;
+
+    [SerializeField]
+    private GameObject Dot_Seven;
+
+    [SerializeField]
+    private GameObject Dot_Eight;
+
+    [SerializeField]
+    private GameObject Dot_Nine;
+
+    [SerializeField]
+    private GameObject Bamboo_One;
+
+    [SerializeField]
+    private GameObject Bamboo_Two;
+
+    [SerializeField]
+    private GameObject Bamboo_Three;
+
+    [SerializeField]
+    private GameObject Bamboo_Four;
+
+    [SerializeField]
+    private GameObject Bamboo_Five;
+
+    [SerializeField]
+    private GameObject Bamboo_Six;
+
+    [SerializeField]
+    private GameObject Bamboo_Seven;
+
+    [SerializeField]
+    private GameObject Bamboo_Eight;
+
+    [SerializeField]
+    private GameObject Bamboo_Nine;
+
+    [SerializeField]
+    private GameObject Wind_One;
+
+    [SerializeField]
+    private GameObject Wind_Two;
+
+    [SerializeField]
+    private GameObject Wind_Three;
+
+    [SerializeField]
+    private GameObject Wind_Four;
+
+    [SerializeField]
+    private GameObject Dragon_One;
+
+    [SerializeField]
+    private GameObject Dragon_Two;
+
+    [SerializeField]
+    private GameObject Dragon_Three;
+
+    [SerializeField]
+    private GameObject Season_One;
+
+    [SerializeField]
+    private GameObject Season_Two;
+
+    [SerializeField]
+    private GameObject Season_Three;
+
+    [SerializeField]
+    private GameObject Season_Four;
+
+    [SerializeField]
+    private GameObject Flower_One;
+
+    [SerializeField]
+    private GameObject Flower_Two;
+
+    [SerializeField]
+    private GameObject Flower_Three;
+
+    [SerializeField]
+    private GameObject Flower_Four;
+
+    [SerializeField]
+    private GameObject Animal_One;
+
+    [SerializeField]
+    private GameObject Animal_Two;
+
+    [SerializeField]
+    private GameObject Animal_Three;
+
+    [SerializeField]
+    private GameObject Animal_Four;
+
+    #endregion
+
+    #region Dictionaries
+
     /// <summary>
     /// Dictionary containing Tile objects and their respective sprite
     /// </summary>
     public Dictionary<Tile, Sprite> spritesDict;
+
+    /// <summary>
+    /// Dictionary containing Tile objects and their respective prefab
+    /// </summary>
+    public Dictionary<Tile, GameObject> tilesDict;
 
     /// <summary>
     /// Dictionary containing Tile objects and their respective winds
@@ -159,6 +307,12 @@ public class DictManager : MonoBehaviour {
     public Dictionary<PlayerManager.Wind, Tile> windToTileDict;
 
     public Dictionary<PlayerManager.Wind, List<Tile>> windToBonusTilesDict;
+
+    public Dictionary<int, int> windsAllocation;
+
+    #endregion
+
+    #region Singleton Initialization
 
     private static DictManager _instance;
 
@@ -172,11 +326,14 @@ public class DictManager : MonoBehaviour {
         }
     }
 
+    #endregion
+
     private void Start() {
         this.InitializeSpritesDict();
+        this.InitializeTilesDict();
+        this.InitializeWindToBonusTilesDict();
         this.InitializeTileToWindDict();
         this.InitializeWindToTileDict();
-        this.InitializeWindToBonusTilesDict();
     }
 
     /// <summary>
@@ -238,6 +395,68 @@ public class DictManager : MonoBehaviour {
         spritesDict.Add(new Tile("Animal_Two"), Animal_Two_Sprite);
         spritesDict.Add(new Tile("Animal_Three"), Animal_Three_Sprite);
         spritesDict.Add(new Tile("Animal_Four"), Animal_Four_Sprite);
+    }
+
+
+    /// <summary>
+    /// Fill up the tilesDict with Tile objects and their respective prefabs
+    /// </summary>
+    private void InitializeTilesDict() {
+        tilesDict = new Dictionary<Tile, GameObject>();
+
+        tilesDict.Add(new Tile("Character_One"), Character_One);
+        tilesDict.Add(new Tile("Character_Two"), Character_Two);
+        tilesDict.Add(new Tile("Character_Three"), Character_Three);
+        tilesDict.Add(new Tile("Character_Four"), Character_Four);
+        tilesDict.Add(new Tile("Character_Five"), Character_Five);
+        tilesDict.Add(new Tile("Character_Six"), Character_Six);
+        tilesDict.Add(new Tile("Character_Seven"), Character_Seven);
+        tilesDict.Add(new Tile("Character_Eight"), Character_Eight);
+        tilesDict.Add(new Tile("Character_Nine"), Character_Nine);
+
+        tilesDict.Add(new Tile("Dot_One"), Dot_One);
+        tilesDict.Add(new Tile("Dot_Two"), Dot_Two);
+        tilesDict.Add(new Tile("Dot_Three"), Dot_Three);
+        tilesDict.Add(new Tile("Dot_Four"), Dot_Four);
+        tilesDict.Add(new Tile("Dot_Five"), Dot_Five);
+        tilesDict.Add(new Tile("Dot_Six"), Dot_Six);
+        tilesDict.Add(new Tile("Dot_Seven"), Dot_Seven);
+        tilesDict.Add(new Tile("Dot_Eight"), Dot_Eight);
+        tilesDict.Add(new Tile("Dot_Nine"), Dot_Nine);
+
+        tilesDict.Add(new Tile("Bamboo_One"), Bamboo_One);
+        tilesDict.Add(new Tile("Bamboo_Two"), Bamboo_Two);
+        tilesDict.Add(new Tile("Bamboo_Three"), Bamboo_Three);
+        tilesDict.Add(new Tile("Bamboo_Four"), Bamboo_Four);
+        tilesDict.Add(new Tile("Bamboo_Five"), Bamboo_Five);
+        tilesDict.Add(new Tile("Bamboo_Six"), Bamboo_Six);
+        tilesDict.Add(new Tile("Bamboo_Seven"), Bamboo_Seven);
+        tilesDict.Add(new Tile("Bamboo_Eight"), Bamboo_Eight);
+        tilesDict.Add(new Tile("Bamboo_Nine"), Bamboo_Nine);
+
+        tilesDict.Add(new Tile("Wind_One"), Wind_One);
+        tilesDict.Add(new Tile("Wind_Two"), Wind_Two);
+        tilesDict.Add(new Tile("Wind_Three"), Wind_Three);
+        tilesDict.Add(new Tile("Wind_Four"), Wind_Four);
+
+        tilesDict.Add(new Tile("Dragon_One"), Dragon_One);
+        tilesDict.Add(new Tile("Dragon_Two"), Dragon_Two);
+        tilesDict.Add(new Tile("Dragon_Three"), Dragon_Three);
+
+        tilesDict.Add(new Tile("Season_One"), Season_One);
+        tilesDict.Add(new Tile("Season_Two"), Season_Two);
+        tilesDict.Add(new Tile("Season_Three"), Season_Three);
+        tilesDict.Add(new Tile("Season_Four"), Season_Four);
+
+        tilesDict.Add(new Tile("Flower_One"), Flower_One);
+        tilesDict.Add(new Tile("Flower_Two"), Flower_Two);
+        tilesDict.Add(new Tile("Flower_Three"), Flower_Three);
+        tilesDict.Add(new Tile("Flower_Four"), Flower_Four);
+
+        tilesDict.Add(new Tile("Animal_One"), Animal_One);
+        tilesDict.Add(new Tile("Animal_Two"), Animal_Two);
+        tilesDict.Add(new Tile("Animal_Three"), Animal_Three);
+        tilesDict.Add(new Tile("Animal_Four"), Animal_Four);
     }
 
 

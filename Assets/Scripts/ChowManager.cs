@@ -122,7 +122,7 @@ public class ChowManager : MonoBehaviour {
 
 
         // Update discard tile properties to indicate to all players to remove the latest discard tile
-        PropertiesManager.UpdateDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+        PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
 
         // Update both the player's hand and the combo tiles list
         foreach (Tile tile in handTile) {

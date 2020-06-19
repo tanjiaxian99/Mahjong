@@ -86,7 +86,7 @@ public class KongManager : MonoBehaviour {
     public void OnKongOk() {
         // Check if the discard tile is a high risk discard
         if (payAllDiscard.shouldPayForAll(playerManager, tilesManager, gameManager.prevailingWind, gameManager.latestDiscardTile, "Kong")) {
-            PropertiesManager.UpdatePayAllDiscard(gameManager.discardPlayer);
+            PropertiesManager.SetPayAllDiscard(gameManager.discardPlayer);
         }
 
         PongCombo.SetActive(false);
@@ -113,7 +113,7 @@ public class KongManager : MonoBehaviour {
             EventsManager.EventPongKong(true);
 
             // Update discard tile properties to indicate to all players to remove the latest discard tile
-            PropertiesManager.UpdateDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+            PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
 
             List<Tile> combo = new List<Tile>();
             for (int i = 0; i < 3; i++) {
@@ -138,7 +138,7 @@ public class KongManager : MonoBehaviour {
             hand.Remove(drawnTile);
 
             // Update discard tile properties to indicate to all players that Robbing the Kong is possible
-            PropertiesManager.UpdateSpecialTile(new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, drawnTile, 2));
+            PropertiesManager.SetSpecialTile(new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, drawnTile, 2));
 
         } else if (tilesManager.ConcealedKongTiles().Contains(kongTile)) {
             // The second-last tile will be instantiated above the 3 other Kong tiles
@@ -158,7 +158,7 @@ public class KongManager : MonoBehaviour {
             tilesManager.comboTiles.Add(combo);
 
             // Update kong tile properties to indicate to all players that Robbing the Kong is possible for Thirteen Wonders
-            PropertiesManager.UpdateSpecialTile(new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, kongTileSpecial, 3));
+            PropertiesManager.SetSpecialTile(new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, kongTileSpecial, 3));
         }
 
         playerManager.numberOfKong++;

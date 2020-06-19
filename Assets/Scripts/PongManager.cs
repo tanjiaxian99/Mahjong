@@ -85,7 +85,7 @@ public class PongManager : MonoBehaviour {
 
         // Check if the discard tile is a high risk discard
         if (payAllDiscard.shouldPayForAll(playerManager, tilesManager, gameManager.prevailingWind, latestDiscardTile, "Pong")) {
-            PropertiesManager.UpdatePayAllDiscard(gameManager.discardPlayer);
+            PropertiesManager.SetPayAllDiscard(gameManager.discardPlayer);
         }
 
         PongCombo.SetActive(false);
@@ -94,7 +94,7 @@ public class PongManager : MonoBehaviour {
         KongComboTwo.SetActive(false);
 
         // Update discard tile properties to indicate to all players to remove the latest discard tile
-        PropertiesManager.UpdateDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+        PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
 
         // Update both the player's hand and the combo tiles list. 2 tiles are removed from the player's hand and 3 tiles are
         // added to combo tiles.

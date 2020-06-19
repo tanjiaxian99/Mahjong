@@ -571,7 +571,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &146752697
 GameObject:
@@ -2827,7 +2827,7 @@ GameObject:
   - component: {fileID: 760501862}
   - component: {fileID: 760501861}
   m_Layer: 0
-  m_Name: TilesDict
+  m_Name: DictManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2907,6 +2907,95 @@ MonoBehaviour:
   Animal_Three_Sprite: {fileID: 21300000, guid: ac22957fe04aed841b6383ae8618674a,
     type: 3}
   Animal_Four_Sprite: {fileID: 21300000, guid: ab3629fca376f4a41a0b22622acc7a91, type: 3}
+  Character_One: {fileID: -927199367670048503, guid: bc326ad653f9c0246b32a1431356ec7d,
+    type: 3}
+  Character_Two: {fileID: -927199367670048503, guid: 477a2a2671ba76f448726d75a27096de,
+    type: 3}
+  Character_Three: {fileID: -927199367670048503, guid: 4ca51a59457824e43a4ef081b8e2a8f1,
+    type: 3}
+  Character_Four: {fileID: -927199367670048503, guid: 597cf5fd59120464d8b3ec5d0c74ea15,
+    type: 3}
+  Character_Five: {fileID: -927199367670048503, guid: 8c76a361be045e84e9af639e284651d4,
+    type: 3}
+  Character_Six: {fileID: -927199367670048503, guid: c5e319229e316a048880fc3658f1ef30,
+    type: 3}
+  Character_Seven: {fileID: -927199367670048503, guid: 1d06174f53459f94f8fb3ed86418550f,
+    type: 3}
+  Character_Eight: {fileID: -927199367670048503, guid: 0c99629d6b629bc4188d96891dd2cdc5,
+    type: 3}
+  Character_Nine: {fileID: -927199367670048503, guid: d040d92820404e64fbfa6e6d2008404d,
+    type: 3}
+  Dot_One: {fileID: -927199367670048503, guid: 0900296682075654abe513e95a70b3fd, type: 3}
+  Dot_Two: {fileID: -927199367670048503, guid: 98192bf6050cfda49802e2eac8b123ec, type: 3}
+  Dot_Three: {fileID: -927199367670048503, guid: 2bdc100b09147ae449d7b9fb1b5b6fcf,
+    type: 3}
+  Dot_Four: {fileID: -927199367670048503, guid: 6cc62289294c3e24298eb575c70e0aba,
+    type: 3}
+  Dot_Five: {fileID: -927199367670048503, guid: 9efa2171f6a7d61448fdc188dd0ed67f,
+    type: 3}
+  Dot_Six: {fileID: -927199367670048503, guid: 86bd84d691b707c4c92a7912988a86bf, type: 3}
+  Dot_Seven: {fileID: -927199367670048503, guid: 713325dd49a747e49bd0622494d0faa3,
+    type: 3}
+  Dot_Eight: {fileID: -927199367670048503, guid: 7163ef7c0c9f61048bc27f7459c28701,
+    type: 3}
+  Dot_Nine: {fileID: -927199367670048503, guid: 7fe7a4f0bd4631c4a94ee9a71e89a13f,
+    type: 3}
+  Bamboo_One: {fileID: -927199367670048503, guid: dd6f49c1f0b4d464fa2b5397c3efed1a,
+    type: 3}
+  Bamboo_Two: {fileID: -927199367670048503, guid: 52445e0921fbfb148ad6690375df05bb,
+    type: 3}
+  Bamboo_Three: {fileID: -927199367670048503, guid: 7518c3cda3a8ada469346563b5227fb1,
+    type: 3}
+  Bamboo_Four: {fileID: -927199367670048503, guid: 1cd189c0ef4b82d43acf3e6e6ac3d4d6,
+    type: 3}
+  Bamboo_Five: {fileID: -927199367670048503, guid: 8ccdd7951b04960458c0c3f7355d09fc,
+    type: 3}
+  Bamboo_Six: {fileID: -927199367670048503, guid: 50042e6404676284dbbb3a8524c6450f,
+    type: 3}
+  Bamboo_Seven: {fileID: -927199367670048503, guid: a119fef81c2c9114d99e7931f4a2032e,
+    type: 3}
+  Bamboo_Eight: {fileID: -927199367670048503, guid: e0b145d438a282c4aabc015b7c7f687f,
+    type: 3}
+  Bamboo_Nine: {fileID: -927199367670048503, guid: f6bb7aa53d141ec49b5db0d887794202,
+    type: 3}
+  Wind_One: {fileID: -927199367670048503, guid: ba22bb64e2bb3f2409b27f20ae6022c1,
+    type: 3}
+  Wind_Two: {fileID: -927199367670048503, guid: 944cb0ec7dcf9c942a253cf5d711fb43,
+    type: 3}
+  Wind_Three: {fileID: -927199367670048503, guid: 70e2d0e211937b84ba2f10ee6e613645,
+    type: 3}
+  Wind_Four: {fileID: -927199367670048503, guid: 03a454d9c70f269439a0e6ca153f1343,
+    type: 3}
+  Dragon_One: {fileID: -927199367670048503, guid: 32c33138583b46242973d6531e5a30fd,
+    type: 3}
+  Dragon_Two: {fileID: -927199367670048503, guid: 0dc674dd7e873b8468eeed8b71884928,
+    type: 3}
+  Dragon_Three: {fileID: -927199367670048503, guid: 7689a7be92c2d854895aca591a120c13,
+    type: 3}
+  Season_One: {fileID: -927199367670048503, guid: 1ed9d75364d4ddd41a142db1a55048d2,
+    type: 3}
+  Season_Two: {fileID: -927199367670048503, guid: b03dac4ae2cceba4c9246d30093298a9,
+    type: 3}
+  Season_Three: {fileID: -927199367670048503, guid: 71ec3ab91a007b348accdfaf999f7364,
+    type: 3}
+  Season_Four: {fileID: -927199367670048503, guid: 3c2fdca4bc2caf343af107f185bb811b,
+    type: 3}
+  Flower_One: {fileID: -927199367670048503, guid: aa5460e7d3870e6409831740afe1f064,
+    type: 3}
+  Flower_Two: {fileID: -927199367670048503, guid: 2231e07f1cbcb8c4f9c43c325298172b,
+    type: 3}
+  Flower_Three: {fileID: -927199367670048503, guid: aafba60cd60142e48b5b118cbcc59a4c,
+    type: 3}
+  Flower_Four: {fileID: -927199367670048503, guid: 885d72a4fb8df3d4b9c7d423596a824a,
+    type: 3}
+  Animal_One: {fileID: -927199367670048503, guid: 5db514a85f7cd9d4ab78dec1f2819766,
+    type: 3}
+  Animal_Two: {fileID: -927199367670048503, guid: fd3ce49909e28714085a6b9d7f120ffe,
+    type: 3}
+  Animal_Three: {fileID: -927199367670048503, guid: ca9786bc46b023f4ea6e529689edb63b,
+    type: 3}
+  Animal_Four: {fileID: -927199367670048503, guid: ec70fed4e0979b54ea517ff8b81581e2,
+    type: 3}
 --- !u!4 &760501862
 Transform:
   m_ObjectHideFlags: 0
@@ -2919,7 +3008,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &771166371
 GameObject:
@@ -5569,7 +5658,7 @@ Transform:
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1294127114
 GameObject:
@@ -6432,7 +6521,7 @@ MonoBehaviour:
   gameTable: {fileID: 1286068716}
   tableHeight: 0
   tableWidth: 0
-  numberOfPlayersToStart: 4
+  numberOfPlayers: 4
   turnManager: {fileID: 0}
   PongKongUpdateList: 
   winUpdateList: 
@@ -6448,102 +6537,6 @@ MonoBehaviour:
   sacredDiscardManager: {fileID: 0}
   missedDiscardManager: {fileID: 0}
   winManager: {fileID: 0}
-  Character_One: {fileID: -927199367670048503, guid: bc326ad653f9c0246b32a1431356ec7d,
-    type: 3}
-  Character_Two: {fileID: -927199367670048503, guid: 477a2a2671ba76f448726d75a27096de,
-    type: 3}
-  Character_Three: {fileID: -927199367670048503, guid: 4ca51a59457824e43a4ef081b8e2a8f1,
-    type: 3}
-  Character_Four: {fileID: -927199367670048503, guid: 597cf5fd59120464d8b3ec5d0c74ea15,
-    type: 3}
-  Character_Five: {fileID: -927199367670048503, guid: 8c76a361be045e84e9af639e284651d4,
-    type: 3}
-  Character_Six: {fileID: -927199367670048503, guid: c5e319229e316a048880fc3658f1ef30,
-    type: 3}
-  Character_Seven: {fileID: -927199367670048503, guid: 1d06174f53459f94f8fb3ed86418550f,
-    type: 3}
-  Character_Eight: {fileID: -927199367670048503, guid: 0c99629d6b629bc4188d96891dd2cdc5,
-    type: 3}
-  Character_Nine: {fileID: -927199367670048503, guid: d040d92820404e64fbfa6e6d2008404d,
-    type: 3}
-  Dot_One: {fileID: -927199367670048503, guid: 0900296682075654abe513e95a70b3fd, type: 3}
-  Dot_Two: {fileID: -927199367670048503, guid: 98192bf6050cfda49802e2eac8b123ec, type: 3}
-  Dot_Three: {fileID: -927199367670048503, guid: 2bdc100b09147ae449d7b9fb1b5b6fcf,
-    type: 3}
-  Dot_Four: {fileID: -927199367670048503, guid: 6cc62289294c3e24298eb575c70e0aba,
-    type: 3}
-  Dot_Five: {fileID: -927199367670048503, guid: 9efa2171f6a7d61448fdc188dd0ed67f,
-    type: 3}
-  Dot_Six: {fileID: -927199367670048503, guid: 86bd84d691b707c4c92a7912988a86bf, type: 3}
-  Dot_Seven: {fileID: -927199367670048503, guid: 713325dd49a747e49bd0622494d0faa3,
-    type: 3}
-  Dot_Eight: {fileID: -927199367670048503, guid: 7163ef7c0c9f61048bc27f7459c28701,
-    type: 3}
-  Dot_Nine: {fileID: -927199367670048503, guid: 7fe7a4f0bd4631c4a94ee9a71e89a13f,
-    type: 3}
-  Bamboo_One: {fileID: -927199367670048503, guid: dd6f49c1f0b4d464fa2b5397c3efed1a,
-    type: 3}
-  Bamboo_Two: {fileID: -927199367670048503, guid: 52445e0921fbfb148ad6690375df05bb,
-    type: 3}
-  Bamboo_Three: {fileID: -927199367670048503, guid: 7518c3cda3a8ada469346563b5227fb1,
-    type: 3}
-  Bamboo_Four: {fileID: -927199367670048503, guid: 1cd189c0ef4b82d43acf3e6e6ac3d4d6,
-    type: 3}
-  Bamboo_Five: {fileID: -927199367670048503, guid: 8ccdd7951b04960458c0c3f7355d09fc,
-    type: 3}
-  Bamboo_Six: {fileID: -927199367670048503, guid: 50042e6404676284dbbb3a8524c6450f,
-    type: 3}
-  Bamboo_Seven: {fileID: -927199367670048503, guid: a119fef81c2c9114d99e7931f4a2032e,
-    type: 3}
-  Bamboo_Eight: {fileID: -927199367670048503, guid: e0b145d438a282c4aabc015b7c7f687f,
-    type: 3}
-  Bamboo_Nine: {fileID: -927199367670048503, guid: f6bb7aa53d141ec49b5db0d887794202,
-    type: 3}
-  Wind_One: {fileID: -927199367670048503, guid: ba22bb64e2bb3f2409b27f20ae6022c1,
-    type: 3}
-  Wind_Two: {fileID: -927199367670048503, guid: 944cb0ec7dcf9c942a253cf5d711fb43,
-    type: 3}
-  Wind_Three: {fileID: -927199367670048503, guid: 70e2d0e211937b84ba2f10ee6e613645,
-    type: 3}
-  Wind_Four: {fileID: -927199367670048503, guid: 03a454d9c70f269439a0e6ca153f1343,
-    type: 3}
-  Dragon_One: {fileID: -927199367670048503, guid: 32c33138583b46242973d6531e5a30fd,
-    type: 3}
-  Dragon_Two: {fileID: -927199367670048503, guid: 0dc674dd7e873b8468eeed8b71884928,
-    type: 3}
-  Dragon_Three: {fileID: -927199367670048503, guid: 7689a7be92c2d854895aca591a120c13,
-    type: 3}
-  Season_One: {fileID: -927199367670048503, guid: 1ed9d75364d4ddd41a142db1a55048d2,
-    type: 3}
-  Season_Two: {fileID: -927199367670048503, guid: b03dac4ae2cceba4c9246d30093298a9,
-    type: 3}
-  Season_Three: {fileID: -927199367670048503, guid: 71ec3ab91a007b348accdfaf999f7364,
-    type: 3}
-  Season_Four: {fileID: -927199367670048503, guid: 3c2fdca4bc2caf343af107f185bb811b,
-    type: 3}
-  Flower_One: {fileID: -927199367670048503, guid: aa5460e7d3870e6409831740afe1f064,
-    type: 3}
-  Flower_Two: {fileID: -927199367670048503, guid: 2231e07f1cbcb8c4f9c43c325298172b,
-    type: 3}
-  Flower_Three: {fileID: -927199367670048503, guid: aafba60cd60142e48b5b118cbcc59a4c,
-    type: 3}
-  Flower_Four: {fileID: -927199367670048503, guid: 885d72a4fb8df3d4b9c7d423596a824a,
-    type: 3}
-  Animal_One: {fileID: -927199367670048503, guid: 5db514a85f7cd9d4ab78dec1f2819766,
-    type: 3}
-  Animal_Two: {fileID: -927199367670048503, guid: fd3ce49909e28714085a6b9d7f120ffe,
-    type: 3}
-  Animal_Three: {fileID: -927199367670048503, guid: ca9786bc46b023f4ea6e529689edb63b,
-    type: 3}
-  Animal_Four: {fileID: -927199367670048503, guid: ec70fed4e0979b54ea517ff8b81581e2,
-    type: 3}
-  ChowComboZero: {fileID: 1311414061}
-  ChowComboOne: {fileID: 1163502290}
-  ChowComboTwo: {fileID: 146752697}
-  PongCombo: {fileID: 1457008409}
-  KongComboZero: {fileID: 672664132}
-  KongComboOne: {fileID: 456702554}
-  KongComboTwo: {fileID: 1982182469}
   pointsGameObject: {fileID: 1528145999}
 --- !u!4 &1419168653
 Transform:

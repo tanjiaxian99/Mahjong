@@ -106,15 +106,15 @@ public class WinManager : MonoBehaviour {
     public void OnWinOk() {
         // Check if the discard tile is a high risk discard
         if (payAllDiscard.shouldPayForAll(playerManager, tilesManager, gameManager.prevailingWind, gameManager.latestDiscardTile, "Win")) {
-            PropertiesManager.UpdatePayAllDiscard(gameManager.discardPlayer);
+            PropertiesManager.SetPayAllDiscard(gameManager.discardPlayer);
         }
 
         if (playerManager.winningCombos.Contains("Robbing the Kong")) {
-            PropertiesManager.UpdatePayAllDiscard(gameManager.kongPlayer);
+            PropertiesManager.SetPayAllDiscard(gameManager.kongPlayer);
         }
 
         if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
-            PropertiesManager.UpdatePayAllDiscard(gameManager.bonusPlayer);
+            PropertiesManager.SetPayAllDiscard(gameManager.bonusPlayer);
         }
 
         // Raise an event to inform remote players of the win
@@ -125,7 +125,7 @@ public class WinManager : MonoBehaviour {
 
         // Update DiscardTilesPropkey to remove the discard tile used for the win
         if (gameManager.latestDiscardTile != null) {
-            PropertiesManager.UpdateDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+            PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
         }
 
         int numberOfTilesLeft = gameManager.numberOfTilesLeft;
