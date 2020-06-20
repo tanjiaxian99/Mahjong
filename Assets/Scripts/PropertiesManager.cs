@@ -13,7 +13,7 @@ public static class PropertiesManager {
     /// <summary>
     /// Dictionary containing actor numbers and wind assignments
     /// </summary>
-    public static readonly string WindDictPropKey = "wd";
+    public static readonly string WindAllocationPropKey = "wa";
 
     /// <summary>
     /// Play order sequence
@@ -36,17 +36,27 @@ public static class PropertiesManager {
     public static readonly string SpecialTilePropKey = "kt";
 
     /// <summary>
+    /// Number of tiles in the player's hand
+    /// </summary>
+    public static readonly string HandTilesCountPropKey = "ht";
+
+    /// <summary>
+    /// The local player's open tiles
+    /// </summary>
+    public static readonly string OpenTilesPropKey = "ot";
+
+    /// <summary>
     /// The player that has to pay for all players
     /// </summary>
     public static readonly string PayAllDiscardPropKey = "pa";
 
     #endregion
 
-    #region Update Properties Methods
+    #region Set Properties Methods
 
-    public static void SetWindDict(Dictionary<int, int> windsAllocation) {
+    public static void SetWindAllocation(Dictionary<int, int> windsAllocation) {
         Hashtable ht = new Hashtable();
-        ht.Add(WindDictPropKey, windsAllocation);
+        ht.Add(WindAllocationPropKey, windsAllocation);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
     
@@ -84,12 +94,24 @@ public static class PropertiesManager {
 
     #region Retrieve Properties Methods
 
+    public static Dictionary<int, int> GetWindAllocation() {
+        return (Dictionary<int, int>)PhotonNetwork.CurrentRoom.CustomProperties[WindAllocationPropKey];
+    }
+
     public static Player[] GetPlayOrder() {
         return (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
     }
 
     public static List<Tile> GetWallTileList() {
         return (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
+    }
+
+    public static int GetHandTilesCount(Player player) {
+        return (int)player.CustomProperties[HandTilesCountPropKey];
+    }
+
+    public static List<Tile> GetOpenTiles(Player player) {
+        return (List<Tile>)player.CustomProperties[OpenTilesPropKey];
     }
 
     #endregion

@@ -6,7 +6,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class InitializeRound : MonoBehaviour {
+public static class InitializeRound {
 
     /// <summary>
     /// Called by MasterClient to assign a wind to each player
@@ -27,7 +27,7 @@ public class InitializeRound : MonoBehaviour {
             winds.Remove(winds[randomIndex]);
             DictManager.Instance.windsAllocation.Add(player.ActorNumber, (int)playerWind);
         }
-        PropertiesManager.SetWindDict(DictManager.Instance.windsAllocation);
+        PropertiesManager.SetWindAllocation(DictManager.Instance.windsAllocation);
         Debug.LogFormat("The 4 winds have been assigned to each player");
     }
 

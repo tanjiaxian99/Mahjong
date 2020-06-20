@@ -308,6 +308,9 @@ public class DictManager : MonoBehaviour {
 
     public Dictionary<PlayerManager.Wind, List<Tile>> windToBonusTilesDict;
 
+    /// <summary>
+    /// A cached copy of allocated Winds.
+    /// </summary>
     public Dictionary<int, int> windsAllocation;
 
     #endregion
