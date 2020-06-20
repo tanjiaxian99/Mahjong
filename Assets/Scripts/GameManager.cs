@@ -14,7 +14,7 @@ using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = System.Random;
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, IOnEventCallback {
+public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     #region Private Fields
 
     [SerializeField]
@@ -58,21 +58,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Cache for Chow Combinations return value
     /// </summary>
     public List<object[]> chowTiles;
-
-    /// <summary>
-    /// A list used by MasterClient to track whether players can/want to Pong/Kong
-    /// </summary>
-    public List<bool> PongKongUpdateList = new List<bool>();
-
-    /// <summary>
-    /// A list used by MasterClient to track whether players can/want to win
-    /// </summary>
-    public List<bool> winUpdateList = new List<bool>();
-
-    /// <summary>
-    /// A list used by MasterClient to track the actor numbers of players who didn't discard the tile
-    /// </summary>
-    public List<int> nonDiscardActorNumbers = new List<int>();
 
     /// <summary>
     /// The latest tile to be discarded. Null if the player drew a tile
@@ -125,110 +110,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #endregion
 
-    #region OnEvent Fields
-
-    /// <summary>
-    /// The Screen View Adjustment event message byte. Used internally for pointing the camera towards the GameTable and
-    /// stretching the GameTable to fill the screen.
-    /// </summary>
-    public const byte EvScreenViewAdjustment = 4;
-
-    /// <summary>
-    /// The Distribute Tiles event message byte. Used internally for saving data in local player's PlayerManager.
-    /// </summary>
-    public const byte EvDistributeTiles = 5;
-
-    /// <summary>
-    /// The Hidden Payouts event message byte. Used internally for checking for Hidden Payouts in local and remote tiles.
-    /// </summary>
-    public const byte EvHiddenPayouts = 6;
-
-    /// <summary>
-    /// The Initial Instantiation event message byte. Used internally for converting the local player's bonus tiles into normal tiles.
-    /// Afterwards, instantiate the local player's hand and open tiles
-    /// </summary>
-    public const byte EvPlayerInitialization = 7;
-
-    /// <summary>
-    /// The Player Turn event message byte. Used internally by MasterClient to update the next player on his turn.
-    /// </summary>
-    public const byte EvPlayerTurn = 8;
-
-    /// <summary>
-    /// The Win Update event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
-    /// </summary>
-    public const byte EvWinUpdate = 9;
-
-    /// <summary>
-    /// The Check Pong Kong event message byte. Used internally to check whether the local player can Pong/Kong.
-    /// </summary>
-    public const byte EvCheckPongKong = 10;
-
-    /// <summary>
-    /// The Pong Kong Update event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
-    /// the latest discard tile.
-    /// </summary>
-    public const byte EvPongKongUpdate = 11;
-
-    /// <summary>
-    /// The Player Win event message byte. Used internally by the local player when a remote player has won.
-    /// </summary>
-    public const byte EvPlayerWin = 12;
-
-
-
-    /// <summary>
-    /// Dictionary containing actor numbers and wind assignments
-    /// </summary>
-    public static readonly string WindAllocationPropKey = "wa";
-
-    /// <summary>
-    /// Wind of the player
-    /// </summary>
-    public static readonly string PlayerWindPropKey = "pw";
-
-    /// <summary>
-    /// Play order sequence
-    /// </summary>
-    public static readonly string PlayOrderPropkey = "po";
-
-    /// <summary>
-    /// List of tiles in the walls
-    /// </summary>
-    public static readonly string WallTileListPropKey = "wt";
-
-    /// <summary>
-    /// The discarder's actor number, the tile discarded, and the discard position
-    /// </summary>
-    public static readonly string DiscardTilePropKey = "dt";
-
-    /// <summary>
-    /// The latest tile which was Konged
-    /// </summary>
-    public static readonly string SpecialTilePropKey = "kt";
-
-    /// <summary>
-    /// Number of tiles in the player's hand
-    /// </summary>
-    public static readonly string HandTilesCountPropKey = "ht";
-
-    /// <summary>
-    /// The local player's open tiles
-    /// </summary>
-    public static readonly string OpenTilesPropKey = "ot";
-
-    /// <summary>
-    /// The next player to play
-    /// </summary>
-    public static readonly string NextPlayerPropKey = "np";
-
-    /// <summary>
-    /// The player that has to pay for all players
-    /// </summary>
-    public static readonly string PayAllDiscardPropKey = "pa";
-
-    #endregion
-
     #region UI fields
 
     [SerializeField]
@@ -237,6 +118,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     #endregion
 
     #region MonoBehavior Callbacks
+
+    private static GameManager _instance;
+
+    public static GameManager Instance { get { return _instance; } }
+
+    private void Awake() {
+        if (_instance != null && _instance != this) {
+            Destroy(this.gameObject);
+        } else {
+            _instance = this;
+        }
+    }
 
     void Start() {
         Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManager.GetActiveScene().name);
@@ -270,20 +163,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
     #region MonoBehaviourPunCallbacks Callbacks
 
-    // Register the OnEvent callback handler
-    public override void OnEnable() {
-        base.OnEnable();
-        PhotonNetwork.AddCallbackTarget(this);
-    }
-
-
-    // Remove the OnEvent callback handler
-    public override void OnDisable() {
-        base.OnDisable();
-        PhotonNetwork.RemoveCallbackTarget(this);
-    }
-
-
     /// <summary>
     /// Called by the local player upon joining a room
     /// </summary>
@@ -306,7 +185,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
             // Players that disconnect and reconnect won't start the game at turn 0
             // Game is initialized by MasterClient
             if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
-                StartCoroutine("InitializeGame");
+                StartCoroutine(InitializeRound.InitializeGame(this, numberOfPlayers));
             }
 
         } else {
@@ -320,7 +199,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayers) {
             if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
-                StartCoroutine("InitializeGame");
+                StartCoroutine(InitializeRound.InitializeGame(this, numberOfPlayers));
             }
         }
     }
@@ -353,157 +232,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         Debug.LogFormat("Local player has disconnected due to cause {0}", cause);
     }
 
-
-    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) {
-        if (propertiesThatChanged.ContainsKey(WindAllocationPropKey)) {
-            DictManager.Instance.windsAllocation = PropertiesManager.GetWindAllocation();
-            windsDict = (Dictionary<int, int>)PhotonNetwork.CurrentRoom.CustomProperties[WindAllocationPropKey];
-            PlayerManager.Wind wind = (PlayerManager.Wind)windsDict[PhotonNetwork.LocalPlayer.ActorNumber];
-
-            // Update local player's custom properties
-            Hashtable ht = new Hashtable();
-            ht.Add(PlayerWindPropKey, wind);
-            PhotonNetwork.SetPlayerCustomProperties(ht);
-            // Update local player's playerManager
-            playerManager.seatWind = wind;
-
-            // Initialize Instant Payment dictionary
-            this.payment.InitializeInstantPaymentDict(PhotonNetwork.PlayerList.ToList());
-
-        } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
-            Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
-
-            // Item1 = -1 when the latest discard tile is to be removed, due to Chow, Pong, Kong or Win
-            // Item1 = -2 when a player has drawn a tile and both discardPlayer and latestDiscardTile can be reset to null;
-            if (discardTileInfo.Item1 == -1) {
-                // Remove the last discard tile
-                GameObject lastDiscardTile = GameObject.FindGameObjectWithTag("Discard");
-                Destroy(lastDiscardTile);
-                discardTiles.RemoveAt(discardTiles.Count - 1);
-                return;
-
-            } else if (discardTileInfo.Item1 == -2) {
-                discardPlayer = null;
-                latestDiscardTile = null;
-                return;
-            } 
-
-            discardPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
-            latestDiscardTile = discardTileInfo.Item2;
-            float hPos = discardTileInfo.Item3;
-
-            isFreshTile = FreshTileDiscard.IsFreshTile(discardTiles, this.AllPlayersOpenTiles(), latestDiscardTile);
-            discardTiles.Add(latestDiscardTile);
-
-            // Only instantiate the tile if a remote player threw it
-            if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                return;
-            }
-
-            RemotePlayer.InstantiateRemoteDiscardTile(this, discardPlayer, latestDiscardTile, hPos);
-
-            // Check to see if the player can win based on the discard tile
-            if (winManager.CanWin()) {
-                winManager.WinUI();
-                return;
-            } else {
-                // Inform the Master Client that the player can't win
-                PhotonNetwork.RaiseEvent(EvWinUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
-            }
-
-        } else if (propertiesThatChanged.ContainsKey(SpecialTilePropKey)) {
-            Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[SpecialTilePropKey];
-
-            if (discardTileInfo == null) {
-                kongPlayer = null;
-                latestKongTile = null;
-                return;
-            }
-
-            if (discardTileInfo.Item3 == 1) {
-                bonusPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
-                latestBonusTile = discardTileInfo.Item2;
-
-                if (bonusPlayer == PhotonNetwork.LocalPlayer) {
-                    return;
-                }
-
-                if (winManager.CanWin("Bonus")) {
-                    winManager.WinUI();
-                }
-                return;
-
-            } else if (discardTileInfo.Item3 == 2) {
-                kongPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
-                latestKongTile = discardTileInfo.Item2;
-
-                if (kongPlayer == PhotonNetwork.LocalPlayer) {
-                    return;
-                }
-
-                if (winManager.CanWin("Kong")) {
-                    winManager.WinUI();
-                }
-                return;
-
-            } else if (discardTileInfo.Item3 == 3) {
-                kongPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
-                latestKongTile = discardTileInfo.Item2;
-
-                if (kongPlayer == PhotonNetwork.LocalPlayer) {
-                    return;
-                }
-
-                if (winManager.CanWin("Kong")) {
-                    if (playerManager.winningCombos.Contains("Thirteen Wonders")) {
-                        winManager.WinUI();
-                    }
-                }
-                return;
-            }
-
-            if (PhotonNetwork.IsMasterClient) {
-                Hashtable ht = new Hashtable();
-                ht.Add(SpecialTilePropKey, null);
-                PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
-            }
-
-        } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
-            numberOfTilesLeft = ((List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey]).Count;
-
-            //// DEBUG
-            //numberOfTilesLeft = 50;
-
-            if (numberOfTilesLeft == 15) {
-                this.EndRound();
-            }
-
-        } else if (propertiesThatChanged.ContainsKey(PayAllDiscardPropKey)) {
-            Player player = (Player)PhotonNetwork.CurrentRoom.CustomProperties[PayAllDiscardPropKey];
-            if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.payForAll = "Local";
-            } else {
-                playerManager.payForAll = "Remote";
-            }
-        }
-    }
-
-
-    /// <summary>
-    /// Called when a remote player's hand or open tiles changes
-    /// </summary>
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) {
-        if (changedProps.ContainsKey(HandTilesCountPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {
-            RemotePlayer.InstantiateRemoteHand(this, targetPlayer);
-
-        } else if (changedProps.ContainsKey(OpenTilesPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {
-            RemotePlayer.InstantiateRemoteOpenTiles(this, payment, targetPlayer);
-        }
-    }
-
     #endregion
-
-    #region Gameplay Methods
 
     /// <summary>
     /// Called by the MasterClient to start a new Turn
@@ -511,126 +240,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     public void StartTurn() {
         this.turnManager.BeginTurn();
     }
-
-
-    /// <summary>
-    /// Called at the start of every game (when PunTurnManager.Turn == 0) by MasterClient
-    /// </summary>
-    IEnumerator InitializeGame() {
-        // At this point, Start hasn't been called yet. Wait a frame before proceeding with the Coroutine
-        yield return null;
-        InitializeRound.AssignPlayerWind(numberOfPlayers);
-        InitializeRound.DeterminePlayOrder(numberOfPlayers);
-        InitializeRound.ScreenViewAdjustment();
-        InitializeRound.GenerateTiles();
-        // Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
-        yield return new WaitForSeconds(1.5f);
-        InitializeRound.DistributeTiles();
-        InitializeRound.HiddenPayouts();
-        yield return new WaitForSeconds(0.5f);
-        this.StartTurn();
-        yield return new WaitForSeconds(0.5f);
-        StartCoroutine(InitializeRound.InitialInitialization());
-        InitializeRound.StartGame();
-    }
-
-    #endregion
-
-    #region IOnEventCallback Callbacks
-
-    public void OnEvent(EventData photonEvent) {
-        byte eventCode = photonEvent.Code;
-
-        switch (eventCode) {
-            case EvScreenViewAdjustment:
-                this.LocalScreenViewAdjustment();
-                break;
-
-            case EvDistributeTiles:
-                // Update local player's playerManager
-                tilesManager.hand = (List<Tile>)photonEvent.CustomData;
-                break;
-
-            case EvHiddenPayouts:
-                this.LocalHiddenPayouts();
-                break;
-
-            case EvPlayerInitialization:
-                this.InitialLocalInstantiation();
-                break;
-
-            case EvPlayerTurn:
-                playerManager.myTurn = true;
-                playerManager.canTouchHandTiles = true;
-                StartCoroutine("OnPlayerTurn");
-                break;
-
-            case EvWinUpdate:
-                if (!PhotonNetwork.IsMasterClient) {
-                    return;
-                }
-
-                bool winUpdate = (bool)photonEvent.CustomData;
-                winUpdateList.Add(winUpdate);
-                nonDiscardActorNumbers.Add(photonEvent.Sender);
-
-                // If none of the players can/wants to win from the discard, players can then check for Pong/Kong
-                bool allWinFalse = true;
-                if (winUpdateList.Count == 3) {
-                    foreach (bool update in winUpdateList) {
-                        if (update) {
-                            allWinFalse = false;
-                        }
-                    }
-
-                    if (allWinFalse) {
-                        PhotonNetwork.RaiseEvent(EvCheckPongKong, null, new RaiseEventOptions() { TargetActors =  nonDiscardActorNumbers.ToArray()}, SendOptions.SendReliable);
-                    }
-                    winUpdateList.Clear();
-                    nonDiscardActorNumbers.Clear();
-                }
-                break;
-
-            case EvCheckPongKong:
-                this.CheckPongKong();
-                break;
-
-            case EvPongKongUpdate:
-                if (!PhotonNetwork.IsMasterClient) {
-                    return;
-                }
-
-                bool pongKongUpdate = (bool)photonEvent.CustomData;
-                PongKongUpdateList.Add(pongKongUpdate);
-
-                // If none of the players can/wants to Pong/Kong, start the next player's turn.
-                bool allFalse = true;
-                if (PongKongUpdateList.Count == 3) {
-                    foreach (bool update in PongKongUpdateList) {
-                        if (update) {
-                            allFalse = false;
-                        }
-                    }
-
-                    if (allFalse) {
-                        Player nextPlayer = (Player)PhotonNetwork.CurrentRoom.CustomProperties[NextPlayerPropKey];
-                        PhotonNetwork.RaiseEvent(EvPlayerTurn, null, new RaiseEventOptions() { TargetActors = new int[] { nextPlayer.ActorNumber } }, SendOptions.SendReliable);
-                    }
-
-                    PongKongUpdateList.Clear();
-                }
-                break;
-
-            case EvPlayerWin:
-                Dictionary <int, string[]> winInfo = (Dictionary<int, string[]>)photonEvent.CustomData;
-                winInfo.Values.ToList()[0].ToList().ForEach(Debug.LogError);
-                Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
-                winManager.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
-                break;
-        }
-    }
-
-    #endregion
 
     #region Methods called by Local Player
 
@@ -682,9 +291,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         payment.InstantPayout(PhotonNetwork.LocalPlayer, initialOpenTiles, turnManager.Turn, numberOfTilesLeft, isFreshTile, discardPlayer, playerManager.seatWind);
 
         // Remote Hidden Payout check
-        Hashtable ht = new Hashtable();
-        ht.Add(OpenTilesPropKey, initialOpenTiles);
-        PhotonNetwork.SetPlayerCustomProperties(ht);
+        PropertiesManager.SetOpenTiles(initialOpenTiles);
     }
 
 
@@ -722,7 +329,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called immediately when myTurn is set to true. The only times it is not called is when the East Wind makes the first move, or
     /// when the player Pong or Kong
     /// </summary>
-    IEnumerator OnPlayerTurn() {
+    public IEnumerator OnPlayerTurn() {
         // If there are only 15 tiles left, end the game
         if (numberOfTilesLeft == 15) {
             this.EndRound();
@@ -755,7 +362,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
 
 
         // Check if the discarded tile could be Chowed
-        Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
+        Tuple<int, Tile, float> discardTileInfo = PropertiesManager.GetDiscardTile();
         Tile tile = discardTileInfo.Item2;
         chowTiles = tilesManager.ChowCombinations(tile);
 
@@ -861,7 +468,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public Tile DrawTile() {
         // DEBUG 
-        List<Tile> tiles = (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
+        List<Tile> tiles = PropertiesManager.GetWallTileList();
 
         Tile tile = tiles[0];
         tiles.Remove(tiles[0]);
@@ -869,20 +476,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         numberOfTilesLeft = tiles.Count;
 
         // Reinsert updated tiles list into Room Custom Properties
-        Hashtable ht = new Hashtable();
-        ht.Add(WallTileListPropKey, tiles);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        PropertiesManager.SetWallTileList(tiles);
 
         // Inform remote players that the local player has drawn a tile, and discardTile and discardPlayer can be reset to null
-        ht = new Hashtable();
-        ht.Add(DiscardTilePropKey, new Tuple<int, Tile, float>(-2, new Tile(0, 0), 0));
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(-2, new Tile(0, 0), 0));
 
         // Inform remote players that the local player has drawn a bonus tile. 
         if (tile.IsBonus()) {
-            ht = new Hashtable();
-            ht.Add(SpecialTilePropKey, new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, tile, 1));
-            PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+            PropertiesManager.SetSpecialTile(new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, tile, 1));
         }
 
         return tile;
@@ -921,9 +522,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// </summary>
     public void InstantiateLocalHand() {
         // Update the local player's hand count custom property
-        Hashtable ht = new Hashtable();
-        ht.Add(HandTilesCountPropKey, tilesManager.hand.Count);
-        PhotonNetwork.SetPlayerCustomProperties(ht);
+        PropertiesManager.SetHandTilesCount(tilesManager.hand.Count);
 
         // Separation between pivot of tiles
         float xSepHand = 0.83f;
@@ -973,9 +572,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         payment.InstantPayout(PhotonNetwork.LocalPlayer, tilesManager.openTiles, turnManager.Turn, numberOfTilesLeft, isFreshTile, discardPlayer, playerManager.seatWind);
 
         // Update the list of open tiles on the local player's custom properties
-        Hashtable ht = new Hashtable();
-        ht.Add(OpenTilesPropKey, tilesManager.openTiles);
-        PhotonNetwork.SetPlayerCustomProperties(ht);
+        PropertiesManager.SetOpenTiles(tilesManager.openTiles);
 
         int openSize = tilesManager.openTiles.Count;
         foreach (Tile tile in tilesManager.openTiles) {
@@ -1018,10 +615,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     // TODO: detect changes in CustomProperties which contains the word discardtilepropkey
     public void DiscardTile(Tile tile, float xPos) {
         // Update the properties of the discard tile
-        Hashtable ht = new Hashtable();
-        Tuple<int, Tile, float> tuple = new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, tile, xPos);
-        ht.Add(DiscardTilePropKey, tuple);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, tile, xPos));
 
         // The tile is now the Sacred Discard
         sacredDiscardManager.sacredDiscard = tile;
@@ -1085,7 +679,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         missedDiscardManager.UpdateMissedDiscard(discardPlayer, latestDiscardTile);
 
         // Inform Master Client that the local player can't Pong/Kong
-        PhotonNetwork.RaiseEvent(EvPongKongUpdate, false, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+        EventsManager.EventCanPongKong(false);
     }
 
 
@@ -1093,7 +687,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called by the local player to inform the next player that it is his turn
     /// </summary>
     public void nextPlayersTurn() {
-        Player[] playOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
+        Player[] playOrder = PropertiesManager.GetPlayOrder();
         int localPlayerPos = 0;
         Player nextPlayer;
 
@@ -1115,9 +709,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
         }
 
         // Update Room Custom Properties with the next player
-        Hashtable ht = new Hashtable();
-        ht.Add(NextPlayerPropKey, nextPlayer);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        PropertiesManager.SetNextPlayer(nextPlayer);
     }
 
 
@@ -1146,6 +738,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks, 
     /// Called to end the round
     /// </summary>
     public void EndRound() {
+        Debug.LogError("End of Round");
         // TODO
     }
 

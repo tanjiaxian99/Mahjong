@@ -60,7 +60,7 @@ public class MissedDiscardManager : MonoBehaviour {
     /// </summary>
     public void MissedDiscardUI() {
         Debug.LogError("Called MissedDiscardUI");
-        EventsManager.EventPongKong(false);
+        EventsManager.EventCanPongKong(false);
         // TODO
     }
 }

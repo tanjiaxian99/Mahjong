@@ -5,7 +5,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class RemotePlayer {
+public static class RemotePlayer {
 
     /// <summary>
     /// Called by the remote player to instantiate the hand of remotePlayer on the local client.

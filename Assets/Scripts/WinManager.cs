@@ -106,15 +106,15 @@ public class WinManager : MonoBehaviour {
     public void OnWinOk() {
         // Check if the discard tile is a high risk discard
         if (payAllDiscard.shouldPayForAll(playerManager, tilesManager, gameManager.prevailingWind, gameManager.latestDiscardTile, "Win")) {
-            PropertiesManager.SetPayAllDiscard(gameManager.discardPlayer);
+            PropertiesManager.SetPayAllPlayer(gameManager.discardPlayer);
         }
 
         if (playerManager.winningCombos.Contains("Robbing the Kong")) {
-            PropertiesManager.SetPayAllDiscard(gameManager.kongPlayer);
+            PropertiesManager.SetPayAllPlayer(gameManager.kongPlayer);
         }
 
         if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
-            PropertiesManager.SetPayAllDiscard(gameManager.bonusPlayer);
+            PropertiesManager.SetPayAllPlayer(gameManager.bonusPlayer);
         }
 
         // Raise an event to inform remote players of the win

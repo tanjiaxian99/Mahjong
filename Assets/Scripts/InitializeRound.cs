@@ -9,6 +9,28 @@ using Photon.Realtime;
 public static class InitializeRound {
 
     /// <summary>
+    /// Called at the start of every game (when PunTurnManager.Turn == 0) by MasterClient
+    /// </summary>
+    public static IEnumerator InitializeGame(GameManager gameManager, int numberOfPlayers) {
+        // At this point, Start hasn't been called yet. Wait a frame before proceeding with the Coroutine
+        yield return null;
+        AssignPlayerWind(numberOfPlayers);
+        DeterminePlayOrder(numberOfPlayers);
+        ScreenViewAdjustment();
+        GenerateTiles();
+        // Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
+        yield return new WaitForSeconds(1.5f);
+        DistributeTiles();
+        HiddenPayouts();
+        yield return new WaitForSeconds(0.5f);
+        gameManager.StartTurn();
+        yield return new WaitForSeconds(0.5f);
+        GameManager.Instance.StartCoroutine(InitialInitialization());
+        StartGame();
+    }
+
+
+    /// <summary>
     /// Called by MasterClient to assign a wind to each player
     /// </summary>
     public static void AssignPlayerWind(int numberOfPlayers) {

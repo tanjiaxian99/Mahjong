@@ -86,7 +86,7 @@ public class KongManager : MonoBehaviour {
     public void OnKongOk() {
         // Check if the discard tile is a high risk discard
         if (payAllDiscard.shouldPayForAll(playerManager, tilesManager, gameManager.prevailingWind, gameManager.latestDiscardTile, "Kong")) {
-            PropertiesManager.SetPayAllDiscard(gameManager.discardPlayer);
+            PropertiesManager.SetPayAllPlayer(gameManager.discardPlayer);
         }
 
         PongCombo.SetActive(false);
@@ -110,7 +110,7 @@ public class KongManager : MonoBehaviour {
         if (tilesManager.CanDiscardKong(kongTile)) {
 
             // Update MasterClient that the player wants to Kong the discard tile
-            EventsManager.EventPongKong(true);
+            EventsManager.EventCanPongKong(true);
 
             // Update discard tile properties to indicate to all players to remove the latest discard tile
             PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
@@ -199,7 +199,7 @@ public class KongManager : MonoBehaviour {
 
         if (!playerManager.myTurn) {
             // Update MasterClient that the player doesn't want to Pong. Only applicable for 3 concealed tiles Kong.
-            EventsManager.EventPongKong(false);
+            EventsManager.EventCanPongKong(false);
         }
 
         PongCombo.SetActive(false);

@@ -6439,6 +6439,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1419168653}
   - component: {fileID: 1419168652}
+  - component: {fileID: 1419168665}
+  - component: {fileID: 1419168664}
   - component: {fileID: 1419168651}
   - component: {fileID: 1419168650}
   - component: {fileID: 1419168649}
@@ -6687,6 +6689,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0064d5fc2db557e489d13be11a7f6fe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1419168664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed5214d8d6fb99e4fad63e6e3613afa5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptManager: {fileID: 1419168648}
+  PongKongUpdateList: 
+  nonDiscardActorNumbers: 
+  winUpdateList: 
+--- !u!114 &1419168665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419168648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 941ab7e2f707059418e2d1f1007a83b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptManager: {fileID: 1419168648}
 --- !u!1 &1457008409
 GameObject:
   m_ObjectHideFlags: 0

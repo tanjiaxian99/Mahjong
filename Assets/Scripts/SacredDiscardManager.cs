@@ -12,7 +12,7 @@ public class SacredDiscardManager : MonoBehaviour {
     /// </summary>
     public void SacredDiscardUI() {
         Debug.LogError("Called SacredDiscardUI");
-        EventsManager.EventPongKong(false);
+        EventsManager.EventCanPongKong(false);
         // TODO
     }
 }

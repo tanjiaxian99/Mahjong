@@ -81,11 +81,11 @@ public class PongManager : MonoBehaviour {
         Tile latestDiscardTile = gameManager.latestDiscardTile;
 
         // Update MasterClient that the player want to Pong
-        EventsManager.EventPongKong(true);
+        EventsManager.EventCanPongKong(true);
 
         // Check if the discard tile is a high risk discard
         if (payAllDiscard.shouldPayForAll(playerManager, tilesManager, gameManager.prevailingWind, latestDiscardTile, "Pong")) {
-            PropertiesManager.SetPayAllDiscard(gameManager.discardPlayer);
+            PropertiesManager.SetPayAllPlayer(gameManager.discardPlayer);
         }
 
         PongCombo.SetActive(false);
@@ -122,7 +122,7 @@ public class PongManager : MonoBehaviour {
     /// </summary>
     public void OnPongSkip() {
         // Update MasterClient that the player doesn't want to Pong
-        EventsManager.EventPongKong(false);
+        EventsManager.EventCanPongKong(false);
 
         missedDiscardManager.UpdateMissedDiscard(gameManager.discardPlayer, gameManager.latestDiscardTile);
 
