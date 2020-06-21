@@ -18,6 +18,8 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
     private PlayerManager playerManager;
 
+    private TilesManager tilesManager;
+
     private Payment payment;
 
     private WinManager winManager;
@@ -62,6 +64,11 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     public static readonly string HandTilesCountPropKey = "ht";
 
     /// <summary>
+    /// The local player's hand tiles
+    /// </summary>
+    public static readonly string OpenHandPropKey = "oh";
+
+    /// <summary>
     /// The local player's open tiles
     /// </summary>
     public static readonly string OpenTilesPropKey = "ot";
@@ -81,6 +88,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     private void Start() {
         gameManager = scriptManager.GetComponent<GameManager>();
         playerManager = scriptManager.GetComponent<PlayerManager>();
+        tilesManager = scriptManager.GetComponent<TilesManager>();
         payment = scriptManager.GetComponent<Payment>();
         winManager = scriptManager.GetComponent<WinManager>();
     }
@@ -129,6 +137,12 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.SetPlayerCustomProperties(ht);
     }
 
+    public static void SetOpenHand(List<Tile> hand) {
+        Hashtable ht = new Hashtable();
+        ht.Add(OpenHandPropKey, hand);
+        PhotonNetwork.SetPlayerCustomProperties(ht);
+    }
+
     public static void SetOpenTiles(List<Tile> openTiles) {
         Hashtable ht = new Hashtable();
         ht.Add(OpenTilesPropKey, openTiles);
@@ -169,6 +183,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
     public static int GetHandTilesCount(Player player) {
         return (int)player.CustomProperties[HandTilesCountPropKey];
+    }
+
+    public static List<Tile> GetOpenHand(Player player) {
+        return (List<Tile>)player.CustomProperties[OpenHandPropKey];
     }
 
     public static List<Tile> GetOpenTiles(Player player) {
@@ -305,7 +323,8 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             //numberOfTilesLeft = 50;
 
             if (gameManager.numberOfTilesLeft == 15) {
-                gameManager.EndRound();
+                EndRound.EndGame(null, 0, null, tilesManager);
+                EventsManager.EventEndRound();
             }
 
         } else if (propertiesThatChanged.ContainsKey(PayAllPlayerPropKey)) {
@@ -325,6 +344,9 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) {
         if (changedProps.ContainsKey(HandTilesCountPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {
             RemotePlayer.InstantiateRemoteHand(gameManager, targetPlayer);
+
+        } else if (changedProps.ContainsKey(OpenHandPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {
+            RemotePlayer.InstantiateRemoteOpenHand(gameManager, targetPlayer);
 
         } else if (changedProps.ContainsKey(OpenTilesPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {
             RemotePlayer.InstantiateRemoteOpenTiles(gameManager, payment, targetPlayer);

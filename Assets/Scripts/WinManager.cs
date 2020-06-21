@@ -117,11 +117,12 @@ public class WinManager : MonoBehaviour {
             PropertiesManager.SetPayAllPlayer(gameManager.bonusPlayer);
         }
 
-        // Raise an event to inform remote players of the win
+        // Raise an event to inform remote players of the win, which ends the round as well
         Dictionary<int, string[]> winInfo = new Dictionary<int, string[]>() {
             [playerManager.fanTotal] = playerManager.winningCombos.ToArray()
         };
         EventsManager.EventPlayerWin(winInfo);
+        EndRound.EndGame(PhotonNetwork.LocalPlayer, playerManager.fanTotal, playerManager.winningCombos, tilesManager);
 
         // Update DiscardTilesPropkey to remove the discard tile used for the win
         if (gameManager.latestDiscardTile != null) {

@@ -12,10 +12,10 @@ public static class RemotePlayer {
     /// </summary>
     public static void InstantiateRemoteHand(GameManager gameManager, Player remotePlayer) {
         int remoteHandSize = PropertiesManager.GetHandTilesCount(remotePlayer);
-        PlayerManager.Wind wind = (PlayerManager.Wind)DictManager.Instance.windsAllocation[remotePlayer.ActorNumber];
+        string relativePos = RelativePlayerPosition(remotePlayer);
 
         // Represents the tiles currently on the GameTable which the remote player had
-        GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag(wind + "_" + "Hand");
+        GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag(relativePos + "_" + "Hand");
         // Destroy the remote player's hand tiles
         foreach (GameObject tileGameObject in taggedRemoteHand) {
             UnityEngine.Object.Destroy(tileGameObject);
@@ -25,7 +25,23 @@ public static class RemotePlayer {
         for (int i = 0; i < remoteHandSize; i++) {
             remoteHand.Add(new Tile(0, 0));
         }
-        InstantiateRemoteTiles(gameManager, wind, remoteHand, RelativePlayerPosition(remotePlayer), "Hand");
+        InstantiateRemoteTiles(gameManager, remoteHand, relativePos, "Hand");
+    }
+
+
+    /// <summary>
+    /// Called by the remote player to instantiate the open hand of the remotePlayer on the local client. Only called once when the round ends.
+    /// </summary>
+    public static void InstantiateRemoteOpenHand(GameManager gameManager, Player remotePlayer) {
+        List<Tile> remoteHand = PropertiesManager.GetOpenHand(remotePlayer);
+        string relativePos = RelativePlayerPosition(remotePlayer);
+
+        GameObject[] taggedRemoteHand = GameObject.FindGameObjectsWithTag(relativePos + "_" + "Hand");
+        foreach (GameObject tileGameObject in taggedRemoteHand) {
+            UnityEngine.Object.Destroy(tileGameObject);
+        }
+
+        InstantiateRemoteTiles(gameManager, remoteHand, relativePos, "Open Hand");
     }
 
 
@@ -34,27 +50,29 @@ public static class RemotePlayer {
     /// </summary>
     public static void InstantiateRemoteOpenTiles(GameManager gameManager, Payment payment, Player remotePlayer) {
         List<Tile> remoteOpenTiles = PropertiesManager.GetOpenTiles(remotePlayer);
+
         PlayerManager.Wind remotePlayerWind = (PlayerManager.Wind)DictManager.Instance.windsAllocation[remotePlayer.ActorNumber];
+        string relativePos = RelativePlayerPosition(remotePlayer);
         gameManager.UpdateAllPlayersOpenTiles(remotePlayer, remoteOpenTiles);
         
         payment.InstantPayout(remotePlayer, remoteOpenTiles, gameManager.turnManager.Turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, remotePlayerWind);
 
         // Represents the tiles currently on the GameTable which the remote player had
-        GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(remotePlayerWind + "_" + "Open");
+        GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(relativePos + "_" + "Open");
 
         // Destroy the remote player's hand tiles
         foreach (GameObject tileGameObject in taggedRemoteOpenTiles) {
             UnityEngine.Object.Destroy(tileGameObject);
         }
 
-        InstantiateRemoteTiles(gameManager, remotePlayerWind, remoteOpenTiles, RelativePlayerPosition(remotePlayer), "Open");
+        InstantiateRemoteTiles(gameManager, remoteOpenTiles, relativePos, "Open");
     }
 
 
     /// <summary>
-    /// Helper function for InstantiateRemoteHand and InstantiateRemoteOpenTiles
+    /// Helper function for InstantiateRemoteHand, InstantiateRemoteOpenHand and InstantiateRemoteOpenTiles
     /// </summary>
-    private static void InstantiateRemoteTiles(GameManager gameManager, PlayerManager.Wind wind, List<Tile> remoteTiles, string remotePosition, string tileType) {
+    private static void InstantiateRemoteTiles(GameManager gameManager, List<Tile> remoteTiles, string relativePos, string tileType) {
         // Starting position to instantiate the tiles
         float pos;
 
@@ -69,12 +87,12 @@ public static class RemotePlayer {
 
         int negativeConversion;
         int remoteTilesSize = remoteTiles.Count;
-        int remoteTilesSizeWithoutConcealedKongTile = remoteTiles.Count;
+        int remoteTilesSizeNoConcealedKong = remoteTiles.Count;
 
         // Determine whether negativeConversion is -1 or 1
-        if (remotePosition.Equals("Left") || remotePosition.Equals("Opposite")) {
+        if (relativePos.Equals("Left") || relativePos.Equals("Opposite")) {
             negativeConversion = 1;
-        } else if (remotePosition.Equals("Right")) {
+        } else if (relativePos.Equals("Right")) {
             negativeConversion = -1;
         } else {
             Debug.LogError("Invalid remote position. Only accepted remote positions are 'Left', 'Right' and 'Opposite'");
@@ -84,16 +102,16 @@ public static class RemotePlayer {
 
         foreach (Tile tile in remoteTiles) {
             if (tile.kongType == 3) {
-                remoteTilesSizeWithoutConcealedKongTile -= 1;
+                remoteTilesSizeNoConcealedKong -= 1;
             }
         }
 
 
         // Calculating the position of the first tile
-        if (tileType.Equals("Hand") && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize)) {
-            pos = negativeConversion * 0.83f * 0.5f * (remoteTilesSizeWithoutConcealedKongTile - 2) / 2;
+        if ((tileType.Equals("Hand") && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize)) || tileType.Equals("Open Hand")) {
+            pos = negativeConversion * 0.83f * 0.5f * (remoteTilesSizeNoConcealedKong - 2) / 2;
         } else {
-            pos = negativeConversion * 0.83f * 0.5f * (remoteTilesSizeWithoutConcealedKongTile - 1) / 2;
+            pos = negativeConversion * 0.83f * 0.5f * (remoteTilesSizeNoConcealedKong - 1) / 2;
         }
 
 
@@ -108,18 +126,31 @@ public static class RemotePlayer {
 
             // Calculate the position and rotation of each tile
             if (tileType.Equals("Hand")) {
-                if (remotePosition.Equals("Left")) {
+                if (relativePos.Equals("Left")) {
                     position = new Vector3(-gameManager.tableWidth / 2 + 0.5f, 1f, pos);
                     rotation = Quaternion.Euler(0f, -90f, 0f);
 
-                } else if (remotePosition.Equals("Right")) {
+                } else if (relativePos.Equals("Right")) {
                     position = new Vector3(gameManager.tableWidth / 2 - 0.5f, 1f, pos);
                     rotation = Quaternion.Euler(0f, 90f, 0f);
 
-                } else if (remotePosition.Equals("Opposite")) {
+                } else if (relativePos.Equals("Opposite")) {
                     position = new Vector3(pos, 1f, 4.4f);
                     rotation = Quaternion.Euler(0f, 0f, 0f);
+                }
 
+            } else if (tileType.Equals("Open Hand")) {
+                if (relativePos.Equals("Left")) {
+                    position = new Vector3(-gameManager.tableWidth / 2 + 0.5f, 1f, pos);
+                    rotation = Quaternion.Euler(-90f, -90f, 0f);
+
+                } else if (relativePos.Equals("Right")) {
+                    position = new Vector3(gameManager.tableWidth / 2 - 0.5f, 1f, pos);
+                    rotation = Quaternion.Euler(-90f, 90f, 0f);
+
+                } else if (relativePos.Equals("Opposite")) {
+                    position = new Vector3(pos, 1f, 4.4f);
+                    rotation = Quaternion.Euler(-90f, 0f, 0f);
                 }
 
             } else if (tileType.Equals("Open")) {
@@ -129,26 +160,26 @@ public static class RemotePlayer {
                     yPos = 1f + 0.3f;
                 }
 
-                if (remotePosition.Equals("Left")) {
+                if (relativePos.Equals("Left")) {
                     position = new Vector3(-gameManager.tableWidth / 2 + 0.5f + 0.7f, yPos, pos);
                     rotation = Quaternion.Euler(-90f, -90f, 0f);
 
-                } else if (remotePosition.Equals("Right")) {
+                } else if (relativePos.Equals("Right")) {
                     position = new Vector3(gameManager.tableWidth / 2 - 0.5f - 0.7f, yPos, pos);
                     rotation = Quaternion.Euler(-90f, 90f, 0f);
 
-                } else if (remotePosition.Equals("Opposite")) {
+                } else if (relativePos.Equals("Opposite")) {
                     position = new Vector3(pos, yPos, 4.4f - 0.7f);
                     rotation = Quaternion.Euler(-90f, 0f, 0f);
                 }
 
             } else {
-                Debug.LogError("Invalid tile type. Only accepted tile types are 'Hand' and 'Open'");
+                Debug.LogError("Invalid tile type. Only accepted tile types are \"Hand\", \"Open Hand\" and \"Open\"");
                 return;
             }
             GameObject newTile = UnityEngine.Object.Instantiate(DictManager.Instance.tilesDict[remoteTiles[i]], position, rotation);
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-            newTile.tag = wind + "_" + tileType;
+            newTile.tag = relativePos + "_" + tileType;
 
             pos += -negativeConversion * sep;
         }

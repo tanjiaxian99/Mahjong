@@ -271,15 +271,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         return allPlayersOpenTiles;
     }
 
-
-    /// <summary>
-    /// Called to end the round
-    /// </summary>
-    public void EndRound() {
-        Debug.LogError("End of Round");
-        // TODO
-    }
-
     #region IPunTurnManagerCallbacks Callbacks
 
     public void OnTurnBegins(int turn) {

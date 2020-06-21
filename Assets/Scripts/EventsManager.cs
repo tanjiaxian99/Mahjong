@@ -57,7 +57,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public const byte EvCheckPongKong = 9;
 
     /// <summary>
-    /// The Can Pong Kong event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
+    /// The Can Pong Kong event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong.
     /// the latest discard tile.
     /// </summary>
     public const byte EvCanPongKong = 10;
@@ -68,9 +68,14 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public const byte EvPlayerWin = 11;
 
     /// <summary>
-    /// The Win Update event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
+    /// The Win Update event message byte. Used internally by MasterClient to track the number of players who are unable to win.
     /// </summary>
     public const byte EvWinUpdate = 12;
+
+    /// <summary>
+    /// The End Round event message byte. Used internally by the local player when a remote player ends the round.
+    /// </summary>
+    public const byte EvEndRound = 13;
 
     #endregion
 
@@ -168,6 +173,10 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         PhotonNetwork.RaiseEvent(EvWinUpdate, canWin, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
     }
 
+    public static void EventEndRound() {
+        PhotonNetwork.RaiseEvent(EvEndRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+    }
+
     #endregion 
 
     public void OnEvent(EventData photonEvent) {
@@ -227,11 +236,11 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 break;
 
             case EvPlayerWin:
-                Debug.LogError(PhotonNetwork.IsMasterClient);
                 Dictionary<int, string[]> winInfo = (Dictionary<int, string[]>)photonEvent.CustomData;
                 winInfo.Values.ToList()[0].ToList().ForEach(Debug.LogError);
                 Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
                 winManager.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
+                EndRound.EndGame(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList(), tilesManager);
                 break;
 
             case EvWinUpdate:
@@ -257,6 +266,10 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                     winUpdateList.Clear();
                     nonDiscardActorNumbers.Clear();
                 }
+                break;
+
+            case EvEndRound:
+                EndRound.EndGame(null, 0, null, tilesManager);
                 break;
         }
     }
