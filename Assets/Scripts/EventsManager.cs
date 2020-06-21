@@ -175,7 +175,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
         switch (eventCode) {
             case EvScreenViewAdjustment:
-                gameManager.LocalScreenViewAdjustment();
+                playerManager.LocalScreenViewAdjustment();
                 break;
 
             case EvDistributeTiles:
@@ -184,21 +184,21 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 break;
 
             case EvHiddenPayouts:
-                gameManager.LocalHiddenPayouts();
+                playerManager.LocalHiddenPayouts();
                 break;
 
             case EvPlayerInitialization:
-                gameManager.InitialLocalInstantiation();
+                playerManager.InitialLocalInstantiation();
                 break;
 
             case EvPlayerTurn:
                 playerManager.myTurn = true;
                 playerManager.canTouchHandTiles = true;
-                StartCoroutine(gameManager.OnPlayerTurn());
+                StartCoroutine(playerManager.OnPlayerTurn());
                 break;
 
             case EvCheckPongKong:
-                gameManager.CheckPongKong();
+                playerManager.CheckPongKong();
                 break;
 
             case EvCanPongKong:

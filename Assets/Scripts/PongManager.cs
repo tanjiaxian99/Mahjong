@@ -108,8 +108,8 @@ public class PongManager : MonoBehaviour {
         }
         tilesManager.comboTiles.Add(pongTiles);
 
-        gameManager.InstantiateLocalHand();
-        gameManager.InstantiateLocalOpenTiles();
+        playerManager.InstantiateLocalHand();
+        playerManager.InstantiateLocalOpenTiles();
 
         // The local player automatically update that it is his turn
         playerManager.myTurn = true;

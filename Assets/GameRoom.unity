@@ -6507,6 +6507,7 @@ MonoBehaviour:
   payForAll: 
   fanTotal: 0
   winningCombos: []
+  scriptManager: {fileID: 1419168648}
 --- !u!114 &1419168652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6520,25 +6521,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptManager: {fileID: 1419168648}
+  turnManager: {fileID: 0}
   gameTable: {fileID: 1286068716}
   tableHeight: 0
   tableWidth: 0
   numberOfPlayers: 4
-  turnManager: {fileID: 0}
-  PongKongUpdateList: 
-  winUpdateList: 
-  nonDiscardActorNumbers: 
   numberOfTilesLeft: 0
   prevailingWind: 0
-  payAllDiscard: {fileID: 0}
-  payment: {fileID: 0}
   isFreshTile: 0
-  chowManager: {fileID: 0}
-  pongManager: {fileID: 0}
-  kongManager: {fileID: 0}
-  sacredDiscardManager: {fileID: 0}
-  missedDiscardManager: {fileID: 0}
-  winManager: {fileID: 0}
   pointsGameObject: {fileID: 1528145999}
 --- !u!4 &1419168653
 Transform:

@@ -162,16 +162,16 @@ public class KongManager : MonoBehaviour {
         }
 
         playerManager.numberOfKong++;
-        gameManager.InstantiateLocalOpenTiles();
+        playerManager.InstantiateLocalOpenTiles();
 
         // Always draw a tile regardless of Kong type
-        hand.Add(gameManager.DrawTile());
+        hand.Add(playerManager.DrawTile());
         gameManager.latestDiscardTile = null;
         gameManager.discardPlayer = null;
 
-        gameManager.ConvertLocalBonusTiles();
-        gameManager.InstantiateLocalHand();
-        gameManager.InstantiateLocalOpenTiles();
+        playerManager.ConvertLocalBonusTiles();
+        playerManager.InstantiateLocalHand();
+        playerManager.InstantiateLocalOpenTiles();
 
         // Return the ability to interact with hand tiles
         playerManager.canTouchHandTiles = true;

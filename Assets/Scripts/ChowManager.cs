@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Photon.Realtime;
 
 public class ChowManager : MonoBehaviour {
 
@@ -98,7 +99,7 @@ public class ChowManager : MonoBehaviour {
         // The UI panels are named "Chow Combo 0", "Chow Combo 1" and "Chow Combo 2", which corresponds directly to the index of the 
         // chowCombo list. This was set up in ChowUI.
         int index = (int)Char.GetNumericValue(chowComboGameObject.name[11]);
-        tileAndStringArray = gameManager.chowTiles[index];
+        tileAndStringArray = playerManager.chowTiles[index];
 
         Tile otherTile;
         Tile[] handTile = new Tile[2];
@@ -135,8 +136,8 @@ public class ChowManager : MonoBehaviour {
         }
         tilesManager.comboTiles.Add(pongTiles);
 
-        gameManager.InstantiateLocalHand();
-        gameManager.InstantiateLocalOpenTiles();
+        playerManager.InstantiateLocalHand();
+        playerManager.InstantiateLocalOpenTiles();
 
         // Return the ability to interact with hand tiles
         playerManager.canTouchHandTiles = true;
@@ -151,13 +152,13 @@ public class ChowManager : MonoBehaviour {
         ChowComboOne.SetActive(false);
         ChowComboTwo.SetActive(false);
 
-        tilesManager.hand.Add(gameManager.DrawTile());
+        tilesManager.hand.Add(playerManager.DrawTile());
         gameManager.latestDiscardTile = null;
         gameManager.discardPlayer = null;
 
-        gameManager.ConvertLocalBonusTiles();
-        gameManager.InstantiateLocalHand();
-        gameManager.InstantiateLocalOpenTiles();
+        playerManager.ConvertLocalBonusTiles();
+        playerManager.InstantiateLocalHand();
+        playerManager.InstantiateLocalOpenTiles();
 
         // Check to see if the player can win based on the drawn tile
         if (winManager.CanWin()) {
