@@ -95,7 +95,7 @@ public static class RemotePlayer {
         } else if (relativePos.Equals("Right")) {
             negativeConversion = -1;
         } else {
-            Debug.LogError("Invalid remote position. Only accepted remote positions are 'Left', 'Right' and 'Opposite'");
+            Debug.LogError("Invalid remote position. Only accepted remote positions are \"Left\", \"Right\" and \"Opposite\"");
             return;
         }
 
@@ -119,7 +119,7 @@ public static class RemotePlayer {
         for (int i = 0; i < remoteTilesSize; i++) {
 
             // Instantiate the last hand tile with an offset
-            if (tileType.Equals("Hand") && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize) && remoteTilesSize - 1 == i) {
+            if ((tileType.Equals("Hand") || tileType.Equals("Open Hand")) && new[] { 2, 5, 8, 11, 14 }.Contains(remoteTilesSize) && remoteTilesSize - 1 == i) {
                 pos += -negativeConversion * offset;
             }
 
@@ -191,7 +191,7 @@ public static class RemotePlayer {
     /// <summary>
     /// Determine the relative position of the remotePlayer with respect to the local player.
     /// </summary>
-    private static string RelativePlayerPosition(Player remotePlayer) {
+    public static string RelativePlayerPosition(Player remotePlayer) {
         Player[] playOrder = PropertiesManager.GetPlayOrder();
 
         // Retrieve the local and remote players' positions
@@ -224,7 +224,7 @@ public static class RemotePlayer {
         }
 
         Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
-        return "";
+        return null;
     }
 
 

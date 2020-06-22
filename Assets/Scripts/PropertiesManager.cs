@@ -223,10 +223,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[DiscardTilePropKey];
 
-            // Item1 = -1 when the latest discard tile is to be removed, due to Chow, Pong, Kong or Win
-            // Item1 = -2 when a player has drawn a tile and both discardPlayer and latestDiscardTile can be reset to null;
+            // Item1 == -1 when the latest discard tile is to be removed, due to Chow, Pong, Kong or Win
+            // Item1 == -2 when a player has drawn a tile and both discardPlayer and latestDiscardTile can be reset to null;
             if (discardTileInfo.Item1 == -1) {
-                // Remove the last discard tile
+                // Remove the latest discard tile
                 GameObject lastDiscardTile = GameObject.FindGameObjectWithTag("Discard");
                 Destroy(lastDiscardTile);
                 gameManager.discardTiles.RemoveAt(gameManager.discardTiles.Count - 1);
@@ -264,13 +264,24 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         } else if (propertiesThatChanged.ContainsKey(SpecialTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[SpecialTilePropKey];
 
-            if (discardTileInfo == null) {
-                gameManager.kongPlayer = null;
-                gameManager.latestKongTile = null;
-                return;
-            }
+            if (discardTileInfo.Item3 == -100 && PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1) == PhotonNetwork.LocalPlayer) {
+                // Remove the lastest Bonus/Kong Tile
+                Tile tile = discardTileInfo.Item2;
+                if (tile.suit == Tile.Suit.Season || tile.suit == Tile.Suit.Flower) {
+                    tilesManager.bonusTiles.Remove(tile);
+                    playerManager.InstantiateLocalOpenTiles();
+                    return;
+                } else {
+                    for (int i = 0; i < tilesManager.comboTiles.Count; i++) {
+                        if (tilesManager.comboTiles[i].Contains(tile)) {
+                            tilesManager.comboTiles[i].Remove(tile);
+                            playerManager.InstantiateLocalOpenTiles();
+                            return;
+                        }
+                    }
+                }
 
-            if (discardTileInfo.Item3 == 1) {
+            } else if (discardTileInfo.Item3 == 1) {
                 gameManager.bonusPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
                 gameManager.latestBonusTile = discardTileInfo.Item2;
 
@@ -310,10 +321,6 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
                     }
                 }
                 return;
-            }
-
-            if (PhotonNetwork.IsMasterClient) {
-                SetSpecialTile(null);
             }
 
         } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {

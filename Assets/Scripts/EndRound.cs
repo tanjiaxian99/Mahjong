@@ -11,18 +11,22 @@ public static class EndRound {
     //private TilesManager tilesManager;
 
     public static void EndGame(Player winner, int fanTotal, List<string> winningCombos, TilesManager tilesManager) {
-        ShowHandTiles(tilesManager);
+        UpdateHandTiles(tilesManager);
+        DisplayWinningCombo(winner, fanTotal, winningCombos);
     }
 
     /// <summary>
     /// Inform other players of the local player's hand tiles
     /// </summary>
-    public static void ShowHandTiles(TilesManager tilesManager) {
-        // TODO: Add winning tile to player's hand
+    public static void UpdateHandTiles(TilesManager tilesManager) {
+        // TODO: Update player's hand after Robbing the Kong
         PropertiesManager.SetOpenHand(tilesManager.hand);
     }
 
-    // TODO: Display winning combos / fan
+    public static void DisplayWinningCombo(Player winner, int fanTotal, List<string> winningCombos) {
+        // TODO: Display winning combos / fan
+    }
+
 
     // TODO: Reset most variables
 

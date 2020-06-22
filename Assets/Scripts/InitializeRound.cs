@@ -26,6 +26,8 @@ public static class InitializeRound {
         gameManager.StartTurn();
         yield return new WaitForSeconds(0.5f);
         GameManager.Instance.StartCoroutine(InitialInitialization());
+        // Ensures InitialLocalInstantiation is called before OnPlayerTurn
+        yield return new WaitForSeconds(0.8f);
         StartGame();
     }
 
@@ -138,6 +140,10 @@ public static class InitializeRound {
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+            new Tile(Tile.Suit.Character, Tile.Rank.One),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+
             new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
@@ -176,19 +182,19 @@ public static class InitializeRound {
                 List<Tile> playerTiles = new List<Tile>();
 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Six));
-                playerTiles.Add(new Tile(Tile.Suit.Animal, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine));                
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Eight));
 
                 EventsManager.EventDistributeTiles(player, playerTiles);
 
@@ -197,14 +203,14 @@ public static class InitializeRound {
 
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Six));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
@@ -216,17 +222,17 @@ public static class InitializeRound {
 
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
                 playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven));
 
                 EventsManager.EventDistributeTiles(player, playerTiles);
 

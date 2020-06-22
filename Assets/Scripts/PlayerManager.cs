@@ -142,7 +142,7 @@ public class PlayerManager : MonoBehaviour {
 
         // Initial sort. Afterwards, hand will only be sorted after discarding a tile.
         tilesManager.hand = tilesManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
-
+        
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
     }
@@ -166,6 +166,7 @@ public class PlayerManager : MonoBehaviour {
             // Start of Turn 2 will definitely have at least one discard tile
             if (gameManager.turnManager.Turn == 1 && gameManager.discardTiles.Count == 0) {
                 // Check to see if the player can win based on the East Wind's initial 14 tiles
+                
                 if (winManager.CanWin()) {
                     winManager.WinUI();
                     yield break;
