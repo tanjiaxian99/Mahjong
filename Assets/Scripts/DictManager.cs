@@ -306,7 +306,9 @@ public class DictManager : MonoBehaviour {
 
     public Dictionary<PlayerManager.Wind, Tile> windToTileDict;
 
-    public Dictionary<PlayerManager.Wind, List<Tile>> windToBonusTilesDict;
+    public Dictionary<PlayerManager.Wind, List<Tile>> windTo3TilesDict;
+
+    public Dictionary<Tile.Suit?, List<Tile>> fullFlushDict;
 
     /// <summary>
     /// A cached copy of allocated Winds.
@@ -334,9 +336,10 @@ public class DictManager : MonoBehaviour {
     private void Start() {
         this.InitializeSpritesDict();
         this.InitializeTilesDict();
-        this.InitializeWindToBonusTilesDict();
+        this.InitializeWindTo3TilesDict();
         this.InitializeTileToWindDict();
         this.InitializeWindToTileDict();
+        this.InitializeFullFlushDict();
     }
 
 
@@ -501,15 +504,91 @@ public class DictManager : MonoBehaviour {
 
 
     /// <summary>
-    /// Initialize the windToBonusTilesDict with Winds and the 2 bonus tiles paired to each Wind
+    /// Initialize the windTo3TilesDict with Winds and the Wind, Season and Flower tile paired to each wind.
     /// </summary>
-    private void InitializeWindToBonusTilesDict() {
-        windToBonusTilesDict = new Dictionary<PlayerManager.Wind, List<Tile>>();
+    private void InitializeWindTo3TilesDict() {
+        this.windTo3TilesDict = new Dictionary<PlayerManager.Wind, List<Tile>>();
 
-        windToBonusTilesDict.Add(PlayerManager.Wind.EAST, new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.One), new Tile(Tile.Suit.Flower, Tile.Rank.One) });
-        windToBonusTilesDict.Add(PlayerManager.Wind.SOUTH, new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.Two), new Tile(Tile.Suit.Flower, Tile.Rank.Two) });
-        windToBonusTilesDict.Add(PlayerManager.Wind.WEST, new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.Three), new Tile(Tile.Suit.Flower, Tile.Rank.Three) });
-        windToBonusTilesDict.Add(PlayerManager.Wind.NORTH, new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.Four), new Tile(Tile.Suit.Flower, Tile.Rank.Four) });
+        this.windTo3TilesDict.Add(PlayerManager.Wind.EAST, new List<Tile>() {
+            new Tile(Tile.Suit.Season, Tile.Rank.One),
+            new Tile(Tile.Suit.Flower, Tile.Rank.One),
+            new Tile(Tile.Suit.Wind, Tile.Rank.One) });
+        this.windTo3TilesDict.Add(PlayerManager.Wind.SOUTH, new List<Tile>() {
+            new Tile(Tile.Suit.Season, Tile.Rank.Two),
+            new Tile(Tile.Suit.Flower, Tile.Rank.Two),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Two)});
+        this.windTo3TilesDict.Add(PlayerManager.Wind.WEST, new List<Tile>() {
+            new Tile(Tile.Suit.Season, Tile.Rank.Three),
+            new Tile(Tile.Suit.Flower, Tile.Rank.Three),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Three)});
+        this.windTo3TilesDict.Add(PlayerManager.Wind.NORTH, new List<Tile>() {
+            new Tile(Tile.Suit.Season, Tile.Rank.Four),
+            new Tile(Tile.Suit.Flower, Tile.Rank.Four),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Four)});
+    }
+
+
+    /// <summary>
+    /// Initializes FullFlushDict
+    /// </summary>
+    private void InitializeFullFlushDict() {
+        this.fullFlushDict = new Dictionary<Tile.Suit?, List<Tile>>();
+
+        fullFlushDict.Add(Tile.Suit.Character, new List<Tile>() {
+            new Tile(Tile.Suit.Character, Tile.Rank.One),
+            new Tile(Tile.Suit.Character, Tile.Rank.Two),
+            new Tile(Tile.Suit.Character, Tile.Rank.Three),
+            new Tile(Tile.Suit.Character, Tile.Rank.Four),
+            new Tile(Tile.Suit.Character, Tile.Rank.Five),
+            new Tile(Tile.Suit.Character, Tile.Rank.Six),
+            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+            new Tile(Tile.Suit.Character, Tile.Rank.Eight),
+            new Tile(Tile.Suit.Character, Tile.Rank.Nine)
+        });
+
+        fullFlushDict.Add(Tile.Suit.Dot, new List<Tile>() {
+            new Tile(Tile.Suit.Dot, Tile.Rank.One),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Six),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Eight),
+            new Tile(Tile.Suit.Dot, Tile.Rank.Nine)
+        });
+
+        fullFlushDict.Add(Tile.Suit.Bamboo, new List<Tile>() {
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
+            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine)
+        });
+
+        fullFlushDict.Add(Tile.Suit.Wind, new List<Tile>() {
+            new Tile(Tile.Suit.Wind, Tile.Rank.One),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
+        });
+
+        fullFlushDict.Add(Tile.Suit.Dragon, new List<Tile>() {
+            new Tile(Tile.Suit.Wind, Tile.Rank.One),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+            new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+            new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
+        });
     }
 
 

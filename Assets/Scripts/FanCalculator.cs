@@ -9,7 +9,7 @@ using UnityEngine;
 /// <summary>
 /// Calculates the number of Fan the player has
 /// </summary>
-public class FanCalculator : MonoBehaviour {
+public class FanCalculator : MonoBehaviour, IResetVariables {
     [SerializeField]
     private GameObject scriptManager;
 
@@ -1254,4 +1254,11 @@ public class FanCalculator : MonoBehaviour {
     }
 
     #endregion
+
+    public void ResetVariables() {
+        fanTotal = 0;
+        winningCombos.Clear();
+        listOfWinningCombos.Clear();
+        fanTotalList.Clear();
+    }
 }

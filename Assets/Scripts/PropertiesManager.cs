@@ -330,7 +330,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             //numberOfTilesLeft = 50;
 
             if (gameManager.numberOfTilesLeft == 15) {
-                EndRound.EndGame(null, 0, null, tilesManager);
+                EndRound.Instance.EndGame(null, 0, null);
                 EventsManager.EventEndRound();
             }
 

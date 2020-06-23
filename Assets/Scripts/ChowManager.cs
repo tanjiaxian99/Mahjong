@@ -42,7 +42,6 @@ public class ChowManager : MonoBehaviour {
         winManager = scriptManager.GetComponent<WinManager>();
     }
 
-
     /// <summary>
     /// Called when the player can chow
     /// </summary>

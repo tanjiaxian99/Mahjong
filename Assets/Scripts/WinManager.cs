@@ -137,7 +137,7 @@ public class WinManager : MonoBehaviour {
             }
         }
 
-        EndRound.EndGame(PhotonNetwork.LocalPlayer, playerManager.fanTotal, playerManager.winningCombos, tilesManager);
+        EndRound.Instance.EndGame(PhotonNetwork.LocalPlayer, playerManager.fanTotal, playerManager.winningCombos);
 
         // Remove the discard/bonus/kong tile used for the win
         if (gameManager.latestDiscardTile != null) {

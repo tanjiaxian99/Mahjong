@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class PlayerManager : MonoBehaviour {
+public class PlayerManager : MonoBehaviour, IResetVariables {
 
     public enum Wind {
         EAST,
@@ -155,7 +155,7 @@ public class PlayerManager : MonoBehaviour {
     public IEnumerator OnPlayerTurn() {
         // If there are only 15 tiles left, end the game
         if (gameManager.numberOfTilesLeft == 15) {
-            EndRound.EndGame(null, 0, null, tilesManager);
+            EndRound.Instance.EndGame(null, 0, null);
             EventsManager.EventEndRound();
             yield break;
         }
@@ -270,7 +270,7 @@ public class PlayerManager : MonoBehaviour {
         while (true) {
             // If there are only 15 tiles left, end the game
             if (gameManager.numberOfTilesLeft == 15) {
-                EndRound.EndGame(null, 0, null, tilesManager);
+                EndRound.Instance.EndGame(null, 0, null);
                 EventsManager.EventEndRound();
                 return;
             }
@@ -508,6 +508,17 @@ public class PlayerManager : MonoBehaviour {
 
         // Inform Master Client that the local player can't Pong/Kong
         EventsManager.EventCanPongKong(false);
+    }
+
+
+    public void ResetVariables() {
+        myTurn = false;
+        canTouchHandTiles = false;
+        numberOfReplacementTiles = 0;
+        numberOfKong = 0;
+        payForAll = "";
+        fanTotal = 0;
+        winningCombos.Clear();
     }
 }
 

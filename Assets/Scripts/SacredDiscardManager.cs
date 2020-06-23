@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class SacredDiscardManager : MonoBehaviour {
+public class SacredDiscardManager : MonoBehaviour, IResetVariables {
 
     public Tile sacredDiscard;
 
@@ -14,5 +14,10 @@ public class SacredDiscardManager : MonoBehaviour {
         Debug.LogError("Called SacredDiscardUI");
         EventsManager.EventCanPongKong(false);
         // TODO
+    }
+
+
+    public void ResetVariables() {
+        sacredDiscard = null;
     }
 }

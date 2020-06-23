@@ -82,17 +82,17 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     /// <summary>
     /// A list used by MasterClient to track whether players can/want to Pong/Kong
     /// </summary>
-    public List<bool> PongKongUpdateList;
+    private static List<bool> PongKongUpdateList;
 
     /// <summary>
     /// A list used by MasterClient to track the actor numbers of players who didn't discard the tile
     /// </summary>
-    public List<int> nonDiscardActorNumbers;
+    private static List<int> nonDiscardActorNumbers;
 
     /// <summary>
     /// A list used by MasterClient to track whether players can/want to win
     /// </summary>
-    public List<bool> winUpdateList;
+    private static List<bool> winUpdateList;
 
     #region MonoBehaviourPunCallbacks Callbacks
 
@@ -240,7 +240,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 winInfo.Values.ToList()[0].ToList().ForEach(Debug.LogError);
                 Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
                 winManager.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
-                EndRound.EndGame(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList(), tilesManager);
+                EndRound.Instance.EndGame(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
                 break;
 
             case EvWinUpdate:
@@ -269,8 +269,14 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 break;
 
             case EvEndRound:
-                EndRound.EndGame(null, 0, null, tilesManager);
+                EndRound.Instance.EndGame(null, 0, null);
                 break;
         }
+    }
+
+    public static void ResetVariables() {
+        PongKongUpdateList.Clear();
+        nonDiscardActorNumbers.Clear();
+        winUpdateList.Clear();
     }
 }
