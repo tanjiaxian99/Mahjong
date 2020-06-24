@@ -57,7 +57,7 @@ public class WinManager : MonoBehaviour {
 
         PlayerManager.Wind prevailingWind = gameManager.prevailingWind;
         int numberOfTilesLeft = gameManager.numberOfTilesLeft;
-        int turn = gameManager.turnManager.Turn;
+        int turn = gameManager.turn;
 
         if (discardType == "Normal") {
             (playerManager.fanTotal, playerManager.winningCombos) = fanCalculator.CalculateFan(
@@ -137,8 +137,6 @@ public class WinManager : MonoBehaviour {
             }
         }
 
-        EndRound.Instance.EndGame(PhotonNetwork.LocalPlayer, playerManager.fanTotal, playerManager.winningCombos);
-
         // Remove the discard/bonus/kong tile used for the win
         if (gameManager.latestDiscardTile != null) {
             PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
@@ -160,8 +158,7 @@ public class WinManager : MonoBehaviour {
             payment.HandPayout(PhotonNetwork.LocalPlayer, gameManager.discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
         }
 
-
-        // TODO: Show win screen
+        EndRound.Instance.EndGame(PhotonNetwork.LocalPlayer, playerManager.fanTotal, playerManager.winningCombos);
     }
 
 

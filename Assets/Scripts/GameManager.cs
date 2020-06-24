@@ -14,15 +14,13 @@ using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = System.Random;
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
+public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
     #region Private Fields
 
     [SerializeField]
     private GameObject scriptManager;
 
     private PlayerManager playerManager;
-
-    public PunTurnManager turnManager;
 
     [Tooltip("The GameObject used to represent a physical Mahjong table")]
     [SerializeField]
@@ -83,6 +81,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
 
     public bool isFreshTile;
 
+    public int turn;
+
     #endregion
 
     #region UI fields
@@ -109,10 +109,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     void Start() {
         Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManager.GetActiveScene().name);
 
-        // PunTurnManager settings
-        turnManager = this.gameObject.AddComponent<PunTurnManager>();
-        turnManager.TurnManagerListener = this;
-        this.turnManager.TurnDuration = 1000f;
+        turn = 0;
 
         this.openTilesDict = new Dictionary<Player, List<Tile>>();
         this.discardTiles = new List<Tile>();
@@ -151,7 +148,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayers) {
             // Players that disconnect and reconnect won't start the game at turn 0
             // Game is initialized by MasterClient
-            if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
+            if (turn == 0 && PhotonNetwork.IsMasterClient) {
                 StartCoroutine(InitializeRound.InitializeGame(this, numberOfPlayers));
             }
 
@@ -165,7 +162,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         Debug.Log("A new player has arrived");
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayers) {
-            if (this.turnManager.Turn == 0 && PhotonNetwork.IsMasterClient) {
+            if (turn == 0 && PhotonNetwork.IsMasterClient) {
                 StartCoroutine(InitializeRound.InitializeGame(this, numberOfPlayers));
             }
         }
@@ -200,14 +197,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
     }
 
     #endregion
-
-    /// <summary>
-    /// Called by the MasterClient to start a new Turn
-    /// </summary>
-    public void StartTurn() {
-        this.turnManager.BeginTurn();
-    }
-
 
     /// <summary>
     /// Generates a random number. lock() makes it thread-safe
@@ -271,22 +260,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks {
         return allPlayersOpenTiles;
     }
 
-    #region IPunTurnManagerCallbacks Callbacks
 
-    public void OnTurnBegins(int turn) {
+    public void ResetVariables() {
+        windsDict.Clear();
+        latestDiscardTile = null;
+        numberOfTilesLeft = 0;
+        discardPlayer = null;
+        openTilesDict.Clear();
+        discardTiles.Clear();
+        kongPlayer = null;
+        latestKongTile = null;
+        bonusPlayer = null;
+        latestBonusTile = null;
+        isFreshTile = true;
+        turn = 0;
     }
-
-    public void OnTurnCompleted(int turn) {
-    }
-
-    public void OnPlayerMove(Player player, int turn, object move) {
-    }
-
-    public void OnPlayerFinished(Player player, int turn, object move) {
-    }
-
-    public void OnTurnTimeEnds(int turn) {
-    }
-
-    #endregion
 }

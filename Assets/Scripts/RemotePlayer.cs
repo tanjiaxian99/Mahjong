@@ -55,7 +55,7 @@ public static class RemotePlayer {
         string relativePos = RelativePlayerPosition(remotePlayer);
         gameManager.UpdateAllPlayersOpenTiles(remotePlayer, remoteOpenTiles);
         
-        payment.InstantPayout(remotePlayer, remoteOpenTiles, gameManager.turnManager.Turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, remotePlayerWind);
+        payment.InstantPayout(remotePlayer, remoteOpenTiles, gameManager.turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, remotePlayerWind);
 
         // Represents the tiles currently on the GameTable which the remote player had
         GameObject[] taggedRemoteOpenTiles = GameObject.FindGameObjectsWithTag(relativePos + "_" + "Open");

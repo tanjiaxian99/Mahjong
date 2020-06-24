@@ -15,20 +15,45 @@ public static class InitializeRound {
         // At this point, Start hasn't been called yet. Wait a frame before proceeding with the Coroutine
         yield return null;
         AssignPlayerWind(numberOfPlayers);
+        PropertiesManager.SetPrevailingWind(PlayerManager.Wind.EAST);
         DeterminePlayOrder(numberOfPlayers);
         ScreenViewAdjustment();
         GenerateTiles();
+        PropertiesManager.SetTurnNumber(0);
         // Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
         yield return new WaitForSeconds(1.5f);
         DistributeTiles();
         HiddenPayouts();
         yield return new WaitForSeconds(0.5f);
-        gameManager.StartTurn();
+        PropertiesManager.StartTurn();
         yield return new WaitForSeconds(0.5f);
         GameManager.Instance.StartCoroutine(InitialInitialization());
         // Ensures InitialLocalInstantiation is called before OnPlayerTurn
         yield return new WaitForSeconds(0.8f);
         StartGame();
+    }
+
+
+    public static IEnumerator InitializeNewRound(GameManager gameManager, int numberOfPlayers) {
+        Debug.LogError("Initializing New Round");
+        yield break;
+        //// At this point, Start hasn't been called yet. Wait a frame before proceeding with the Coroutine
+        //yield return null;
+        //AssignPlayerWind(numberOfPlayers);
+        //DeterminePlayOrder(numberOfPlayers);
+        //ScreenViewAdjustment();
+        //GenerateTiles();
+        //// Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
+        //yield return new WaitForSeconds(1.5f);
+        //DistributeTiles();
+        //HiddenPayouts();
+        //yield return new WaitForSeconds(0.5f);
+        //gameManager.StartTurn();
+        //yield return new WaitForSeconds(0.5f);
+        //GameManager.Instance.StartCoroutine(InitialInitialization());
+        //// Ensures InitialLocalInstantiation is called before OnPlayerTurn
+        //yield return new WaitForSeconds(0.8f);
+        //StartGame();
     }
 
 
@@ -69,6 +94,7 @@ public static class InitializeRound {
             int index = DictManager.Instance.windsAllocation[actorNumber];
             playOrder[index] = PhotonNetwork.CurrentRoom.GetPlayer(actorNumber);
         }
+        PropertiesManager.SetInitialPlayerOrder(playOrder);
         PropertiesManager.SetPlayOrder(playOrder);
     }
 

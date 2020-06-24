@@ -111,7 +111,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
             }
         }
         // Local Hidden Payout check
-        payment.InstantPayout(PhotonNetwork.LocalPlayer, initialOpenTiles, gameManager.turnManager.Turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, playerManager.seatWind);
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, initialOpenTiles, gameManager.turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, playerManager.seatWind);
 
         // Remote Hidden Payout check
         PropertiesManager.SetOpenTiles(initialOpenTiles);
@@ -164,7 +164,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         if (playerManager.seatWind == PlayerManager.Wind.EAST) {
 
             // Start of Turn 2 will definitely have at least one discard tile
-            if (gameManager.turnManager.Turn == 1 && gameManager.discardTiles.Count == 0) {
+            if (gameManager.turn == 1 && gameManager.discardTiles.Count == 0) {
                 // Check to see if the player can win based on the East Wind's initial 14 tiles
                 
                 if (winManager.CanWin()) {
@@ -177,9 +177,9 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
                 }
                 yield break;
             } else {
-                gameManager.StartTurn();
-                // DEBUG
-                gameManager.StartTurn();
+                PropertiesManager.StartTurn();
+                //// DEBUG
+                //PropertiesManager.StartTurn();
                 // The wait ensures the local player's turn number is updated
                 yield return new WaitForSeconds(0.2f);
             }
@@ -395,7 +395,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     public void InstantiateLocalOpenTiles() {
         tilesManager.UpdateOpenTiles();
         gameManager.UpdateAllPlayersOpenTiles(PhotonNetwork.LocalPlayer, tilesManager.openTiles);
-        payment.InstantPayout(PhotonNetwork.LocalPlayer, tilesManager.openTiles, gameManager.turnManager.Turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, playerManager.seatWind);
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, tilesManager.openTiles, gameManager.turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, playerManager.seatWind);
 
         // Update the list of open tiles on the local player's custom properties
         PropertiesManager.SetOpenTiles(tilesManager.openTiles);

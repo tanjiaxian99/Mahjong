@@ -77,6 +77,11 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     /// </summary>
     public const byte EvEndRound = 13;
 
+    /// <summary>
+    /// The New Round event message byte. Used internally by all players to start a new round.
+    /// </summary>
+    public const byte EvNewRound = 14;
+
     #endregion
 
     /// <summary>
@@ -177,6 +182,10 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         PhotonNetwork.RaiseEvent(EvEndRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
     }
 
+    public static void EventNewRound() {
+        PhotonNetwork.RaiseEvent(EvNewRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
+    }
+
     #endregion 
 
     public void OnEvent(EventData photonEvent) {
@@ -270,6 +279,10 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
             case EvEndRound:
                 EndRound.Instance.EndGame(null, 0, null);
+                break;
+
+            case EvNewRound:
+                EndRound.Instance.OnStartNewRound();
                 break;
         }
     }
