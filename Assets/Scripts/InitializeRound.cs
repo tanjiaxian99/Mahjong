@@ -11,13 +11,21 @@ public static class InitializeRound {
     /// <summary>
     /// Called at the start of every game (when PunTurnManager.Turn == 0) by MasterClient
     /// </summary>
-    public static IEnumerator InitializeGame(GameManager gameManager, int numberOfPlayers) {
-        // At this point, Start hasn't been called yet. Wait a frame before proceeding with the Coroutine
-        yield return null;
-        AssignPlayerWind(numberOfPlayers);
-        PropertiesManager.SetPrevailingWind(PlayerManager.Wind.EAST);
-        DeterminePlayOrder(numberOfPlayers);
-        ScreenViewAdjustment();
+    public static IEnumerator InitializeGame(GameManager gameManager, int numberOfPlayers, string type = "New Game") {
+        if (type == "New Game") {
+            // At this point, Start hasn't been called yet. Wait a frame before proceeding with the Coroutine
+            yield return null;
+            AssignSeatWind(numberOfPlayers);
+            PropertiesManager.SetPrevailingWind(PlayerManager.Wind.NORTH);
+            DeterminePlayOrder(numberOfPlayers);
+            ScreenViewAdjustment();
+
+        } else if (type == "New Round") {
+            Debug.LogError("Initializing New Round");
+            yield return new WaitForSeconds(0.5f);
+            NewSeatWind();
+        }
+
         GenerateTiles();
         PropertiesManager.SetTurnNumber(0);
         // Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
@@ -33,34 +41,10 @@ public static class InitializeRound {
         StartGame();
     }
 
-
-    public static IEnumerator InitializeNewRound(GameManager gameManager, int numberOfPlayers) {
-        Debug.LogError("Initializing New Round");
-        yield break;
-        //// At this point, Start hasn't been called yet. Wait a frame before proceeding with the Coroutine
-        //yield return null;
-        //AssignPlayerWind(numberOfPlayers);
-        //DeterminePlayOrder(numberOfPlayers);
-        //ScreenViewAdjustment();
-        //GenerateTiles();
-        //// Delay for WallTileListPropKey and PlayerWindPropKey related custom properties to update
-        //yield return new WaitForSeconds(1.5f);
-        //DistributeTiles();
-        //HiddenPayouts();
-        //yield return new WaitForSeconds(0.5f);
-        //gameManager.StartTurn();
-        //yield return new WaitForSeconds(0.5f);
-        //GameManager.Instance.StartCoroutine(InitialInitialization());
-        //// Ensures InitialLocalInstantiation is called before OnPlayerTurn
-        //yield return new WaitForSeconds(0.8f);
-        //StartGame();
-    }
-
-
     /// <summary>
     /// Called by MasterClient to assign a wind to each player
     /// </summary>
-    public static void AssignPlayerWind(int numberOfPlayers) {
+    public static void AssignSeatWind(int numberOfPlayers) {
         DictManager.Instance.windsAllocation = new Dictionary<int, int>();
 
         List<PlayerManager.Wind> winds = ((PlayerManager.Wind[])Enum.GetValues(typeof(PlayerManager.Wind))).ToList();
@@ -78,7 +62,7 @@ public static class InitializeRound {
         }
         PropertiesManager.SetWindAllocation(DictManager.Instance.windsAllocation);
         Debug.LogFormat("The 4 winds have been assigned to each player");
-    }
+    } 
 
 
     /// <summary>
@@ -106,6 +90,21 @@ public static class InitializeRound {
         EventsManager.EventScreenViewAdjustment();
     }
 
+    /// <summary>
+    /// Called by MasterClient to assign a seat wind to each player based on the predetermined play order.
+    /// </summary>
+    /// <param name="numberOfPlayers"></param>
+    public static void NewSeatWind() {
+        DictManager.Instance.windsAllocation = new Dictionary<int, int>();
+
+        Player[] playOrder = PropertiesManager.GetPlayOrder();
+        for (int i = 0; i < playOrder.Length; i++) {
+            DictManager.Instance.windsAllocation.Add(playOrder[i].ActorNumber, i);
+        }
+
+        PropertiesManager.SetWindAllocation(DictManager.Instance.windsAllocation);
+        Debug.LogFormat("The 4 winds have been assigned to each player");
+    }
 
     /// <summary>
     /// Create 4 copies of each tile, giving 148 tiles
@@ -246,19 +245,19 @@ public static class InitializeRound {
             } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.WEST) {
                 List<Tile> playerTiles = new List<Tile>();
 
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Four));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Six));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Eight));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
 
                 EventsManager.EventDistributeTiles(player, playerTiles);
 
@@ -337,5 +336,5 @@ public static class InitializeRound {
 
         Player firstPlayer = playOrder[0];
         EventsManager.EventPlayerTurn(firstPlayer);
-    }
+    }    
 }

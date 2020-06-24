@@ -158,7 +158,7 @@ public class WinManager : MonoBehaviour {
             payment.HandPayout(PhotonNetwork.LocalPlayer, gameManager.discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
         }
 
-        EndRound.Instance.EndGame(PhotonNetwork.LocalPlayer, playerManager.fanTotal, playerManager.winningCombos);
+        FinishRound.Instance.EndRound(PhotonNetwork.LocalPlayer, playerManager.fanTotal, playerManager.winningCombos);
     }
 
 

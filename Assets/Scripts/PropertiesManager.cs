@@ -273,11 +273,13 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             SetSeatWind(wind);
             // Update local player's playerManager
             playerManager.seatWind = wind;
-
+            Debug.LogErrorFormat("The player's wind is {0}", playerManager.seatWind);
             // Initialize Instant Payment dictionary
             this.payment.InitializeInstantPaymentDict(PhotonNetwork.PlayerList.ToList());
+
         } else if (propertiesThatChanged.ContainsKey(PrevailingWindPropKey)) {
             gameManager.prevailingWind = GetPrevailingWind();
+            Debug.LogErrorFormat("The prevailing wind is {0}", gameManager.prevailingWind);
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = GetDiscardTile();
@@ -389,7 +391,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             //numberOfTilesLeft = 50;
 
             if (gameManager.numberOfTilesLeft == 15) {
-                EndRound.Instance.EndGame(null, 0, null);
+                FinishRound.Instance.EndRound(null, 0, null);
                 EventsManager.EventEndRound();
             }
 

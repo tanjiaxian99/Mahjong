@@ -155,7 +155,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     public IEnumerator OnPlayerTurn() {
         // If there are only 15 tiles left, end the game
         if (gameManager.numberOfTilesLeft == 15) {
-            EndRound.Instance.EndGame(null, 0, null);
+            FinishRound.Instance.EndRound(null, 0, null);
             EventsManager.EventEndRound();
             yield break;
         }
@@ -270,7 +270,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         while (true) {
             // If there are only 15 tiles left, end the game
             if (gameManager.numberOfTilesLeft == 15) {
-                EndRound.Instance.EndGame(null, 0, null);
+                FinishRound.Instance.EndRound(null, 0, null);
                 EventsManager.EventEndRound();
                 return;
             }

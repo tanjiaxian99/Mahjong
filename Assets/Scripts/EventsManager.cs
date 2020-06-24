@@ -82,6 +82,11 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     /// </summary>
     public const byte EvNewRound = 14;
 
+    /// <summary>
+    /// The End Game event message byte. Used internally by all players to end the game.
+    /// </summary>
+    public const byte EvEndGame = 15;
+
     #endregion
 
     /// <summary>
@@ -186,6 +191,10 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         PhotonNetwork.RaiseEvent(EvNewRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
     }
 
+    public static void EventEndGame() {
+        PhotonNetwork.RaiseEvent(EvEndGame, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
+    }
+
     #endregion 
 
     public void OnEvent(EventData photonEvent) {
@@ -249,7 +258,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 winInfo.Values.ToList()[0].ToList().ForEach(Debug.LogError);
                 Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
                 winManager.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
-                EndRound.Instance.EndGame(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
+                FinishRound.Instance.EndRound(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
                 break;
 
             case EvWinUpdate:
@@ -270,7 +279,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                     }
 
                     if (allWinFalse) {
-                        EventsManager.EventCheckPongKong(nonDiscardActorNumbers);
+                        EventCheckPongKong(nonDiscardActorNumbers);
                     }
                     winUpdateList.Clear();
                     nonDiscardActorNumbers.Clear();
@@ -278,11 +287,15 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 break;
 
             case EvEndRound:
-                EndRound.Instance.EndGame(null, 0, null);
+                FinishRound.Instance.EndRound(null, 0, null);
                 break;
 
             case EvNewRound:
-                EndRound.Instance.OnStartNewRound();
+                FinishRound.Instance.OnStartNewRound();
+                break;
+
+            case EvEndGame:
+                FinishRound.Instance.EndGame();
                 break;
         }
     }

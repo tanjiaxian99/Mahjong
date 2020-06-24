@@ -6,19 +6,20 @@ using System.Linq;
 using System;
 using Photon.Pun;
 
-public class EndRound : MonoBehaviour {
+public class FinishRound : MonoBehaviour {
 
     [SerializeField]
     private GameObject scriptManager;
 
+    private GameManager gameManager;
 
     private TilesManager tilesManager;
 
     #region Singleton Initialization
 
-    private static EndRound _instance;
+    private static FinishRound _instance;
 
-    public static EndRound Instance { get { return _instance; } }
+    public static FinishRound Instance { get { return _instance; } }
 
     private void Awake() {
         if (_instance != null && _instance != this) {
@@ -31,6 +32,7 @@ public class EndRound : MonoBehaviour {
     #endregion
 
     private void Start() {
+        gameManager = scriptManager.GetComponent<GameManager>();
         tilesManager = scriptManager.GetComponent<TilesManager>();
     }
 
@@ -40,7 +42,7 @@ public class EndRound : MonoBehaviour {
     /// <param name="winner"></param>
     /// <param name="fanTotal"></param>
     /// <param name="winningCombos"></param>
-    public void EndGame(Player winner, int fanTotal, List<string> winningCombos) {
+    public void EndRound(Player winner, int fanTotal, List<string> winningCombos) {
         UpdateHandTiles();
         DisplayWinningCombo(winner, fanTotal, winningCombos);
         NewPlayOrder(winner);
@@ -55,6 +57,49 @@ public class EndRound : MonoBehaviour {
 
     private void DisplayWinningCombo(Player winner, int fanTotal, List<string> winningCombos) {
         // TODO: Display winning combos / fan
+    }
+
+    /// <summary>
+    /// Determine the new play order
+    /// </summary>
+    private void NewPlayOrder(Player winner) {
+        if (!PhotonNetwork.IsMasterClient) {
+            return;
+        }
+
+        Player[] currentPlayOrder = PropertiesManager.GetPlayOrder();
+        if (winner == null || winner == currentPlayOrder[0]) {
+            return;
+        }
+
+        Player[] newPlayOrder = new Player[4];
+        Array.Copy(currentPlayOrder, 1, newPlayOrder, 0, 3);
+        newPlayOrder[3] = currentPlayOrder[0];
+
+        PropertiesManager.SetPlayOrder(newPlayOrder);
+
+        if (Enumerable.SequenceEqual(newPlayOrder, PropertiesManager.GetInitialPlayOrder())) {
+            NewPrevailingWind();
+        }
+    }
+
+    /// <summary>
+    /// Determine the new prevailing wind
+    /// </summary>
+    private void NewPrevailingWind() {
+        if (!PhotonNetwork.IsMasterClient) {
+            return;
+        }
+
+        PlayerManager.Wind currentPrevailingWind = PropertiesManager.GetPrevailingWind();
+        PlayerManager.Wind newPrevailingWind = currentPrevailingWind + 1;
+
+        if ((int)newPrevailingWind == 4) {
+            EventsManager.EventEndGame();
+            return;
+        }
+
+        PropertiesManager.SetPrevailingWind(newPrevailingWind);
     }
 
     /// <summary>
@@ -77,7 +122,6 @@ public class EndRound : MonoBehaviour {
     public void OnStartNewRound() {
         ResetAllVariables();
         ClearGameTable();
-        NewPrevailingWind();
         StartNewRound();
     }
 
@@ -107,51 +151,12 @@ public class EndRound : MonoBehaviour {
             }
         }
     }
-
-    /// <summary>
-    /// Determine the new play order
-    /// </summary>
-    private void NewPlayOrder(Player winner) {
+    
+    public void StartNewRound() {
         if (!PhotonNetwork.IsMasterClient) {
             return;
         }
-
-        Player[] currentPlayOrder = PropertiesManager.GetPlayOrder();
-        if (winner == currentPlayOrder[0]) {
-            return;
-        }
-
-        Player[] newPlayOrder = new Player[4];
-        Array.Copy(currentPlayOrder, 1, newPlayOrder, 0, 3);
-        newPlayOrder[3] = currentPlayOrder[0];
-
-        PropertiesManager.SetPlayOrder(newPlayOrder);
-
-        if (newPlayOrder == PropertiesManager.GetInitialPlayOrder()) {
-            NewPrevailingWind();
-        }
-    }
-
-    /// <summary>
-    /// Determine the new prevailing wind
-    /// </summary>
-    private void NewPrevailingWind() {
-        PlayerManager.Wind currentPrevailingWind = PropertiesManager.GetPrevailingWind();
-        PlayerManager.Wind newPrevailingWind = currentPrevailingWind + 1;
-
-        if (newPrevailingWind == PlayerManager.Wind.EAST) {
-            EndGame();
-            return;
-        }
-
-        PropertiesManager.SetPrevailingWind(newPrevailingWind);
-    }
-
-
-    // TODO: Call InitializeRound to start the new round
-    public static void StartNewRound() {
-        // TODO: Every player press ok, masterclient then starts the new round
-        // TODO: DO NOT CALL assignPlayerWind
+        StartCoroutine(InitializeRound.InitializeGame(gameManager, gameManager.numberOfTilesLeft, "New Round"));
     }
     
 
