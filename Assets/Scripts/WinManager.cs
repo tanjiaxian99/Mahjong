@@ -57,7 +57,7 @@ public class WinManager : MonoBehaviour {
 
         PlayerManager.Wind prevailingWind = gameManager.prevailingWind;
         int numberOfTilesLeft = gameManager.numberOfTilesLeft;
-        int turn = gameManager.turnManager.Turn;
+        int turn = gameManager.turn;
 
         if (discardType == "Normal") {
             (playerManager.fanTotal, playerManager.winningCombos) = fanCalculator.CalculateFan(
@@ -117,15 +117,33 @@ public class WinManager : MonoBehaviour {
             PropertiesManager.SetPayAllPlayer(gameManager.bonusPlayer);
         }
 
-        // Raise an event to inform remote players of the win
+        // Raise an event to inform remote players of the win, which ends the round as well
         Dictionary<int, string[]> winInfo = new Dictionary<int, string[]>() {
             [playerManager.fanTotal] = playerManager.winningCombos.ToArray()
         };
         EventsManager.EventPlayerWin(winInfo);
 
-        // Update DiscardTilesPropkey to remove the discard tile used for the win
+        // Update player's hand
+        if ((tilesManager.hand.Count + 1) % 3 != 0) {
+            if (gameManager.latestDiscardTile != null) {
+                tilesManager.hand.Add(gameManager.latestDiscardTile);
+                playerManager.InstantiateLocalHand();
+            } else if (playerManager.winningCombos.Contains("Robbing the Kong") && gameManager.latestKongTile != null) {
+                tilesManager.hand.Add(gameManager.latestKongTile);
+                playerManager.InstantiateLocalHand();
+            } else if (playerManager.winningCombos.Contains("Robbing the Eighth") && gameManager.latestBonusTile != null) {
+                tilesManager.bonusTiles.Add(gameManager.latestBonusTile);
+                playerManager.InstantiateLocalOpenTiles();
+            }
+        }
+
+        // Remove the discard/bonus/kong tile used for the win
         if (gameManager.latestDiscardTile != null) {
             PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+        } else if (playerManager.winningCombos.Contains("Robbing the Kong")) {
+            PropertiesManager.SetSpecialTile(new Tuple<int, Tile, float>(gameManager.kongPlayer.ActorNumber, gameManager.latestKongTile, -100));
+        } else if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
+            PropertiesManager.SetSpecialTile(new Tuple<int, Tile, float>(gameManager.bonusPlayer.ActorNumber, gameManager.latestBonusTile, -100));
         }
 
         int numberOfTilesLeft = gameManager.numberOfTilesLeft;
@@ -140,8 +158,7 @@ public class WinManager : MonoBehaviour {
             payment.HandPayout(PhotonNetwork.LocalPlayer, gameManager.discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
         }
 
-
-        // TODO: Show win screen
+        FinishRound.Instance.EndRound(PhotonNetwork.LocalPlayer, playerManager.fanTotal, playerManager.winningCombos);
     }
 
 

@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Container for player tiles and tiles-related methods
 /// </summary>
-public class TilesManager : MonoBehaviour {
+public class TilesManager : MonoBehaviour, IResetVariables {
 
     public List<Tile> hand { get; set; }
 
@@ -175,4 +175,11 @@ public class TilesManager : MonoBehaviour {
     }
 
     #endregion
+
+    public void ResetVariables() {
+        hand.Clear();
+        bonusTiles.Clear();
+        comboTiles.Clear();
+        openTiles.Clear();
+    }
 }

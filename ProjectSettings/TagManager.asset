@@ -6,15 +6,16 @@ TagManager:
   tags:
   - Hand
   - Open
-  - EAST_Hand
-  - EAST_Open
-  - NORTH_Hand
-  - NORTH_Open
-  - WEST_Hand
-  - WEST_Open
-  - SOUTH_Hand
-  - SOUTH_Open
   - Discard
+  - Left_Hand
+  - Right_Hand
+  - Opposite_Hand
+  - Left_Open Hand
+  - Right_Open Hand
+  - Opposite_Open Hand
+  - Left_Open
+  - Right_Open
+  - Opposite_Open
   layers:
   - Default
   - TransparentFX

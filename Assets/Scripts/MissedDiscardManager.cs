@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class MissedDiscardManager : MonoBehaviour {
+public class MissedDiscardManager : MonoBehaviour, IResetVariables {
 
     private Dictionary<Player, List<Tile>> missedDiscard;
 
@@ -62,5 +62,10 @@ public class MissedDiscardManager : MonoBehaviour {
         Debug.LogError("Called MissedDiscardUI");
         EventsManager.EventCanPongKong(false);
         // TODO
+    }
+
+
+    public void ResetVariables() {
+        missedDiscard.Clear();
     }
 }

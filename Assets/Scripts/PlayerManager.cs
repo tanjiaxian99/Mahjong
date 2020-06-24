@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class PlayerManager : MonoBehaviour {
+public class PlayerManager : MonoBehaviour, IResetVariables {
 
     public enum Wind {
         EAST,
@@ -111,7 +111,7 @@ public class PlayerManager : MonoBehaviour {
             }
         }
         // Local Hidden Payout check
-        payment.InstantPayout(PhotonNetwork.LocalPlayer, initialOpenTiles, gameManager.turnManager.Turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, playerManager.seatWind);
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, initialOpenTiles, gameManager.turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, playerManager.seatWind);
 
         // Remote Hidden Payout check
         PropertiesManager.SetOpenTiles(initialOpenTiles);
@@ -142,7 +142,7 @@ public class PlayerManager : MonoBehaviour {
 
         // Initial sort. Afterwards, hand will only be sorted after discarding a tile.
         tilesManager.hand = tilesManager.hand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
-
+        
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
     }
@@ -155,7 +155,8 @@ public class PlayerManager : MonoBehaviour {
     public IEnumerator OnPlayerTurn() {
         // If there are only 15 tiles left, end the game
         if (gameManager.numberOfTilesLeft == 15) {
-            gameManager.EndRound();
+            FinishRound.Instance.EndRound(null, 0, null);
+            EventsManager.EventEndRound();
             yield break;
         }
 
@@ -163,8 +164,9 @@ public class PlayerManager : MonoBehaviour {
         if (playerManager.seatWind == PlayerManager.Wind.EAST) {
 
             // Start of Turn 2 will definitely have at least one discard tile
-            if (gameManager.turnManager.Turn == 1 && gameManager.discardTiles.Count == 0) {
+            if (gameManager.turn == 1 && gameManager.discardTiles.Count == 0) {
                 // Check to see if the player can win based on the East Wind's initial 14 tiles
+                
                 if (winManager.CanWin()) {
                     winManager.WinUI();
                     yield break;
@@ -175,9 +177,9 @@ public class PlayerManager : MonoBehaviour {
                 }
                 yield break;
             } else {
-                gameManager.StartTurn();
-                // DEBUG
-                gameManager.StartTurn();
+                PropertiesManager.StartTurn();
+                //// DEBUG
+                //PropertiesManager.StartTurn();
                 // The wait ensures the local player's turn number is updated
                 yield return new WaitForSeconds(0.2f);
             }
@@ -268,7 +270,8 @@ public class PlayerManager : MonoBehaviour {
         while (true) {
             // If there are only 15 tiles left, end the game
             if (gameManager.numberOfTilesLeft == 15) {
-                gameManager.EndRound();
+                FinishRound.Instance.EndRound(null, 0, null);
+                EventsManager.EventEndRound();
                 return;
             }
 
@@ -392,7 +395,7 @@ public class PlayerManager : MonoBehaviour {
     public void InstantiateLocalOpenTiles() {
         tilesManager.UpdateOpenTiles();
         gameManager.UpdateAllPlayersOpenTiles(PhotonNetwork.LocalPlayer, tilesManager.openTiles);
-        payment.InstantPayout(PhotonNetwork.LocalPlayer, tilesManager.openTiles, gameManager.turnManager.Turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, playerManager.seatWind);
+        payment.InstantPayout(PhotonNetwork.LocalPlayer, tilesManager.openTiles, gameManager.turn, gameManager.numberOfTilesLeft, gameManager.isFreshTile, gameManager.discardPlayer, playerManager.seatWind);
 
         // Update the list of open tiles on the local player's custom properties
         PropertiesManager.SetOpenTiles(tilesManager.openTiles);
@@ -505,6 +508,17 @@ public class PlayerManager : MonoBehaviour {
 
         // Inform Master Client that the local player can't Pong/Kong
         EventsManager.EventCanPongKong(false);
+    }
+
+
+    public void ResetVariables() {
+        myTurn = false;
+        canTouchHandTiles = false;
+        numberOfReplacementTiles = 0;
+        numberOfKong = 0;
+        payForAll = "";
+        fanTotal = 0;
+        winningCombos.Clear();
     }
 }
 

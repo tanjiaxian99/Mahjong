@@ -6,7 +6,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Security.Cryptography;
 
-public class Payment : MonoBehaviour {
+public class Payment : MonoBehaviour, IResetVariables {
 
     [SerializeField]
     private GameObject scriptManager;
@@ -224,7 +224,7 @@ public class Payment : MonoBehaviour {
     /// Determine if the player has the Bonus Tile Match Seat Wind Pair. Runs locally.
     /// </summary>
     private void BonusTileMatchSeatWindPair(Player player, PlayerManager.Wind playerWind, List<Tile> openTiles, bool isStartingHand) {
-        if (openTiles.Contains(DictManager.Instance.windToBonusTilesDict[playerWind][0]) && openTiles.Contains(DictManager.Instance.windToBonusTilesDict[playerWind][1])) {
+        if (openTiles.Contains(DictManager.Instance.windTo3TilesDict[playerWind][0]) && openTiles.Contains(DictManager.Instance.windTo3TilesDict[playerWind][1])) {
 
             if (instantPaymentDict[player].Contains("Bonus Tile Match Seat Wind Pair")) {
                 return;
@@ -481,5 +481,13 @@ public class Payment : MonoBehaviour {
                 playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]);
             }
         }
+    }
+
+
+    public void ResetVariables() {
+        instantPaymentDict.Clear();
+        latestKongPlayer = null;
+        latestKongType = null;
+        kongTypeCount.Clear();
     }
 }

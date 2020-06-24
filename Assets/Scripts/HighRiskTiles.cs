@@ -13,8 +13,6 @@ public class HighRiskTiles : MonoBehaviour {
     private GameObject scriptManager;
 
     private Dictionary<string, int> settingsDict;
-    private Dictionary<PlayerManager.Wind, List<Tile>> windToTileDict;
-    private Dictionary<Tile.Suit?, List<Tile>> fullFlushDict;
 
     private List<string> highRiskScenarios;
 
@@ -32,12 +30,8 @@ public class HighRiskTiles : MonoBehaviour {
     private void Start() {
         Settings settings = scriptManager.GetComponent<Settings>();
         settingsDict = settings.settingsDict;
-        this.windToTileDict = new Dictionary<PlayerManager.Wind, List<Tile>>();
 
         this.highRiskScenarios = new List<string>();
-
-        this.InitializeWindToTileDict();
-        this.InitializeFullFlushDict();
         this.InitializeTiles();
     }
 
@@ -47,12 +41,7 @@ public class HighRiskTiles : MonoBehaviour {
     public HighRiskTiles(Dictionary<string, int> settingsDict) {
         this.settingsDict = settingsDict;
 
-        this.windToTileDict = new Dictionary<PlayerManager.Wind, List<Tile>>();
-
         this.highRiskScenarios = new List<string>();
-
-        this.InitializeWindToTileDict();
-        this.InitializeFullFlushDict();
         this.InitializeTiles();
     }
 
@@ -61,6 +50,7 @@ public class HighRiskTiles : MonoBehaviour {
     /// </summary>
     public List<Tile> HighRiskDiscards(List<Tile> openTiles, PlayerManager.Wind playerWind, PlayerManager.Wind prevailingWind) {
         List<Tile> highRiskTiles = new List<Tile>();
+        highRiskScenarios = new List<string>();
 
         highRiskTiles.AddRange(this.DragonTileSet(openTiles));
         //highRiskTiles.AddRange(this.WindTileSet(openTiles));
@@ -73,9 +63,8 @@ public class HighRiskTiles : MonoBehaviour {
 
 
     /// <summary>
-    /// Returns the list of High Risk Scenarios which the discard tile fall under
+    /// Returns the list of High Risk Scenarios which the discard tile falls under
     /// </summary>
-    /// <returns></returns>
     public List<string> HighRiskScenarios() {
         return highRiskScenarios;
     }
@@ -158,9 +147,9 @@ public class HighRiskTiles : MonoBehaviour {
         highRiskDict.Add(dragonOne, 0);
         highRiskDict.Add(dragonTwo, 0);
         highRiskDict.Add(dragonThree, 0);
-        highRiskDict.Add(windToTileDict[playerWind][2], 0);
+        highRiskDict.Add(DictManager.Instance.windTo3TilesDict[playerWind][2], 0);
         if (playerWind != prevailingWind) {
-            highRiskDict.Add(windToTileDict[prevailingWind][2], 0);
+            highRiskDict.Add(DictManager.Instance.windTo3TilesDict[prevailingWind][2], 0);
         }
 
         int seasonTilesCount = 0;
@@ -171,7 +160,7 @@ public class HighRiskTiles : MonoBehaviour {
         // Bonus Tile Match Seat Wind: Season & Flower. Player Wind Combo: Wind. Prevailing Wind Combo: Wind
         foreach (Tile tile in openTiles) {
 
-            if (tile == windToTileDict[playerWind][0] || tile == windToTileDict[playerWind][1]) {
+            if (tile == DictManager.Instance.windTo3TilesDict[playerWind][0] || tile == DictManager.Instance.windTo3TilesDict[playerWind][1]) {
                 totalFan += settingsDict["Bonus Tile Match Seat Wind"];
             }
 
@@ -192,12 +181,12 @@ public class HighRiskTiles : MonoBehaviour {
             }
         }
 
-        if (openTiles.Contains(windToTileDict[playerWind][2])) {
-            highRiskDict[windToTileDict[playerWind][2]] += settingsDict["Player Wind Combo"];
+        if (openTiles.Contains(DictManager.Instance.windTo3TilesDict[playerWind][2])) {
+            highRiskDict[DictManager.Instance.windTo3TilesDict[playerWind][2]] += settingsDict["Player Wind Combo"];
         }
 
-        if (openTiles.Contains(windToTileDict[prevailingWind][2])) {
-            highRiskDict[windToTileDict[prevailingWind][2]] += settingsDict["Prevailing Wind Combo"];
+        if (openTiles.Contains(DictManager.Instance.windTo3TilesDict[prevailingWind][2])) {
+            highRiskDict[DictManager.Instance.windTo3TilesDict[prevailingWind][2]] += settingsDict["Prevailing Wind Combo"];
         }
 
         if (openTiles.Contains(dragonOne)) {
@@ -234,8 +223,8 @@ public class HighRiskTiles : MonoBehaviour {
 
         // If fan limit is 5, there are high risk discards only when there are at least 3 fan.
         if (totalFan == settingsDict["Fan Limit"] - 2) {
-            if (playerWind == prevailingWind && highRiskDict[windToTileDict[playerWind][2]] == 0) {
-                highRiskTiles.Add(windToTileDict[playerWind][2]);
+            if (playerWind == prevailingWind && highRiskDict[DictManager.Instance.windTo3TilesDict[playerWind][2]] == 0) {
+                highRiskTiles.Add(DictManager.Instance.windTo3TilesDict[playerWind][2]);
                 return highRiskTiles;
             }
 
@@ -300,7 +289,7 @@ public class HighRiskTiles : MonoBehaviour {
             return highRiskTiles;
         }
 
-        highRiskTiles = fullFlushDict[referenceSuit];
+        highRiskTiles = DictManager.Instance.fullFlushDict[referenceSuit];
 
         var q = from x in openTiles
                 group x by x into g
@@ -373,94 +362,6 @@ public class HighRiskTiles : MonoBehaviour {
 
     // Eighteen Arhats Scenario
 
-    #region Initializer Functions
-
-    /// <summary>
-    /// Initialize the Wind to Tile Dictionary
-    /// </summary>
-    private void InitializeWindToTileDict() {
-        this.windToTileDict = new Dictionary<PlayerManager.Wind, List<Tile>>();
-        this.windToTileDict.Add(PlayerManager.Wind.EAST, new List<Tile>() {
-            new Tile(Tile.Suit.Season, Tile.Rank.One),
-            new Tile(Tile.Suit.Flower, Tile.Rank.One),
-            new Tile(Tile.Suit.Wind, Tile.Rank.One) });
-        this.windToTileDict.Add(PlayerManager.Wind.SOUTH, new List<Tile>() {
-            new Tile(Tile.Suit.Season, Tile.Rank.Two),
-            new Tile(Tile.Suit.Flower, Tile.Rank.Two),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Two)});
-        this.windToTileDict.Add(PlayerManager.Wind.WEST, new List<Tile>() {
-            new Tile(Tile.Suit.Season, Tile.Rank.Three),
-            new Tile(Tile.Suit.Flower, Tile.Rank.Three),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Three)});
-        this.windToTileDict.Add(PlayerManager.Wind.NORTH, new List<Tile>() {
-            new Tile(Tile.Suit.Season, Tile.Rank.Four),
-            new Tile(Tile.Suit.Flower, Tile.Rank.Four),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Four)});
-    }
-
-
-    /// <summary>
-    /// Initializes the Full Flush Dictionary
-    /// </summary>
-    private void InitializeFullFlushDict() {
-        this.fullFlushDict = new Dictionary<Tile.Suit?, List<Tile>>();
-        fullFlushDict.Add(Tile.Suit.Character, new List<Tile>() {
-            new Tile(Tile.Suit.Character, Tile.Rank.One),
-            new Tile(Tile.Suit.Character, Tile.Rank.Two),
-            new Tile(Tile.Suit.Character, Tile.Rank.Three),
-            new Tile(Tile.Suit.Character, Tile.Rank.Four),
-            new Tile(Tile.Suit.Character, Tile.Rank.Five),
-            new Tile(Tile.Suit.Character, Tile.Rank.Six),
-            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Character, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Character, Tile.Rank.Nine)
-        });
-
-        fullFlushDict.Add(Tile.Suit.Dot, new List<Tile>() {
-            new Tile(Tile.Suit.Dot, Tile.Rank.One),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Two),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Four),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Five),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Six),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Dot, Tile.Rank.Nine)
-        });
-
-        fullFlushDict.Add(Tile.Suit.Bamboo, new List<Tile>() {
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine)
-        });
-
-        fullFlushDict.Add(Tile.Suit.Wind, new List<Tile>() {
-            new Tile(Tile.Suit.Wind, Tile.Rank.One),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Two),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Three),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Four),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
-        });
-
-        fullFlushDict.Add(Tile.Suit.Dragon, new List<Tile>() {
-            new Tile(Tile.Suit.Wind, Tile.Rank.One),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Two),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Three),
-            new Tile(Tile.Suit.Wind, Tile.Rank.Four),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
-        });
-    }
-
 
     /// <summary>
     /// Initialize tiles
@@ -475,6 +376,5 @@ public class HighRiskTiles : MonoBehaviour {
         this.windThree = new Tile(Tile.Suit.Wind, Tile.Rank.Three);
         this.windFour = new Tile(Tile.Suit.Wind, Tile.Rank.Four);
     }
-    #endregion
 
 }

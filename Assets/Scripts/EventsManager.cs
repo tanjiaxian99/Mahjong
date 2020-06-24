@@ -57,7 +57,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public const byte EvCheckPongKong = 9;
 
     /// <summary>
-    /// The Can Pong Kong event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
+    /// The Can Pong Kong event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong.
     /// the latest discard tile.
     /// </summary>
     public const byte EvCanPongKong = 10;
@@ -68,26 +68,41 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public const byte EvPlayerWin = 11;
 
     /// <summary>
-    /// The Win Update event message byte. Used internally by MasterClient to track the number of players who are unable to Pong/Kong
+    /// The Win Update event message byte. Used internally by MasterClient to track the number of players who are unable to win.
     /// </summary>
     public const byte EvWinUpdate = 12;
+
+    /// <summary>
+    /// The End Round event message byte. Used internally by the local player when a remote player ends the round.
+    /// </summary>
+    public const byte EvEndRound = 13;
+
+    /// <summary>
+    /// The New Round event message byte. Used internally by all players to start a new round.
+    /// </summary>
+    public const byte EvNewRound = 14;
+
+    /// <summary>
+    /// The End Game event message byte. Used internally by all players to end the game.
+    /// </summary>
+    public const byte EvEndGame = 15;
 
     #endregion
 
     /// <summary>
     /// A list used by MasterClient to track whether players can/want to Pong/Kong
     /// </summary>
-    public List<bool> PongKongUpdateList;
+    private static List<bool> PongKongUpdateList;
 
     /// <summary>
     /// A list used by MasterClient to track the actor numbers of players who didn't discard the tile
     /// </summary>
-    public List<int> nonDiscardActorNumbers;
+    private static List<int> nonDiscardActorNumbers;
 
     /// <summary>
     /// A list used by MasterClient to track whether players can/want to win
     /// </summary>
-    public List<bool> winUpdateList;
+    private static List<bool> winUpdateList;
 
     #region MonoBehaviourPunCallbacks Callbacks
 
@@ -168,6 +183,18 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         PhotonNetwork.RaiseEvent(EvWinUpdate, canWin, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
     }
 
+    public static void EventEndRound() {
+        PhotonNetwork.RaiseEvent(EvEndRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+    }
+
+    public static void EventNewRound() {
+        PhotonNetwork.RaiseEvent(EvNewRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
+    }
+
+    public static void EventEndGame() {
+        PhotonNetwork.RaiseEvent(EvEndGame, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
+    }
+
     #endregion 
 
     public void OnEvent(EventData photonEvent) {
@@ -227,11 +254,11 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 break;
 
             case EvPlayerWin:
-                Debug.LogError(PhotonNetwork.IsMasterClient);
                 Dictionary<int, string[]> winInfo = (Dictionary<int, string[]>)photonEvent.CustomData;
                 winInfo.Values.ToList()[0].ToList().ForEach(Debug.LogError);
                 Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
                 winManager.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
+                FinishRound.Instance.EndRound(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
                 break;
 
             case EvWinUpdate:
@@ -252,12 +279,30 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                     }
 
                     if (allWinFalse) {
-                        EventsManager.EventCheckPongKong(nonDiscardActorNumbers);
+                        EventCheckPongKong(nonDiscardActorNumbers);
                     }
                     winUpdateList.Clear();
                     nonDiscardActorNumbers.Clear();
                 }
                 break;
+
+            case EvEndRound:
+                FinishRound.Instance.EndRound(null, 0, null);
+                break;
+
+            case EvNewRound:
+                FinishRound.Instance.OnStartNewRound();
+                break;
+
+            case EvEndGame:
+                FinishRound.Instance.EndGame();
+                break;
         }
+    }
+
+    public static void ResetVariables() {
+        PongKongUpdateList.Clear();
+        nonDiscardActorNumbers.Clear();
+        winUpdateList.Clear();
     }
 }
