@@ -85,12 +85,12 @@ public class WinManager : MonoBehaviour {
     /// </summary>
     public void WinUI() {
         if (sacredDiscardManager.sacredDiscard != null && sacredDiscardManager.sacredDiscard == gameManager.latestDiscardTile) {
-            sacredDiscardManager.SacredDiscardUI();
+            sacredDiscardManager.TileIsSacredDiscard();
             return;
         }
 
         if (missedDiscardManager.IsMissedDiscard(gameManager.latestDiscardTile)) {
-            missedDiscardManager.MissedDiscardUI();
+            missedDiscardManager.MissedDiscardUI(gameManager.latestDiscardTile);
             return;
         }
 

@@ -58,8 +58,8 @@ public class MissedDiscardManager : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Called when the player can Pong/Win but the discard tile is a Missed Discard
     /// </summary>
-    public void MissedDiscardUI() {
-        Debug.LogError("Called MissedDiscardUI");
+    public void MissedDiscardUI(Tile missedDiscard) {
+        UI.Instance.MissedDiscardUI(missedDiscard);
         EventsManager.EventCanPongKong(false);
         // TODO
     }
