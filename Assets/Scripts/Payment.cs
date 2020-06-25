@@ -104,7 +104,7 @@ public class Payment : MonoBehaviour, IResetVariables {
         }
 
         if (settingsDict["Complete Animal Group Payout"] > 0) {
-            this.CompleteAnimalGroupPayout(player, openTiles);
+            this.CompleteAnimalGroupPayout(player);
         }
 
         if (settingsDict["Hidden Bonus Tile Match Seat Wind Pair"] > 0 && settingsDict["Bonus Tile Match Seat Wind Pair"] > 0) {
@@ -145,6 +145,9 @@ public class Payment : MonoBehaviour, IResetVariables {
         // Hidden Cat and Rat check
         if (isStartingHand) {
             Debug.LogError("Instant Payout: Hidden Cat and Rat");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Hidden Cat and Rat", 
+                new List<Tile>() { new Tile(Tile.Suit.Animal, Tile.Rank.One), new Tile(Tile.Suit.Animal, Tile.Rank.Two) }));
+
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int) Math.Pow(2, settingsDict["Hidden Cat and Rat"]) * 3;
             } else {
@@ -153,6 +156,9 @@ public class Payment : MonoBehaviour, IResetVariables {
 
         } else {
             Debug.LogError("Instant Payout: Cat and Rat");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Cat and Rat",
+                            new List<Tile>() { new Tile(Tile.Suit.Animal, Tile.Rank.One), new Tile(Tile.Suit.Animal, Tile.Rank.Two) })); 
+
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Cat and Rat"]) * 3;
             } else {
@@ -180,6 +186,9 @@ public class Payment : MonoBehaviour, IResetVariables {
         // Hidden Chicken and Centipede check
         if (isStartingHand) {
             Debug.LogError("Instant Payout: Hidden Chicken and Centipede");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Hidden Chicken and Centipede",
+                            new List<Tile>() { new Tile(Tile.Suit.Animal, Tile.Rank.Three), new Tile(Tile.Suit.Animal, Tile.Rank.Four) })); 
+
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Hidden Chicken and Centipede"]) * 3;
             } else {
@@ -188,6 +197,9 @@ public class Payment : MonoBehaviour, IResetVariables {
 
         } else {
             Debug.LogError("Instant Payout: Chicken and Centipede");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Chicken and Centipede",
+                            new List<Tile>() { new Tile(Tile.Suit.Animal, Tile.Rank.Three), new Tile(Tile.Suit.Animal, Tile.Rank.Four) })); 
+
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Chicken and Centipede"]) * 3;
             } else {
@@ -200,7 +212,7 @@ public class Payment : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Determine if the player has the Complete Animal Group. Runs locally.
     /// </summary>
-    private void CompleteAnimalGroupPayout(Player player, List<Tile> openTiles) {
+    private void CompleteAnimalGroupPayout(Player player) {
         if (instantPaymentDict[player].Contains("Cat and Rat") && instantPaymentDict[player].Contains("Chicken and Centipede")) {
             if (instantPaymentDict[player].Contains("Complete Animal Group")) {
                 return;
@@ -211,6 +223,9 @@ public class Payment : MonoBehaviour, IResetVariables {
             return;
         }
         Debug.LogError("Instant Payout: Complete Animal Group Payout");
+        StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Complete Animal Group Payout", new List<Tile>() {
+            new Tile(Tile.Suit.Animal, Tile.Rank.One), new Tile(Tile.Suit.Animal, Tile.Rank.Two),
+            new Tile(Tile.Suit.Animal, Tile.Rank.Three), new Tile(Tile.Suit.Animal, Tile.Rank.Four) }));
 
         if (player == PhotonNetwork.LocalPlayer) {
             playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Complete Animal Group Payout"]) * 3;
@@ -223,8 +238,8 @@ public class Payment : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Determine if the player has the Bonus Tile Match Seat Wind Pair. Runs locally.
     /// </summary>
-    private void BonusTileMatchSeatWindPair(Player player, PlayerManager.Wind playerWind, List<Tile> openTiles, bool isStartingHand) {
-        if (openTiles.Contains(DictManager.Instance.windTo3TilesDict[playerWind][0]) && openTiles.Contains(DictManager.Instance.windTo3TilesDict[playerWind][1])) {
+    private void BonusTileMatchSeatWindPair(Player player, PlayerManager.Wind seatWind, List<Tile> openTiles, bool isStartingHand) {
+        if (openTiles.Contains(DictManager.Instance.windTo3TilesDict[seatWind][0]) && openTiles.Contains(DictManager.Instance.windTo3TilesDict[seatWind][1])) {
 
             if (instantPaymentDict[player].Contains("Bonus Tile Match Seat Wind Pair")) {
                 return;
@@ -238,6 +253,9 @@ public class Payment : MonoBehaviour, IResetVariables {
         // Hidden Bonus Tile Match Seat Wind check
         if (isStartingHand) {
             Debug.LogError("Instant Payout: Hidden Bonus Tile Match Seat Wind Pair");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Hidden Bonus Tile Match Seat Wind Pair", new List<Tile>() { 
+                DictManager.Instance.windTo3TilesDict[seatWind][0], DictManager.Instance.windTo3TilesDict[seatWind][1] }));
+
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Hidden Bonus Tile Match Seat Wind Pair"]) * 3;
             } else {
@@ -246,6 +264,9 @@ public class Payment : MonoBehaviour, IResetVariables {
 
         } else {
             Debug.LogError("Instant Payout: Bonus Tile Match Seat Wind Pair");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Bonus Tile Match Seat Wind Pair", new List<Tile>() {
+                DictManager.Instance.windTo3TilesDict[seatWind][0], DictManager.Instance.windTo3TilesDict[seatWind][1] }));
+
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Bonus Tile Match Seat Wind Pair"]) * 3;
             } else {
@@ -271,6 +292,9 @@ public class Payment : MonoBehaviour, IResetVariables {
             return;
         }
         Debug.LogError("Instant Payout: Complete Season Group Payout");
+        StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Complete Season Group Payout", new List<Tile>() {
+            new Tile(Tile.Suit.Season, Tile.Rank.One), new Tile(Tile.Suit.Season, Tile.Rank.Two),
+            new Tile(Tile.Suit.Season, Tile.Rank.Three), new Tile(Tile.Suit.Season, Tile.Rank.Four) }));
 
         if (player == PhotonNetwork.LocalPlayer) {
             playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Complete Season Group Payout"]) * 3;
@@ -296,6 +320,9 @@ public class Payment : MonoBehaviour, IResetVariables {
             return;
         }
         Debug.LogError("Instant Payout: Complete Flower Group Payout");
+        StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Complete Flower Group Payout", new List<Tile>() {
+            new Tile(Tile.Suit.Flower, Tile.Rank.One), new Tile(Tile.Suit.Flower, Tile.Rank.Two),
+            new Tile(Tile.Suit.Flower, Tile.Rank.Three), new Tile(Tile.Suit.Flower, Tile.Rank.Four) }));
 
         if (player == PhotonNetwork.LocalPlayer) {
             playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Complete Flower Group Payout"]) * 3;
@@ -310,12 +337,16 @@ public class Payment : MonoBehaviour, IResetVariables {
     /// </summary>
     private void KongPayout(Player player, List<Tile> openTiles, int numberOfTilesLeft, bool isFreshTile, Player discardPlayer) {
         kongTypeCount = new Dictionary<int, int>();
+        Tile kongTile = null;
 
         for (int i = 0; i < 4; i++) {
             kongTypeCount.Add(i, 0);
         }
 
         foreach (Tile tile in openTiles) {
+            if (tile.kongType > 0) {
+                kongTile = tile;
+            }
             kongTypeCount[tile.kongType]++;
         }
 
@@ -339,6 +370,9 @@ public class Payment : MonoBehaviour, IResetVariables {
             latestKongPlayer = player;
             latestKongType = "Concealed Kong";
             Debug.LogError("Instant Payout: Concealed Kong");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Concealed Kong", new List<Tile>() {
+                kongTile, kongTile, kongTile, kongTile }));
+
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Concealed Kong Payout"]) * 3;
             } else {
@@ -351,6 +385,9 @@ public class Payment : MonoBehaviour, IResetVariables {
             latestKongPlayer = player;
             latestKongType = "Exposed Kong";
             Debug.LogError("Instant Payout: Exposed Kong");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Exposed Kong", new List<Tile>() {
+                kongTile, kongTile, kongTile, kongTile }));
+
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
             } else {
@@ -361,6 +398,9 @@ public class Payment : MonoBehaviour, IResetVariables {
         } else {
             instantPaymentDict[player].Add("Discard Kong");
             Debug.LogError("Instant Payout: Discard Kong");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Discard Kong", new List<Tile>() {
+                kongTile, kongTile, kongTile, kongTile }));
+
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
             } else {
