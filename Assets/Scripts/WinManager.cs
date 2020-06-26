@@ -84,19 +84,35 @@ public class WinManager : MonoBehaviour {
     /// Called when the player can win
     /// </summary>
     public void WinUI() {
+        playerManager.canTouchHandTiles = false;
+
         if (sacredDiscardManager.sacredDiscard != null && sacredDiscardManager.sacredDiscard == gameManager.latestDiscardTile) {
             sacredDiscardManager.TileIsSacredDiscard();
+            EventsManager.EventWinUpdate(false);
             return;
         }
 
         if (missedDiscardManager.IsMissedDiscard(gameManager.latestDiscardTile)) {
             missedDiscardManager.MissedDiscardUI(gameManager.latestDiscardTile);
+            EventsManager.EventWinUpdate(false);
             return;
         }
 
-        Debug.LogErrorFormat("The player can win with {0} fan and the following combos: ", playerManager.fanTotal);
-        playerManager.winningCombos.ForEach(Debug.LogError);
-        // TODO
+        if (gameManager.latestDiscardTile != null) {
+            StartCoroutine(UI.Instance.GeneralUI("Can Win", gameManager.latestDiscardTile, playerManager.fanTotal));
+
+        } else if ((tilesManager.hand.Count + 1) % 3 == 0) {
+            StartCoroutine(UI.Instance.GeneralUI("Can Win", tilesManager.hand[tilesManager.hand.Count - 1], playerManager.fanTotal));
+        
+        } else if (playerManager.winningCombos.Contains("Robbing the Kong") && gameManager.latestKongTile != null) {
+            StartCoroutine(UI.Instance.GeneralUI("Can Win", gameManager.latestKongTile, playerManager.fanTotal));
+
+        } else if (playerManager.winningCombos.Contains("Robbing the Eighth") && gameManager.latestKongTile != null) {
+            StartCoroutine(UI.Instance.GeneralUI("Can Win", gameManager.latestBonusTile, playerManager.fanTotal));
+        } 
+
+        Debug.LogFormat("The player can win with {0} fan and the following combos: ", playerManager.fanTotal);
+        playerManager.winningCombos.ForEach(Debug.Log);
     }
 
 
@@ -121,6 +137,7 @@ public class WinManager : MonoBehaviour {
         Dictionary<int, string[]> winInfo = new Dictionary<int, string[]>() {
             [playerManager.fanTotal] = playerManager.winningCombos.ToArray()
         };
+        FinishRound.Instance.EndRound(PhotonNetwork.LocalPlayer);
         EventsManager.EventPlayerWin(winInfo);
 
         // Update player's hand
@@ -148,17 +165,29 @@ public class WinManager : MonoBehaviour {
 
         int numberOfTilesLeft = gameManager.numberOfTilesLeft;
         bool isFreshTile = gameManager.isFreshTile;
+        string winLoseType;
 
         if (playerManager.winningCombos.Contains("Robbing the Kong")) {
-            payment.HandPayout(PhotonNetwork.LocalPlayer, gameManager.kongPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
+            winLoseType = payment.HandPayout(PhotonNetwork.LocalPlayer, gameManager.kongPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
             payment.RevertKongPayout();
         } else if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
-            payment.HandPayout(PhotonNetwork.LocalPlayer, gameManager.bonusPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
+            winLoseType = payment.HandPayout(PhotonNetwork.LocalPlayer, gameManager.bonusPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
         } else {
-            payment.HandPayout(PhotonNetwork.LocalPlayer, gameManager.discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
+            winLoseType = payment.HandPayout(PhotonNetwork.LocalPlayer, gameManager.discardPlayer, playerManager.fanTotal, playerManager.winningCombos, numberOfTilesLeft, isFreshTile);
         }
 
-        FinishRound.Instance.EndRound(PhotonNetwork.LocalPlayer, playerManager.fanTotal, playerManager.winningCombos);
+        if (gameManager.latestDiscardTile != null) {
+            StartCoroutine(UI.Instance.GeneralUI("Win Ok", gameManager.latestDiscardTile, playerManager.fanTotal, playerManager.winningCombos, winLoseType));
+
+        } else if ((tilesManager.hand.Count + 1) % 3 == 0) {
+            StartCoroutine(UI.Instance.GeneralUI("Win Ok", tilesManager.hand[tilesManager.hand.Count - 1], playerManager.fanTotal, playerManager.winningCombos, winLoseType));
+
+        } else if (playerManager.winningCombos.Contains("Robbing the Kong") && gameManager.latestKongTile != null) {
+            StartCoroutine(UI.Instance.GeneralUI("Win Ok", gameManager.latestKongTile, playerManager.fanTotal, playerManager.winningCombos, winLoseType));
+
+        } else if (playerManager.winningCombos.Contains("Robbing the Eighth") && gameManager.latestKongTile != null) {
+            StartCoroutine(UI.Instance.GeneralUI("Win Ok", gameManager.latestBonusTile, playerManager.fanTotal, playerManager.winningCombos, winLoseType));
+        }
     }
 
 
@@ -166,8 +195,10 @@ public class WinManager : MonoBehaviour {
     /// Called when "Skip" button is clicked for the win
     /// </summary>
     public void OnWinSkip() {
-        // TODO
-        EventsManager.EventWinUpdate(false);
+        playerManager.canTouchHandTiles = true;
+        if (!playerManager.myTurn) {
+            EventsManager.EventWinUpdate(false);
+        }
     }
 
 
@@ -178,13 +209,25 @@ public class WinManager : MonoBehaviour {
         int numberOfTilesLeft = gameManager.numberOfTilesLeft;
         bool isFreshTile = gameManager.isFreshTile;
 
+        Tile winningTile;
+        string winLoseType;
+
         if (winningCombos.Contains("Robbing the Kong")) {
-            payment.HandPayout(winner, gameManager.kongPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
+            winningTile = gameManager.latestKongTile;
+            winLoseType = payment.HandPayout(winner, gameManager.kongPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
             payment.RevertKongPayout();
         } else if (winningCombos.Contains("Robbing the Eighth")) {
-            payment.HandPayout(winner, gameManager.bonusPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
+            winningTile = gameManager.latestBonusTile;
+            winLoseType = payment.HandPayout(winner, gameManager.bonusPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
         } else {
-            payment.HandPayout(winner, gameManager.discardPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
+            winningTile = gameManager.latestDiscardTile;
+            winLoseType = payment.HandPayout(winner, gameManager.discardPlayer, fanTotal, winningCombos, numberOfTilesLeft, isFreshTile);
         }
+
+        if (winningTile == null) {
+            winningTile = PropertiesManager.GetWinningTile(winner);
+        }
+
+        StartCoroutine(UI.Instance.GeneralUI("Remote Win", winner, winningTile, fanTotal, winningCombos, winLoseType));
     }
 }

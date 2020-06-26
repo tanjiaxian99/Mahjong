@@ -153,13 +153,6 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     /// when the player Pong or Kong
     /// </summary>
     public IEnumerator OnPlayerTurn() {
-        // If there are only 15 tiles left, end the game
-        if (gameManager.numberOfTilesLeft == 15) {
-            FinishRound.Instance.EndRound(null, 0, null);
-            EventsManager.EventEndRound();
-            yield break;
-        }
-
         List<Tile> hand = tilesManager.hand;
         if (playerManager.seatWind == PlayerManager.Wind.EAST) {
 
@@ -213,6 +206,13 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         // Check if the player can Kong the drawn tile
         if (tilesManager.ExposedKongTiles().Count != 0 || tilesManager.ConcealedKongTiles().Count != 0) {
             kongManager.KongUI(tilesManager.ExposedKongTiles().Concat(tilesManager.ConcealedKongTiles()).ToList());
+        }
+
+        // If there are only 15 tiles left, end the game
+        if (gameManager.numberOfTilesLeft == 15) {
+            FinishRound.Instance.EndRound(null);
+            EventsManager.EventEndRound();
+            yield break;
         }
     }
 
@@ -270,7 +270,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         while (true) {
             // If there are only 15 tiles left, end the game
             if (gameManager.numberOfTilesLeft == 15) {
-                FinishRound.Instance.EndRound(null, 0, null);
+                FinishRound.Instance.EndRound(null);
                 EventsManager.EventEndRound();
                 return;
             }
@@ -295,6 +295,13 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     public Tile DrawTile() {
         // DEBUG 
         List<Tile> tiles = PropertiesManager.GetWallTileList();
+
+        // If there are only 15 tiles left, end the game
+        if (gameManager.numberOfTilesLeft == 15) {
+            FinishRound.Instance.EndRound(null);
+            EventsManager.EventEndRound();
+            return null;
+        }
 
         Tile tile = tiles[0];
         tiles.Remove(tiles[0]);

@@ -12,7 +12,6 @@ public class SacredDiscardManager : MonoBehaviour, IResetVariables {
     /// </summary>
     public void TileIsSacredDiscard() {
         StartCoroutine(UI.Instance.GeneralUI("Sacred Discard", sacredDiscard));
-        EventsManager.EventCanPongKong(false);
     }
 
 

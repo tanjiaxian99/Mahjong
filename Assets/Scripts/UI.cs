@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,16 +11,16 @@ public class UI : MonoBehaviour {
     #region SerializeField
 
     [SerializeField]
+    private GameObject scriptManager;
+
+    [SerializeField]
     private GameObject uiPanel;
 
     [SerializeField]
     private GameObject primaryText;
 
     [SerializeField]
-    private GameObject secondarySpritesPanel;
-
-    [SerializeField]
-    private GameObject primarySpritesPanel;
+    private GameObject spritesPanel;
 
     [SerializeField]
     private GameObject secondaryText;
@@ -35,11 +35,15 @@ public class UI : MonoBehaviour {
 
     #region Retrieved Components
 
+    private WinManager winManager;
+
     private Text primaryTextField;
 
     private Text secondaryTextField;
 
     private Button okButton;
+
+    private Dictionary<string, int> settingsDict;
 
     #endregion
 
@@ -60,9 +64,14 @@ public class UI : MonoBehaviour {
     #endregion
 
     public void Start() {
+        winManager = scriptManager.GetComponent<WinManager>();
+
         primaryTextField = primaryText.GetComponent<Text>();
         secondaryTextField = secondaryText.GetComponent<Text>();
         okButton = okButtonObject.GetComponent<Button>();
+
+        Settings settings = scriptManager.GetComponent<Settings>();
+        settingsDict = settings.settingsDict;
 
         DefaultUI();
     }
@@ -84,10 +93,18 @@ public class UI : MonoBehaviour {
                 break;
             case "Sacred Discard":
                 SacredDiscardUI(objects);
-                Debug.LogError("called");
                 break;
             case "Missed Discard":
                 MissedDiscardUI(objects);
+                break;
+            case "Can Win":
+                CanWinUI(objects);
+                break;
+            case "Win Ok":
+                OnWinOkUI(objects);
+                break;
+            case "Remote Win":
+                RemoteWinUI(objects);
                 break;
         }
         
@@ -120,16 +137,72 @@ public class UI : MonoBehaviour {
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
     }
 
+    private void CanWinUI(params object[] objects) {
+        uiPanel.SetActive(true);
+        skipButtonObject.SetActive(true);
+        primaryTextField.text = "Can Win";
+        AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
+        
+        secondaryTextField.text = string.Format("You can win with {0} fan.", (int)objects[1]);
+    }
+
+    private void OnWinOkUI(params object[] objects) {
+        uiPanel.SetActive(true);
+        primaryTextField.text = "You have won!";
+
+        Tile winningTile = (Tile)objects[0];
+        int fanTotal = (int)objects[1];
+        List<string> winningCombos = (List<string>)objects[2];
+        string winLoseType = (string)objects[3];
+
+        AddSpriteTiles(new List<Tile>() { winningTile });
+
+        string combos = "";
+        foreach (string combo in winningCombos) {
+            if (combo.Contains("Dragon")) {
+                combos += combo + " = " + settingsDict["Dragon"] + " fan" + "\n";
+            } else {
+                combos += combo + " = " + settingsDict[combo] + " fan" + "\n";
+            }  
+        }
+        combos = combos.TrimEnd('\n');
+        secondaryTextField.text = string.Format("You won with {0} fan and the following combos:\n{1}\n\n{2}", fanTotal, combos, winLoseType);
+    }
+
+    private void RemoteWinUI(params object[] objects) {
+        uiPanel.SetActive(true);
+        primaryTextField.text = "Another player has won";
+
+        Player winner = (Player)objects[0];
+        Tile winningTile = (Tile)objects[1];
+        int fanTotal = (int)objects[2];
+        List<string> winningCombos = (List<string>)objects[3];
+        string winLoseType = (string)objects[4];
+
+        AddSpriteTiles(new List<Tile>() { winningTile });
+
+        string combos = "";
+        foreach (string combo in winningCombos) {
+            if (combo.Contains("Dragon")) {
+                combos += combo + " = " + settingsDict["Dragon"] + " fan" + "\n";
+            } else {
+                combos += combo + " = " + settingsDict[combo] + " fan" + "\n";
+            }
+        }
+        combos = combos.TrimEnd('\n');
+        secondaryTextField.text = string.Format(
+            "{0} has won with {1} fan and the following combos:\n{2}\n\n{3}", 
+            winner.NickName, fanTotal, combos, winLoseType);
+    }
+
     #endregion
 
     /// <summary>
     /// Helper function that adds sprites to either the Primary or Secondary Sprites Panel
     /// </summary>
-    private void AddSpriteTiles(List<Tile> tiles, string type = "Primary") {
-        GameObject spritesPanel = (type == "Primary") ? primarySpritesPanel : secondarySpritesPanel;
-
+    private void AddSpriteTiles(List<Tile> tiles) {
         for (int i = 0; i < tiles.Count; i++) {
-            Transform imageTransform = primarySpritesPanel.transform.GetChild(i);
+            Transform imageTransform = spritesPanel.transform.GetChild(i);
             Image image = imageTransform.GetComponent<Image>();
             image.sprite = DictManager.Instance.spritesDict[tiles[i]];
             imageTransform.gameObject.SetActive(true);
@@ -157,6 +230,46 @@ public class UI : MonoBehaviour {
             case "Instant Payout: Discard Kong":
                 ResetUI();
                 break;
+            case "Can Win":
+                ResetUI();
+                winManager.OnWinOk();
+                break;
+            case "You have won!":
+                ResetUI();
+                EventsManager.EventReadyForNewRound();
+                break;
+            case "Another player has won":
+                ResetUI();
+                EventsManager.EventReadyForNewRound();
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Called upon clicking the 'Skip' button
+    /// </summary>
+    public void OnSkip() {
+        switch (primaryTextField.text) {
+            case "Sacred Discard":
+            case "Missed Discard":
+            case "Instant Payout: Hidden Cat and Rat":
+            case "Instant Payout: Cat and Rat":
+            case "Instant Payout: Hidden Chicken and Centipede":
+            case "Instant Payout: Chicken and Centipede":
+            case "Instant Payout: Complete Animal Group Payout":
+            case "Instant Payout: Hidden Bonus Tile Match Seat Wind Pair":
+            case "Instant Payout: Bonus Tile Match Seat Wind Pair":
+            case "Instant Payout: Complete Season Group Payout":
+            case "Instant Payout: Complete Flower Group Payout":
+            case "Instant Payout: Concealed Kong":
+            case "Instant Payout: Exposed Kong":
+            case "Instant Payout: Discard Kong":
+                ResetUI();
+                break;
+            case "Can Win":
+                winManager.OnWinSkip();
+                ResetUI();
+                break;
         }
     }
 
@@ -172,15 +285,8 @@ public class UI : MonoBehaviour {
         secondaryText.SetActive(true);
         secondaryTextField.text = "";
 
-        primarySpritesPanel.SetActive(true);
-        foreach (Transform imageTransform in primarySpritesPanel.transform) {
-            imageTransform.gameObject.SetActive(false);
-            Image image = imageTransform.GetComponent<Image>();
-            image.color = new Color(1f, 1f, 1f);
-        }
-
-        secondarySpritesPanel.SetActive(false);
-        foreach (Transform imageTransform in secondarySpritesPanel.transform) {
+        spritesPanel.SetActive(true);
+        foreach (Transform imageTransform in spritesPanel.transform) {
             imageTransform.gameObject.SetActive(false);
             Image image = imageTransform.GetComponent<Image>();
             image.color = new Color(1f, 1f, 1f);
@@ -197,16 +303,12 @@ public class UI : MonoBehaviour {
         uiPanel.SetActive(false);
         skipButtonObject.SetActive(false);
 
-        foreach (Transform imageTransform in primarySpritesPanel.transform) {
+        foreach (Transform imageTransform in spritesPanel.transform) {
             imageTransform.gameObject.SetActive(false);
             Image image = imageTransform.GetComponent<Image>();
             image.color = new Color(1f, 1f, 1f);
         }
-        foreach (Transform imageTransform in secondarySpritesPanel.transform) {
-            imageTransform.gameObject.SetActive(false);
-            Image image = imageTransform.GetComponent<Image>();
-            image.color = new Color(1f, 1f, 1f);
-        }
+
         secondaryTextField.text = "";
     }
 }

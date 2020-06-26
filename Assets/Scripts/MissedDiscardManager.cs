@@ -60,7 +60,6 @@ public class MissedDiscardManager : MonoBehaviour, IResetVariables {
     /// </summary>
     public void MissedDiscardUI(Tile missedDiscard) {
         StartCoroutine(UI.Instance.GeneralUI("Missed Discard", missedDiscard));
-        EventsManager.EventCanPongKong(false);
     }
 
 

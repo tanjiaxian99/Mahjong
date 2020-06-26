@@ -78,14 +78,19 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public const byte EvEndRound = 13;
 
     /// <summary>
-    /// The New Round event message byte. Used internally by all players to start a new round.
+    /// The Ready For New Round event message byte. Used internally by the local player to signify that he/she is ready to start a new round.
     /// </summary>
-    public const byte EvNewRound = 14;
+    public const byte EvReadyForNewRound = 14;
+
+    /// <summary>
+    /// The Start New Round event message byte. Used internally by the local player to start a new round.
+    /// </summary>
+    public const byte EvStartNewRound = 15;
 
     /// <summary>
     /// The End Game event message byte. Used internally by all players to end the game.
     /// </summary>
-    public const byte EvEndGame = 15;
+    public const byte EvEndGame = 16;
 
     #endregion
 
@@ -104,6 +109,11 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     /// </summary>
     private static List<bool> winUpdateList;
 
+    /// <summary>
+    /// A counter used by MasterClient to track the number of players that is ready to start a new round.
+    /// </summary>
+    private static int startNewRoundCount;
+
     #region MonoBehaviourPunCallbacks Callbacks
 
     private void Start() {
@@ -115,6 +125,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         PongKongUpdateList = new List<bool>();
         nonDiscardActorNumbers = new List<int>();
         winUpdateList = new List<bool>();
+        startNewRoundCount = 0;
     }
 
     // Register the OnEvent callback handler
@@ -187,8 +198,12 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         PhotonNetwork.RaiseEvent(EvEndRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
     }
 
-    public static void EventNewRound() {
-        PhotonNetwork.RaiseEvent(EvNewRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
+    public static void EventReadyForNewRound() {
+        PhotonNetwork.RaiseEvent(EvReadyForNewRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+    }
+
+    public static void EventStartNewRound() {
+        PhotonNetwork.RaiseEvent(EvStartNewRound, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
     }
 
     public static void EventEndGame() {
@@ -224,6 +239,31 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 StartCoroutine(playerManager.OnPlayerTurn());
                 break;
 
+            case EvWinUpdate:
+                if (!PhotonNetwork.IsMasterClient) {
+                    return;
+                }
+                bool winUpdate = (bool)photonEvent.CustomData;
+                winUpdateList.Add(winUpdate);
+                nonDiscardActorNumbers.Add(photonEvent.Sender);
+
+                // If none of the players can/wants to win from the discard, players can then check for Pong/Kong
+                bool allWinFalse = true;
+                if (winUpdateList.Count == 3) {
+                    foreach (bool update in winUpdateList) {
+                        if (update) {
+                            allWinFalse = false;
+                        }
+                    }
+
+                    if (allWinFalse) {
+                        EventCheckPongKong(nonDiscardActorNumbers);
+                    }
+                    winUpdateList.Clear();
+                    nonDiscardActorNumbers.Clear();
+                }
+                break;
+
             case EvCheckPongKong:
                 playerManager.CheckPongKong();
                 break;
@@ -255,43 +295,28 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
             case EvPlayerWin:
                 Dictionary<int, string[]> winInfo = (Dictionary<int, string[]>)photonEvent.CustomData;
-                winInfo.Values.ToList()[0].ToList().ForEach(Debug.LogError);
                 Player sender = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
                 winManager.RemoteWin(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
-                FinishRound.Instance.EndRound(sender, winInfo.Keys.ToList()[0], winInfo.Values.ToList()[0].ToList());
-                break;
-
-            case EvWinUpdate:
-                if (!PhotonNetwork.IsMasterClient) {
-                    return;
-                }
-                bool winUpdate = (bool)photonEvent.CustomData;
-                winUpdateList.Add(winUpdate);
-                nonDiscardActorNumbers.Add(photonEvent.Sender);
-
-                // If none of the players can/wants to win from the discard, players can then check for Pong/Kong
-                bool allWinFalse = true;
-                if (winUpdateList.Count == 3) {
-                    foreach (bool update in winUpdateList) {
-                        if (update) {
-                            allWinFalse = false;
-                        }
-                    }
-
-                    if (allWinFalse) {
-                        EventCheckPongKong(nonDiscardActorNumbers);
-                    }
-                    winUpdateList.Clear();
-                    nonDiscardActorNumbers.Clear();
-                }
+                FinishRound.Instance.EndRound(sender);
                 break;
 
             case EvEndRound:
-                FinishRound.Instance.EndRound(null, 0, null);
+                FinishRound.Instance.EndRound(null);
                 break;
 
-            case EvNewRound:
-                FinishRound.Instance.OnStartNewRound();
+            case EvReadyForNewRound:
+                if (!PhotonNetwork.IsMasterClient) {
+                    return;
+                }
+                startNewRoundCount++;
+                if (startNewRoundCount == 4) {
+                    startNewRoundCount = 0;
+                    EventStartNewRound();
+                }
+                break;
+
+            case EvStartNewRound:
+                FinishRound.Instance.StartNewRound();
                 break;
 
             case EvEndGame:

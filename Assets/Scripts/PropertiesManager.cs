@@ -255,6 +255,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         return (Player)PhotonNetwork.CurrentRoom.CustomProperties[PayAllPlayerPropKey];
     }
 
+    public static Tile GetWinningTile(Player player) {
+        List<Tile> openHand = (List<Tile>)player.CustomProperties[OpenHandPropKey];
+        return (Tile)openHand[openHand.Count - 1];
+    }
 
     #endregion
 
@@ -389,11 +393,6 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
             //// DEBUG
             //numberOfTilesLeft = 50;
-
-            if (gameManager.numberOfTilesLeft == 15) {
-                FinishRound.Instance.EndRound(null, 0, null);
-                EventsManager.EventEndRound();
-            }
 
         } else if (propertiesThatChanged.ContainsKey(PayAllPlayerPropKey)) {
             Player player = GetPayAllPlayer();

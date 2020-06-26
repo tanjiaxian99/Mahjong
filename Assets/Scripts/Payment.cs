@@ -424,78 +424,80 @@ public class Payment : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Determine the number of points to give or remove from the local player. Runs locally after the game is won.
     /// </summary>
-    public void HandPayout(Player winner, Player discardPlayer, int fan, List<string> winningCombos, int numberOfTilesLeft, bool isFreshTile) {
+    public string HandPayout(Player winner, Player discardPlayer, int fan, List<string> winningCombos, int numberOfTilesLeft, bool isFreshTile) {
+        string winLoseType = null;
 
         if (winner == PhotonNetwork.LocalPlayer) {
             // If the local player is the winner
 
             if (discardPlayer == null) {
                 // Self-pick
-                Debug.LogError("Winner: Self-Pick");
+                winLoseType = "Winner: Self-pick";
                 playerManager.points += minPoint * (int)Math.Pow(2, fan - 1) * 2 * 3;
             } else {
-                Debug.LogError("Winner: Non Self-Pick");
+                winLoseType = "Winner: Non Self-pick";
                 playerManager.points += minPoint * (int)Math.Pow(2, fan - 1) * 4;
             }
 
         } else {
             // If the local player is the loser
-            Debug.LogError("Checkpoint 1");
+            Debug.Log("Checkpoint 1");
 
             // Fresh Tile Mahjong Scenario
             if (numberOfTilesLeft < 20 && isFreshTile && discardPlayer != null) {
                 // Only the player that discarded the Fresh Tile pays 
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                    Debug.LogError("Loser: Discarded Fresh Tile For Win");
+                    winLoseType = "Loser: Discarded Fresh Tile For Win";
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
-                return;
+                return winLoseType;
             }
-            Debug.LogError("Checkpoint 2");
 
             // Paying for all players
+            Debug.Log("Checkpoint 2");
             if (playerManager.payForAll == "Local") {
                 if (discardPlayer == null) {
-                    Debug.LogError("Loser: Paying for all players, Self-Pick");
+                    winLoseType = "Loser: Paying for all players, Self-pick";
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2 * 4;
                 } else {
-                    Debug.LogError("Loser: Paying for all players, Non Self-Pick");
+                    winLoseType = "Loser: Paying for all players, Non Self-pick";
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
-                return;
+                return winLoseType;
             } else if (playerManager.payForAll == "Remote") {
-                return;
+                return winLoseType;
             }
-            Debug.LogError("Checkpoint 3");
 
             // Shooter pay
+            Debug.Log("Checkpoint 3");
             if (shooterPay) {
                 // If local player is the shooter
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                    Debug.LogError("Loser: Shooter Pay");
+                    winLoseType = "Loser: Shooter Pay";
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
 
                 } else if (discardPlayer == null) {
                     // If the remote player self pick
-                    Debug.LogError("Loser: Shooter Pay, but Self-Pick");
+                    winLoseType = "Loser: Shooter Pay, but Self-pick";
                     playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
                 }
-                return;
+                return winLoseType;
             }
 
-            Debug.LogError("Checkpoint 4");
             // Non-shooter pay
+            Debug.Log("Checkpoint 4");
             if (discardPlayer == null || discardPlayer == PhotonNetwork.LocalPlayer) {
                 // If the winner self-pick or if the local player discarded the winning tile
-                Debug.LogError("Loser: Normal. Winner Self-Pick / Local Player discarded winning tile");
+                winLoseType = "Loser: Normal. Winner Self-pick / Local Player discarded winning tile";
                 playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
 
             } else {
                 // If the local player is a loser
-                Debug.LogError("Loser: Normal.");
+                winLoseType = "Loser: Normal.";
                 playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1);
             }
         }
+        return winLoseType;
     }
 
 
