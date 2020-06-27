@@ -273,16 +273,16 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             gameManager.windsDict = GetWindAllocation();
             PlayerManager.Wind wind = (PlayerManager.Wind)gameManager.windsDict[PhotonNetwork.LocalPlayer.ActorNumber];
 
-            // Update local player's custom properties
             SetSeatWind(wind);
-            // Update local player's playerManager
             playerManager.seatWind = wind;
+            UI.Instance.SetSeatWind(wind);
             Debug.LogErrorFormat("The player's wind is {0}", playerManager.seatWind);
             // Initialize Instant Payment dictionary
             this.payment.InitializeInstantPaymentDict(PhotonNetwork.PlayerList.ToList());
 
         } else if (propertiesThatChanged.ContainsKey(PrevailingWindPropKey)) {
             gameManager.prevailingWind = GetPrevailingWind();
+            UI.Instance.SetPrevailingWind(gameManager.prevailingWind);
             Debug.LogErrorFormat("The prevailing wind is {0}", gameManager.prevailingWind);
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
@@ -390,6 +390,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
         } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
             gameManager.numberOfTilesLeft = GetWallTileList().Count;
+            UI.Instance.SetNumberOfTilesLeft(gameManager.numberOfTilesLeft);
 
             //// DEBUG
             //numberOfTilesLeft = 50;
