@@ -2,13 +2,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class UI : MonoBehaviour {
-    // TODO: Revert Kong Payout, Number of tiles left, Seat Wind, Prevailing Wind, Nicknames, Points, Update points custom properties, shooter pay kong 
 
     #region SerializeField
 
@@ -33,30 +31,6 @@ public class UI : MonoBehaviour {
     [SerializeField]
     private GameObject skipButtonObject;
 
-    [SerializeField]
-    private GameObject showInfoButton;
-
-    [SerializeField]
-    private GameObject closeInfoButton;
-
-    [SerializeField]
-    private GameObject infoPanel;
-
-    [SerializeField]
-    private GameObject generalInfoTextObject;
-
-    [SerializeField]
-    private GameObject leftPlayerTextObject;
-
-    [SerializeField]
-    private GameObject rightPlayerTextObject;
-
-    [SerializeField]
-    private GameObject oppositePlayerTextObject;
-
-    [SerializeField]
-    private GameObject localPlayerTextObject;
-
     #endregion
 
     #region Retrieved Components
@@ -70,16 +44,6 @@ public class UI : MonoBehaviour {
     private Button okButton;
 
     private Dictionary<string, int> settingsDict;
-
-    private Text generalInfoText;
-
-    private Text leftPlayerText;
-
-    private Text rightPlayerText;
-
-    private Text oppositePlayerText;
-
-    private Text localPlayerText;
 
     #endregion
 
@@ -109,12 +73,6 @@ public class UI : MonoBehaviour {
         Settings settings = scriptManager.GetComponent<Settings>();
         settingsDict = settings.settingsDict;
 
-        generalInfoText = generalInfoTextObject.GetComponent<Text>();
-        leftPlayerText = leftPlayerTextObject.GetComponent<Text>();
-        rightPlayerText = rightPlayerTextObject.GetComponent<Text>();
-        oppositePlayerText = oppositePlayerTextObject.GetComponent<Text>();
-        localPlayerText = localPlayerTextObject.GetComponent<Text>();
-
         DefaultUI();
     }
 
@@ -123,7 +81,6 @@ public class UI : MonoBehaviour {
     /// <summary>
     /// Wrapper coroutine for all UI Methods. Automatically queues up UI requests. 
     /// </summary>
-    // TODO: Test 3 cases of different types (e.g. kong, bonus pair, win)
     public IEnumerator GeneralUI(string type, params object[] objects) {
         while (uiPanel.activeSelf) {
             yield return null;
@@ -133,6 +90,11 @@ public class UI : MonoBehaviour {
             case "Instant Payout":
                 InstantPayoutUI(objects);
                 break;
+
+            case "Revert Kong Payout":
+                RevertKongPayoutUI(objects);
+                break;
+
             case "Sacred Discard":
                 SacredDiscardUI(objects);
                 break;
@@ -148,6 +110,9 @@ public class UI : MonoBehaviour {
             case "Remote Win":
                 RemoteWinUI(objects);
                 break;
+            case "No More Tiles":
+                NoMoreTilesUI();
+                break;
         }
         
     }
@@ -159,6 +124,15 @@ public class UI : MonoBehaviour {
         uiPanel.SetActive(true);
         primaryTextField.text = "Instant Payout: " + (string)objects[0];
         AddSpriteTiles((List<Tile>)objects[1]);
+    }
+
+    /// <summary>
+    /// Called when Kong Payout is to be reverted
+    /// </summary>
+    private void RevertKongPayoutUI(params object[] objects) {
+        uiPanel.SetActive(true);
+        primaryTextField.text = "Revert Kong Payout";
+        AddSpriteTiles((List<Tile>)objects[0]);
     }
 
     /// <summary>
@@ -237,62 +211,9 @@ public class UI : MonoBehaviour {
             winner.NickName, fanTotal, combos, winLoseType);
     }
 
-    #endregion
-
-    #region General Info
-
-    /// <summary>
-    /// Called upon clicking the 'Show Info' button
-    /// </summary>
-    public void ShowInfo() {
-        if (!infoPanel.activeSelf) {
-            infoPanel.SetActive(true);
-        }
-        closeInfoButton.SetActive(true);
-    }
-
-    /// <summary>
-    /// Called upon clicking the 'Close Info' button
-    /// </summary>
-    public void CloseInfo() {
-        if (infoPanel.activeSelf) {
-            infoPanel.SetActive(false);
-        }
-        closeInfoButton.SetActive(false);
-    }
-
-    /// <summary>
-    /// Update the seat wind of the local player in the info panel
-    /// </summary>
-    public void SetSeatWind(PlayerManager.Wind seatWind) {
-        string input = generalInfoText.text;
-        string pattern = @"(Seat Wind: )(\w*)(\s+Prevailing Wind: )(\w*)(\s+Number Of Tiles Left: )(\d*)";
-        string replacement = string.Format("$1{0}$3$4$5$6", seatWind);
-        string result = Regex.Replace(input, pattern, replacement);
-        generalInfoText.text = result;
-    }
-
-    /// <summary>
-    /// Update the prevailing wind in the info panel
-    /// </summary>
-    public void SetPrevailingWind(PlayerManager.Wind prevailingWind) {
-        string input = generalInfoText.text;
-        string pattern = @"(Seat Wind: )(\w*)(\s+Prevailing Wind: )(\w*)(\s+Number Of Tiles Left: )(\d*)";
-        string replacement = string.Format("$1$2$3{0}$5$6", prevailingWind);
-        string result = Regex.Replace(input, pattern, replacement);
-        generalInfoText.text = result;
-    }
-
-    /// <summary>
-    /// Update the number of tiles left in the info panel
-    /// </summary>
-    /// <param name="tilesLeft"></param>
-    public void SetNumberOfTilesLeft(int tilesLeft) {
-        string input = generalInfoText.text;
-        string pattern = @"(Seat Wind: )(\w*)(\s+Prevailing Wind: )(\w*)(\s+Number Of Tiles Left: )(\d*)";
-        string replacement = "$1$2$3$4${5}" + tilesLeft;
-        string result = Regex.Replace(input, pattern, replacement);
-        generalInfoText.text = result;
+    private void NoMoreTilesUI() {
+        uiPanel.SetActive(true);
+        primaryTextField.text = "There are no more tiles left";
     }
 
     #endregion
@@ -328,6 +249,7 @@ public class UI : MonoBehaviour {
             case "Instant Payout: Concealed Kong":
             case "Instant Payout: Exposed Kong":
             case "Instant Payout: Discard Kong":
+            case "Revert Kong Payout":
                 ResetUI();
                 break;
             case "Can Win":
@@ -339,6 +261,10 @@ public class UI : MonoBehaviour {
                 EventsManager.EventReadyForNewRound();
                 break;
             case "Another player has won":
+                ResetUI();
+                EventsManager.EventReadyForNewRound();
+                break;
+            case "There are no more tiles left":
                 ResetUI();
                 EventsManager.EventReadyForNewRound();
                 break;
@@ -394,14 +320,6 @@ public class UI : MonoBehaviour {
 
         okButtonObject.SetActive(true);
         skipButtonObject.SetActive(false);
-
-        showInfoButton.SetActive(true);
-        infoPanel.SetActive(false);
-        generalInfoTextObject.SetActive(true);
-        leftPlayerTextObject.SetActive(true);
-        rightPlayerTextObject.SetActive(true);
-        oppositePlayerTextObject.SetActive(true);
-        localPlayerTextObject.SetActive(true);
     }
 
     /// <summary>

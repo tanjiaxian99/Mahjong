@@ -60,6 +60,11 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     public static readonly string PlayOrderPropkey = "po";
 
     /// <summary>
+    /// The number of points a player has
+    /// </summary>
+    public static readonly string PlayerPointsPropKey = "pp";
+
+    /// <summary>
     /// List of tiles in the walls
     /// </summary>
     public static readonly string WallTileListPropKey = "wt";
@@ -151,6 +156,12 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
+    public static void SetPlayerPoints(int points) {
+        Hashtable ht = new Hashtable();
+        ht.Add(PlayerPointsPropKey, points);
+        PhotonNetwork.SetPlayerCustomProperties(ht);
+    }
+
     public static void SetWallTileList(List<Tile> tiles) {
         Hashtable ht = new Hashtable();
         ht.Add(WallTileListPropKey, tiles);
@@ -223,6 +234,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         return (Player[])PhotonNetwork.CurrentRoom.CustomProperties[PlayOrderPropkey];
     }
 
+    public static int GetPlayerPoints(Player player) {
+        return (int)player.CustomProperties[PlayerPointsPropKey];
+    }
+
     public static List<Tile> GetWallTileList() {
         return (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
     }
@@ -275,15 +290,18 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
             SetSeatWind(wind);
             playerManager.seatWind = wind;
-            UI.Instance.SetSeatWind(wind);
-            Debug.LogErrorFormat("The player's wind is {0}", playerManager.seatWind);
+            InfoPanel.Instance.SetSeatWind(wind);
+            Debug.LogFormat("The player's wind is {0}", playerManager.seatWind);
+            //// DEBUG
+            //PhotonNetwork.NickName = "Player" + (int)playerManager.seatWind;
+
             // Initialize Instant Payment dictionary
             this.payment.InitializeInstantPaymentDict(PhotonNetwork.PlayerList.ToList());
 
         } else if (propertiesThatChanged.ContainsKey(PrevailingWindPropKey)) {
             gameManager.prevailingWind = GetPrevailingWind();
-            UI.Instance.SetPrevailingWind(gameManager.prevailingWind);
-            Debug.LogErrorFormat("The prevailing wind is {0}", gameManager.prevailingWind);
+            InfoPanel.Instance.SetPrevailingWind(gameManager.prevailingWind);
+            Debug.LogFormat("The prevailing wind is {0}", gameManager.prevailingWind);
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = GetDiscardTile();
@@ -390,10 +408,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
         } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
             gameManager.numberOfTilesLeft = GetWallTileList().Count;
-            UI.Instance.SetNumberOfTilesLeft(gameManager.numberOfTilesLeft);
-
-            //// DEBUG
-            //numberOfTilesLeft = 50;
+            InfoPanel.Instance.SetNumberOfTilesLeft(gameManager.numberOfTilesLeft);
 
         } else if (propertiesThatChanged.ContainsKey(PayAllPlayerPropKey)) {
             Player player = GetPayAllPlayer();
@@ -410,7 +425,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     /// Called when a remote player's hand or open tiles changes
     /// </summary>
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps) {
-        if (changedProps.ContainsKey(HandTilesCountPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {
+        if (changedProps.ContainsKey(PlayerPointsPropKey)) {
+            InfoPanel.Instance.SetPlayerPoints(targetPlayer, GetPlayerPoints(targetPlayer));
+
+        } else if (changedProps.ContainsKey(HandTilesCountPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {
             RemotePlayer.InstantiateRemoteHand(gameManager, targetPlayer);
 
         } else if (changedProps.ContainsKey(OpenHandPropKey) && targetPlayer != PhotonNetwork.LocalPlayer) {

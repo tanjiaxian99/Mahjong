@@ -60,8 +60,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
 
     public Player discardPlayer;
 
-    public Dictionary<string, int> settingsDict;
-
     /// <summary>
     /// The prevailing wind of the current round
     /// </summary>
@@ -82,13 +80,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
     public bool isFreshTile;
 
     public int turn;
-
-    #endregion
-
-    #region UI fields
-
-    [SerializeField]
-    private GameObject pointsGameObject;
 
     #endregion
 
@@ -126,9 +117,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
         if (playerManager.myTurn && playerManager.canTouchHandTiles && Input.GetMouseButtonDown(0)) {
             playerManager.OnLocalPlayerMove();
         }
-
-        Text pointsText = pointsGameObject.GetComponent<Text>();
-        pointsText.text = playerManager.points + "";
     }
 
     #endregion
@@ -141,9 +129,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
     public override void OnJoinedRoom() {
         // Initialize PlayerManager for local player
         playerManager = scriptManager.GetComponent<PlayerManager>();
-
-        Settings settings = scriptManager.GetComponent<Settings>();
-        settingsDict = settings.settingsDict;
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == numberOfPlayers) {
             // Players that disconnect and reconnect won't start the game at turn 0

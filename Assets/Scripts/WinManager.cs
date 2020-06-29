@@ -133,13 +133,6 @@ public class WinManager : MonoBehaviour {
             PropertiesManager.SetPayAllPlayer(gameManager.bonusPlayer);
         }
 
-        // Raise an event to inform remote players of the win, which ends the round as well
-        Dictionary<int, string[]> winInfo = new Dictionary<int, string[]>() {
-            [playerManager.fanTotal] = playerManager.winningCombos.ToArray()
-        };
-        FinishRound.Instance.EndRound(PhotonNetwork.LocalPlayer);
-        EventsManager.EventPlayerWin(winInfo);
-
         // Update player's hand
         if ((tilesManager.hand.Count + 1) % 3 != 0) {
             if (gameManager.latestDiscardTile != null) {
@@ -153,6 +146,13 @@ public class WinManager : MonoBehaviour {
                 playerManager.InstantiateLocalOpenTiles();
             }
         }
+
+        // Raise an event to inform remote players of the win, which ends the round as well
+        Dictionary<int, string[]> winInfo = new Dictionary<int, string[]>() {
+            [playerManager.fanTotal] = playerManager.winningCombos.ToArray()
+        };
+        FinishRound.Instance.EndRound(PhotonNetwork.LocalPlayer);
+        EventsManager.EventPlayerWin(winInfo);
 
         // Remove the discard/bonus/kong tile used for the win
         if (gameManager.latestDiscardTile != null) {

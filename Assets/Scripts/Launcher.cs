@@ -45,7 +45,7 @@ public class Launcher : MonoBehaviourPunCallbacks {
         progressLabel.SetActive(false);
         controlPanel.SetActive(true);
 
-        // For debugging
+        // DEBUG
         this.Connect();
     }
 

@@ -223,8 +223,8 @@ public static class RemotePlayer {
             return "Opposite";
         }
 
-        Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
-        return null;
+        //Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
+        return "Local";
     }
 
 

@@ -13,6 +13,8 @@ public class FinishRound : MonoBehaviour {
 
     private GameManager gameManager;
 
+    private PlayerManager playerManager;
+
     private TilesManager tilesManager;
 
     #region Singleton Initialization
@@ -33,6 +35,7 @@ public class FinishRound : MonoBehaviour {
 
     private void Start() {
         gameManager = scriptManager.GetComponent<GameManager>();
+        playerManager = scriptManager.GetComponent<PlayerManager>();
         tilesManager = scriptManager.GetComponent<TilesManager>();
     }
 
@@ -43,9 +46,14 @@ public class FinishRound : MonoBehaviour {
     /// <param name="fanTotal"></param>
     /// <param name="winningCombos"></param>
     public void EndRound(Player winner) {
-        // TODO: When winner == null
+        playerManager.InstantiateLocalHand();
+        playerManager.InstantiateLocalOpenTiles();
         UpdateHandTiles();
         NewPlayOrder(winner);
+
+        if (winner == null) {
+            StartCoroutine(UI.Instance.GeneralUI("No More Tiles"));
+        }
     }
 
     /// <summary>
@@ -60,6 +68,10 @@ public class FinishRound : MonoBehaviour {
     /// </summary>
     private void NewPlayOrder(Player winner) {
         if (!PhotonNetwork.IsMasterClient) {
+            return;
+        }
+
+        if (winner == null) {
             return;
         }
 
