@@ -53,12 +53,14 @@ public class PongManager : MonoBehaviour {
     /// </summary>
     public void PongUI(Tile discardTile) {
         if (sacredDiscardManager.sacredDiscard != null && sacredDiscardManager.sacredDiscard == discardTile) {
-            sacredDiscardManager.SacredDiscardUI();
+            sacredDiscardManager.TileIsSacredDiscard();
+            EventsManager.EventCanPongKong(false);
             return;
         }
 
         if (missedDiscardManager.IsMissedDiscard(discardTile)) {
-            missedDiscardManager.MissedDiscardUI();
+            missedDiscardManager.MissedDiscardUI(discardTile);
+            EventsManager.EventCanPongKong(false);
             return;
         }
 

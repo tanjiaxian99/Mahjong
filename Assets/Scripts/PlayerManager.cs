@@ -16,17 +16,25 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
 
     public Wind seatWind { get; set; }
 
-    public bool myTurn = false;
+    public bool myTurn;
 
-    public bool canTouchHandTiles = false;
+    public bool canTouchHandTiles;
 
     public int numberOfReplacementTiles { get; set; }
 
     public int numberOfKong { get; set; }
 
-    public int points = 200;
+    private int points;
 
-    public string payForAll = "";
+    public int Points {
+        get { return points; }
+        set {
+            points = value;
+            PropertiesManager.SetPlayerPoints(value); 
+        }
+    }
+
+    public string payForAll;
 
     public int fanTotal;
 
@@ -37,7 +45,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     /// </summary>
     public List<object[]> chowTiles;
 
-    #region Managers Initialization
+    #region Manager Fields
 
     [SerializeField]
     private GameObject scriptManager;
@@ -62,7 +70,13 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
 
     private WinManager winManager;
 
+    #endregion 
+
     private void Start() {
+        myTurn = false;
+        canTouchHandTiles = false;
+        payForAll = "";
+
         gameManager = scriptManager.GetComponent<GameManager>();
         playerManager = scriptManager.GetComponent<PlayerManager>();
         tilesManager = scriptManager.GetComponent<TilesManager>();
@@ -74,8 +88,6 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         payment = scriptManager.GetComponent<Payment>();
         winManager = scriptManager.GetComponent<WinManager>();
     }
-
-    #endregion 
 
     /// <summary>
     /// Point the camera towards the GameTable and stretch the GameTable to fill up the screen
@@ -153,13 +165,6 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     /// when the player Pong or Kong
     /// </summary>
     public IEnumerator OnPlayerTurn() {
-        // If there are only 15 tiles left, end the game
-        if (gameManager.numberOfTilesLeft == 15) {
-            FinishRound.Instance.EndRound(null, 0, null);
-            EventsManager.EventEndRound();
-            yield break;
-        }
-
         List<Tile> hand = tilesManager.hand;
         if (playerManager.seatWind == PlayerManager.Wind.EAST) {
 
@@ -178,8 +183,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
                 yield break;
             } else {
                 PropertiesManager.StartTurn();
-                //// DEBUG
-                //PropertiesManager.StartTurn();
+
                 // The wait ensures the local player's turn number is updated
                 yield return new WaitForSeconds(0.2f);
             }
@@ -200,7 +204,9 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         gameManager.latestDiscardTile = null;
         gameManager.discardPlayer = null;
 
-        this.ConvertLocalBonusTiles();
+        if (!playerManager.CanConvertLocalBonusTiles()) {
+            yield break;
+        }
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
 
@@ -262,17 +268,17 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
 
 
     /// <summary>
-    /// Convert the bonus (Season, Flower and Animal) tile into a normal tile.
+    /// Convert the bonus (Season, Flower and Animal) tile into a normal tile. Return false if there are no more tiles left to draw
     /// </summary>
-    public void ConvertLocalBonusTiles() {
+    public bool CanConvertLocalBonusTiles() {
         List<Tile> hand = tilesManager.hand;
 
         while (true) {
             // If there are only 15 tiles left, end the game
             if (gameManager.numberOfTilesLeft == 15) {
-                FinishRound.Instance.EndRound(null, 0, null);
+                FinishRound.Instance.EndRound(null);
                 EventsManager.EventEndRound();
-                return;
+                return false;
             }
 
             Tile tile = hand[hand.Count - 1];
@@ -286,6 +292,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
             hand[hand.Count - 1] = this.DrawTile();
             playerManager.numberOfReplacementTiles++;
         }
+        return true;
     }
 
 
@@ -293,11 +300,22 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     /// Draw a new tile. No distinction made between front end or back end of Wall Tiles.
     /// </summary>
     public Tile DrawTile() {
-        // DEBUG 
         List<Tile> tiles = PropertiesManager.GetWallTileList();
 
+        // If there are only 15 tiles left, end the game
+        if (gameManager.numberOfTilesLeft == 15) {
+            FinishRound.Instance.EndRound(null);
+            EventsManager.EventEndRound();
+            return null;
+        }
+
+        // DEBUG
         Tile tile = tiles[0];
         tiles.Remove(tiles[0]);
+
+        //int randomIndex = GameManager.RandomNumber(tiles.Count());
+        //Tile tile = tiles[randomIndex];
+        //tiles.Remove(tiles[randomIndex]);
 
         gameManager.numberOfTilesLeft = tiles.Count;
 

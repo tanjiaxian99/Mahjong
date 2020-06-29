@@ -10,10 +10,8 @@ public class SacredDiscardManager : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Called when the player can Pong/Win but the discard tile is a Sacred Discard
     /// </summary>
-    public void SacredDiscardUI() {
-        Debug.LogError("Called SacredDiscardUI");
-        EventsManager.EventCanPongKong(false);
-        // TODO
+    public void TileIsSacredDiscard() {
+        StartCoroutine(UI.Instance.GeneralUI("Sacred Discard", sacredDiscard));
     }
 
 

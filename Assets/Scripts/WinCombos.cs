@@ -110,7 +110,6 @@ public class WinCombos {
             string comboType = "Pong";
             comboTypeList.Add(comboType);
 
-            // DEBUG
             int winningTiles = 0;
             foreach (Tile tile in hand) {
                 if (tile.isWinning) {
@@ -156,7 +155,6 @@ public class WinCombos {
                 string comboType = "Chow";
                 comboTypeList.Add(comboType);
 
-                // DEBUG
                 int winningTiles = 0;
                 foreach (Tile tile in hand) {
                     if (tile.isWinning) {
@@ -205,7 +203,6 @@ public class WinCombos {
             string comboType = "Eye";
             comboTypeList.Add(comboType);
 
-            // DEBUG
             int winningTiles = 0;
             foreach (Tile tile in hand) {
                 if (tile.isWinning) {

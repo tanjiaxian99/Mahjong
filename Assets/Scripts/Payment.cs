@@ -16,6 +16,7 @@ public class Payment : MonoBehaviour, IResetVariables {
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Player latestKongPlayer;
     private string latestKongType;
+    Tile kongTile;
 
     private List<Tile> seasonGroupTiles;
     private List<Tile> flowerGroupTiles;
@@ -104,7 +105,7 @@ public class Payment : MonoBehaviour, IResetVariables {
         }
 
         if (settingsDict["Complete Animal Group Payout"] > 0) {
-            this.CompleteAnimalGroupPayout(player, openTiles);
+            this.CompleteAnimalGroupPayout(player);
         }
 
         if (settingsDict["Hidden Bonus Tile Match Seat Wind Pair"] > 0 && settingsDict["Bonus Tile Match Seat Wind Pair"] > 0) {
@@ -145,18 +146,24 @@ public class Payment : MonoBehaviour, IResetVariables {
         // Hidden Cat and Rat check
         if (isStartingHand) {
             Debug.LogError("Instant Payout: Hidden Cat and Rat");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Hidden Cat and Rat", 
+                new List<Tile>() { new Tile(Tile.Suit.Animal, Tile.Rank.One), new Tile(Tile.Suit.Animal, Tile.Rank.Two) }));
+
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int) Math.Pow(2, settingsDict["Hidden Cat and Rat"]) * 3;
+                playerManager.Points += minPoint * (int) Math.Pow(2, settingsDict["Hidden Cat and Rat"]) * 3;
             } else {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Hidden Cat and Rat"]);
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Hidden Cat and Rat"]);
             }
 
         } else {
             Debug.LogError("Instant Payout: Cat and Rat");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Cat and Rat",
+                            new List<Tile>() { new Tile(Tile.Suit.Animal, Tile.Rank.One), new Tile(Tile.Suit.Animal, Tile.Rank.Two) })); 
+
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Cat and Rat"]) * 3;
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Cat and Rat"]) * 3;
             } else {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Cat and Rat"]);
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Cat and Rat"]);
             }
         }
     }
@@ -180,18 +187,24 @@ public class Payment : MonoBehaviour, IResetVariables {
         // Hidden Chicken and Centipede check
         if (isStartingHand) {
             Debug.LogError("Instant Payout: Hidden Chicken and Centipede");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Hidden Chicken and Centipede",
+                            new List<Tile>() { new Tile(Tile.Suit.Animal, Tile.Rank.Three), new Tile(Tile.Suit.Animal, Tile.Rank.Four) })); 
+
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Hidden Chicken and Centipede"]) * 3;
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Hidden Chicken and Centipede"]) * 3;
             } else {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Hidden Chicken and Centipede"]);
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Hidden Chicken and Centipede"]);
             }
 
         } else {
             Debug.LogError("Instant Payout: Chicken and Centipede");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Chicken and Centipede",
+                            new List<Tile>() { new Tile(Tile.Suit.Animal, Tile.Rank.Three), new Tile(Tile.Suit.Animal, Tile.Rank.Four) })); 
+
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Chicken and Centipede"]) * 3;
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Chicken and Centipede"]) * 3;
             } else {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Chicken and Centipede"]);
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Chicken and Centipede"]);
             }
         }
     }
@@ -200,7 +213,7 @@ public class Payment : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Determine if the player has the Complete Animal Group. Runs locally.
     /// </summary>
-    private void CompleteAnimalGroupPayout(Player player, List<Tile> openTiles) {
+    private void CompleteAnimalGroupPayout(Player player) {
         if (instantPaymentDict[player].Contains("Cat and Rat") && instantPaymentDict[player].Contains("Chicken and Centipede")) {
             if (instantPaymentDict[player].Contains("Complete Animal Group")) {
                 return;
@@ -211,11 +224,14 @@ public class Payment : MonoBehaviour, IResetVariables {
             return;
         }
         Debug.LogError("Instant Payout: Complete Animal Group Payout");
+        StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Complete Animal Group Payout", new List<Tile>() {
+            new Tile(Tile.Suit.Animal, Tile.Rank.One), new Tile(Tile.Suit.Animal, Tile.Rank.Two),
+            new Tile(Tile.Suit.Animal, Tile.Rank.Three), new Tile(Tile.Suit.Animal, Tile.Rank.Four) }));
 
         if (player == PhotonNetwork.LocalPlayer) {
-            playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Complete Animal Group Payout"]) * 3;
+            playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Complete Animal Group Payout"]) * 3;
         } else {
-            playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Complete Animal Group Payout"]);
+            playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Complete Animal Group Payout"]);
         }
     }
 
@@ -223,8 +239,8 @@ public class Payment : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Determine if the player has the Bonus Tile Match Seat Wind Pair. Runs locally.
     /// </summary>
-    private void BonusTileMatchSeatWindPair(Player player, PlayerManager.Wind playerWind, List<Tile> openTiles, bool isStartingHand) {
-        if (openTiles.Contains(DictManager.Instance.windTo3TilesDict[playerWind][0]) && openTiles.Contains(DictManager.Instance.windTo3TilesDict[playerWind][1])) {
+    private void BonusTileMatchSeatWindPair(Player player, PlayerManager.Wind seatWind, List<Tile> openTiles, bool isStartingHand) {
+        if (openTiles.Contains(DictManager.Instance.windTo3TilesDict[seatWind][0]) && openTiles.Contains(DictManager.Instance.windTo3TilesDict[seatWind][1])) {
 
             if (instantPaymentDict[player].Contains("Bonus Tile Match Seat Wind Pair")) {
                 return;
@@ -238,18 +254,24 @@ public class Payment : MonoBehaviour, IResetVariables {
         // Hidden Bonus Tile Match Seat Wind check
         if (isStartingHand) {
             Debug.LogError("Instant Payout: Hidden Bonus Tile Match Seat Wind Pair");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Hidden Bonus Tile Match Seat Wind Pair", new List<Tile>() { 
+                DictManager.Instance.windTo3TilesDict[seatWind][0], DictManager.Instance.windTo3TilesDict[seatWind][1] }));
+
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Hidden Bonus Tile Match Seat Wind Pair"]) * 3;
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Hidden Bonus Tile Match Seat Wind Pair"]) * 3;
             } else {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Hidden Bonus Tile Match Seat Wind Pair"]);
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Hidden Bonus Tile Match Seat Wind Pair"]);
             }
 
         } else {
             Debug.LogError("Instant Payout: Bonus Tile Match Seat Wind Pair");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Bonus Tile Match Seat Wind Pair", new List<Tile>() {
+                DictManager.Instance.windTo3TilesDict[seatWind][0], DictManager.Instance.windTo3TilesDict[seatWind][1] }));
+
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Bonus Tile Match Seat Wind Pair"]) * 3;
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Bonus Tile Match Seat Wind Pair"]) * 3;
             } else {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Bonus Tile Match Seat Wind Pair"]);
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Bonus Tile Match Seat Wind Pair"]);
             }
         }
     }
@@ -271,11 +293,14 @@ public class Payment : MonoBehaviour, IResetVariables {
             return;
         }
         Debug.LogError("Instant Payout: Complete Season Group Payout");
+        StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Complete Season Group Payout", new List<Tile>() {
+            new Tile(Tile.Suit.Season, Tile.Rank.One), new Tile(Tile.Suit.Season, Tile.Rank.Two),
+            new Tile(Tile.Suit.Season, Tile.Rank.Three), new Tile(Tile.Suit.Season, Tile.Rank.Four) }));
 
         if (player == PhotonNetwork.LocalPlayer) {
-            playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Complete Season Group Payout"]) * 3;
+            playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Complete Season Group Payout"]) * 3;
         } else {
-            playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Complete Season Group Payout"]);
+            playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Complete Season Group Payout"]);
         }
     }
 
@@ -296,11 +321,14 @@ public class Payment : MonoBehaviour, IResetVariables {
             return;
         }
         Debug.LogError("Instant Payout: Complete Flower Group Payout");
+        StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Complete Flower Group Payout", new List<Tile>() {
+            new Tile(Tile.Suit.Flower, Tile.Rank.One), new Tile(Tile.Suit.Flower, Tile.Rank.Two),
+            new Tile(Tile.Suit.Flower, Tile.Rank.Three), new Tile(Tile.Suit.Flower, Tile.Rank.Four) }));
 
         if (player == PhotonNetwork.LocalPlayer) {
-            playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Complete Flower Group Payout"]) * 3;
+            playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Complete Flower Group Payout"]) * 3;
         } else {
-            playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Complete Flower Group Payout"]);
+            playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Complete Flower Group Payout"]);
         }
     }
 
@@ -310,12 +338,16 @@ public class Payment : MonoBehaviour, IResetVariables {
     /// </summary>
     private void KongPayout(Player player, List<Tile> openTiles, int numberOfTilesLeft, bool isFreshTile, Player discardPlayer) {
         kongTypeCount = new Dictionary<int, int>();
+        kongTile = null;
 
         for (int i = 0; i < 4; i++) {
             kongTypeCount.Add(i, 0);
         }
 
         foreach (Tile tile in openTiles) {
+            if (tile.kongType > 0) {
+                kongTile = tile;
+            }
             kongTypeCount[tile.kongType]++;
         }
 
@@ -338,43 +370,53 @@ public class Payment : MonoBehaviour, IResetVariables {
             instantPaymentDict[player].Add("Concealed Kong");
             latestKongPlayer = player;
             latestKongType = "Concealed Kong";
-            Debug.LogError("Instant Payout: Concealed Kong");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Concealed Kong", new List<Tile>() {
+                kongTile, kongTile, kongTile, kongTile }));
+
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Concealed Kong Payout"]) * 3;
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Concealed Kong Payout"]) * 3;
             } else {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Concealed Kong Payout"]);
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Concealed Kong Payout"]);
             }
+            Debug.Log("Instant Payout: Concealed Kong");
             return;
 
         } else if (kongTypeCount[2] > 0) {
             instantPaymentDict[player].Add("Exposed Kong");
             latestKongPlayer = player;
             latestKongType = "Exposed Kong";
-            Debug.LogError("Instant Payout: Exposed Kong");
+            
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Exposed Kong", new List<Tile>() {
+                kongTile, kongTile, kongTile, kongTile }));
+
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
             } else {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]);
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]);
             }
+            Debug.Log("Instant Payout: Exposed Kong");
             return;
 
         } else {
             instantPaymentDict[player].Add("Discard Kong");
-            Debug.LogError("Instant Payout: Discard Kong");
+            StartCoroutine(UI.Instance.GeneralUI("Instant Payout", "Discard Kong", new List<Tile>() {
+                kongTile, kongTile, kongTile, kongTile }));
+            Debug.Log("Instant Payout: Discard Kong");
+
             if (player == PhotonNetwork.LocalPlayer) {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
             } else {
                 if (numberOfTilesLeft < 22 && isFreshTile) {
                     // Only the player that discarded the Fresh Tile pays 
                     if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                        playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
+                        playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
                         Debug.LogError("Instant Payout: Fresh Tile Discard Kong, Payer");
                     } else {
                         Debug.LogError("Instant Payout: Fresh Tile Discard Kong, Non-Payer");
                     }
                     return;
                 }
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]);
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]);
             }
         }
     }
@@ -384,78 +426,80 @@ public class Payment : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Determine the number of points to give or remove from the local player. Runs locally after the game is won.
     /// </summary>
-    public void HandPayout(Player winner, Player discardPlayer, int fan, List<string> winningCombos, int numberOfTilesLeft, bool isFreshTile) {
+    public string HandPayout(Player winner, Player discardPlayer, int fan, List<string> winningCombos, int numberOfTilesLeft, bool isFreshTile) {
+        string winLoseType = null;
 
         if (winner == PhotonNetwork.LocalPlayer) {
             // If the local player is the winner
 
             if (discardPlayer == null) {
                 // Self-pick
-                Debug.LogError("Winner: Self-Pick");
-                playerManager.points += minPoint * (int)Math.Pow(2, fan - 1) * 2 * 3;
+                winLoseType = "Winner: Self-pick";
+                playerManager.Points += minPoint * (int)Math.Pow(2, fan - 1) * 2 * 3;
             } else {
-                Debug.LogError("Winner: Non Self-Pick");
-                playerManager.points += minPoint * (int)Math.Pow(2, fan - 1) * 4;
+                winLoseType = "Winner: Non Self-pick";
+                playerManager.Points += minPoint * (int)Math.Pow(2, fan - 1) * 4;
             }
 
         } else {
             // If the local player is the loser
-            Debug.LogError("Checkpoint 1");
+            Debug.Log("Checkpoint 1");
 
             // Fresh Tile Mahjong Scenario
             if (numberOfTilesLeft < 20 && isFreshTile && discardPlayer != null) {
                 // Only the player that discarded the Fresh Tile pays 
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                    Debug.LogError("Loser: Discarded Fresh Tile For Win");
-                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
+                    winLoseType = "Loser: Discarded Fresh Tile For Win";
+                    playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
-                return;
+                return winLoseType;
             }
-            Debug.LogError("Checkpoint 2");
 
             // Paying for all players
+            Debug.Log("Checkpoint 2");
             if (playerManager.payForAll == "Local") {
                 if (discardPlayer == null) {
-                    Debug.LogError("Loser: Paying for all players, Self-Pick");
-                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2 * 4;
+                    winLoseType = "Loser: Paying for all players, Self-pick";
+                    playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2 * 4;
                 } else {
-                    Debug.LogError("Loser: Paying for all players, Non Self-Pick");
-                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
+                    winLoseType = "Loser: Paying for all players, Non Self-pick";
+                    playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
-                return;
+                return winLoseType;
             } else if (playerManager.payForAll == "Remote") {
-                return;
+                return winLoseType;
             }
-            Debug.LogError("Checkpoint 3");
 
             // Shooter pay
+            Debug.Log("Checkpoint 3");
             if (shooterPay) {
                 // If local player is the shooter
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                    Debug.LogError("Loser: Shooter Pay");
-                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
+                    winLoseType = "Loser: Shooter Pay";
+                    playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
 
                 } else if (discardPlayer == null) {
                     // If the remote player self pick
-                    Debug.LogError("Loser: Shooter Pay, but Self-Pick");
-                    playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
+                    winLoseType = "Loser: Shooter Pay, but Self-pick";
+                    playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
                 }
-                return;
+                return winLoseType;
             }
 
-            Debug.LogError("Checkpoint 4");
             // Non-shooter pay
+            Debug.Log("Checkpoint 4");
             if (discardPlayer == null || discardPlayer == PhotonNetwork.LocalPlayer) {
                 // If the winner self-pick or if the local player discarded the winning tile
-                Debug.LogError("Loser: Normal. Winner Self-Pick / Local Player discarded winning tile");
-                playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
+                winLoseType = "Loser: Normal. Winner Self-pick / Local Player discarded winning tile";
+                playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
 
             } else {
                 // If the local player is a loser
-                Debug.LogError("Loser: Normal.");
-                playerManager.points -= minPoint * (int)Math.Pow(2, fan - 1);
+                winLoseType = "Loser: Normal.";
+                playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1);
             }
         }
+        return winLoseType;
     }
 
 
@@ -466,21 +510,22 @@ public class Payment : MonoBehaviour, IResetVariables {
         if (latestKongPlayer == null) {
             return;
         }
-        Debug.LogError("Instant Payout: Revert Kong");
+        StartCoroutine(UI.Instance.GeneralUI("Revert Kong Payout", new List<Tile>() { kongTile }));
 
         if (latestKongType == "Concealed Kong") {
             if (latestKongPlayer == PhotonNetwork.LocalPlayer) {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Concealed Kong Payout"]) * 3;
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Concealed Kong Payout"]) * 3;
             } else {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Concealed Kong Payout"]);
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Concealed Kong Payout"]);
             }
         } else if (latestKongType == "Exposed Kong") {
             if (latestKongPlayer == PhotonNetwork.LocalPlayer) {
-                playerManager.points -= minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
+                playerManager.Points -= minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
             } else {
-                playerManager.points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]);
+                playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]);
             }
         }
+        Debug.Log("Instant Payout: Revert Kong");
     }
 
 

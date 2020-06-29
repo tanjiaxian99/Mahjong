@@ -13,6 +13,8 @@ public class FinishRound : MonoBehaviour {
 
     private GameManager gameManager;
 
+    private PlayerManager playerManager;
+
     private TilesManager tilesManager;
 
     #region Singleton Initialization
@@ -33,6 +35,7 @@ public class FinishRound : MonoBehaviour {
 
     private void Start() {
         gameManager = scriptManager.GetComponent<GameManager>();
+        playerManager = scriptManager.GetComponent<PlayerManager>();
         tilesManager = scriptManager.GetComponent<TilesManager>();
     }
 
@@ -42,10 +45,15 @@ public class FinishRound : MonoBehaviour {
     /// <param name="winner"></param>
     /// <param name="fanTotal"></param>
     /// <param name="winningCombos"></param>
-    public void EndRound(Player winner, int fanTotal, List<string> winningCombos) {
+    public void EndRound(Player winner) {
+        playerManager.InstantiateLocalHand();
+        playerManager.InstantiateLocalOpenTiles();
         UpdateHandTiles();
-        DisplayWinningCombo(winner, fanTotal, winningCombos);
         NewPlayOrder(winner);
+
+        if (winner == null) {
+            StartCoroutine(UI.Instance.GeneralUI("No More Tiles"));
+        }
     }
 
     /// <summary>
@@ -55,15 +63,15 @@ public class FinishRound : MonoBehaviour {
         PropertiesManager.SetOpenHand(tilesManager.hand);
     }
 
-    private void DisplayWinningCombo(Player winner, int fanTotal, List<string> winningCombos) {
-        // TODO: Display winning combos / fan
-    }
-
     /// <summary>
     /// Determine the new play order
     /// </summary>
     private void NewPlayOrder(Player winner) {
         if (!PhotonNetwork.IsMasterClient) {
+            return;
+        }
+
+        if (winner == null) {
             return;
         }
 
@@ -103,26 +111,12 @@ public class FinishRound : MonoBehaviour {
     }
 
     /// <summary>
-    /// UI button that prompts the start of a new round
-    /// </summary>
-    private void PromptNewRound() {
-        // TODO
-    }
-
-    /// <summary>
-    /// Called upon clicking the "Start new round" button
-    /// </summary>
-    public void ReadyToStart() {
-        EventsManager.EventNewRound();
-    }
-
-    /// <summary>
     /// Called when all players are ready for a new round
     /// </summary>
-    public void OnStartNewRound() {
+    public void StartNewRound() {
         ResetAllVariables();
         ClearGameTable();
-        StartNewRound();
+        InitializeNewRound();
     }
 
     /// <summary>
@@ -136,7 +130,6 @@ public class FinishRound : MonoBehaviour {
         scriptManager.GetComponent<TilesManager>().ResetVariables();
         scriptManager.GetComponent<SacredDiscardManager>().ResetVariables();
         scriptManager.GetComponent<MissedDiscardManager>().ResetVariables();
-        scriptManager.GetComponent<FanCalculator>().ResetVariables();
         scriptManager.GetComponent<Payment>().ResetVariables();
     }
 
@@ -152,13 +145,15 @@ public class FinishRound : MonoBehaviour {
         }
     }
     
-    public void StartNewRound() {
+    /// <summary>
+    /// The MasterClient will start a new round
+    /// </summary>
+    public void InitializeNewRound() {
         if (!PhotonNetwork.IsMasterClient) {
             return;
         }
         StartCoroutine(InitializeRound.InitializeGame(gameManager, gameManager.numberOfTilesLeft, "New Round"));
     }
-    
 
     /// <summary>
     /// Called when the game ends

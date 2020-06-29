@@ -127,6 +127,7 @@ public class KongManager : MonoBehaviour {
             markedTile.kongType = 1;
             combo.Add(markedTile);
             tilesManager.comboTiles.Add(combo);
+            playerManager.InstantiateLocalOpenTiles();
 
         } else if (tilesManager.ExposedKongTiles().Contains(kongTile)) {
             foreach (List<Tile> combo in tilesManager.comboTiles) {
@@ -137,6 +138,7 @@ public class KongManager : MonoBehaviour {
             }
             hand.Remove(drawnTile);
 
+            playerManager.InstantiateLocalOpenTiles();
             // Update discard tile properties to indicate to all players that Robbing the Kong is possible
             PropertiesManager.SetSpecialTile(new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, drawnTile, 2));
 
@@ -157,19 +159,21 @@ public class KongManager : MonoBehaviour {
 
             tilesManager.comboTiles.Add(combo);
 
+            playerManager.InstantiateLocalOpenTiles();
             // Update kong tile properties to indicate to all players that Robbing the Kong is possible for Thirteen Wonders
             PropertiesManager.SetSpecialTile(new Tuple<int, Tile, float>(PhotonNetwork.LocalPlayer.ActorNumber, kongTileSpecial, 3));
         }
 
         playerManager.numberOfKong++;
-        playerManager.InstantiateLocalOpenTiles();
 
         // Always draw a tile regardless of Kong type
         hand.Add(playerManager.DrawTile());
         gameManager.latestDiscardTile = null;
         gameManager.discardPlayer = null;
 
-        playerManager.ConvertLocalBonusTiles();
+        if (!playerManager.CanConvertLocalBonusTiles()) {
+            return;
+        }
         playerManager.InstantiateLocalHand();
         playerManager.InstantiateLocalOpenTiles();
 

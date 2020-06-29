@@ -155,7 +155,9 @@ public class ChowManager : MonoBehaviour {
         gameManager.latestDiscardTile = null;
         gameManager.discardPlayer = null;
 
-        playerManager.ConvertLocalBonusTiles();
+        if (!playerManager.CanConvertLocalBonusTiles()) {
+            return;
+        }
         playerManager.InstantiateLocalHand();
         playerManager.InstantiateLocalOpenTiles();
 
