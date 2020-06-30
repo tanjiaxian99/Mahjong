@@ -12,8 +12,6 @@
 - If the hand contains the drawn tile and the drawn tile is then discarded, the tile in the hand will be the one thrown away.
 - Add dealer's dice
 - 234678 character, 567567 dot, dragon_three, cat, season_four, seat_wind = North, prevailing_wind = South. Should be 2 fan instead of 3
-- Names cannot have a space, otherwise it will fail regex
-- Robbing the kong not pay all, but guilty party
 - All copies of unity crashing simultaneously
 - Discard tile circled
 

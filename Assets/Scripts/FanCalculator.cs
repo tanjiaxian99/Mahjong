@@ -278,6 +278,10 @@ public class FanCalculator : MonoBehaviour {
                 fanTotal += settingsDict["Winning on Last Available Tile"];
             }
 
+            if (fanTotal > fanLimit) {
+                fanTotal = fanLimit;
+            }
+
             fanTotalList.Add(fanTotal);
         }
 
@@ -422,7 +426,7 @@ public class FanCalculator : MonoBehaviour {
         int numberOfSeasonTiles = 0;
         int numberOfFlowerTiles = 0;
         int numberOfAnimalTiles = 0;
-
+        
         foreach (Tile bonusTile in bonusTiles) {
             if (DictManager.Instance.tileToWindDict.ContainsKey(bonusTile)) {
 

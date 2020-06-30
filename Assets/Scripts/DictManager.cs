@@ -344,6 +344,21 @@ public class DictManager : MonoBehaviour {
 
 
     /// <summary>
+    /// For Unit Testing
+    /// </summary>
+    public DictManager() {
+        _instance = this;
+
+        this.InitializeSpritesDict();
+        this.InitializeTilesDict();
+        this.InitializeWindTo3TilesDict();
+        this.InitializeTileToWindDict();
+        this.InitializeWindToTileDict();
+        this.InitializeFullFlushDict();
+    }
+
+
+    /// <summary>
     /// Initialize the spritesDict with Tile objects and their respective sprites
     /// </summary>
     private void InitializeSpritesDict() {
