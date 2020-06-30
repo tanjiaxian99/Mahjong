@@ -80,6 +80,11 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     public static readonly string SpecialTilePropKey = "kt";
 
     /// <summary>
+    /// The type of the tile that could be used for winning, ranging from Normal to Kong to Bonus
+    /// </summary>
+    public static readonly string TileTypePropKey = "tt";
+
+    /// <summary>
     /// Number of tiles in the player's hand
     /// </summary>
     public static readonly string HandTilesCountPropKey = "ht";
@@ -180,6 +185,12 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
+    public static void SetTileType(string type) {
+        Hashtable ht = new Hashtable();
+        ht.Add(TileTypePropKey, type);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
     public static void SetHandTilesCount(int handTilesCount) {
         Hashtable ht = new Hashtable();
         ht.Add(HandTilesCountPropKey, handTilesCount);
@@ -250,6 +261,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         return (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[SpecialTilePropKey];
     }
 
+    public static string GetTileType() {
+        return (string)PhotonNetwork.CurrentRoom.CustomProperties[TileTypePropKey];
+    }
+
     public static int GetHandTilesCount(Player player) {
         return (int)player.CustomProperties[HandTilesCountPropKey];
     }
@@ -292,8 +307,8 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             playerManager.seatWind = wind;
             InfoPanel.Instance.SetSeatWind(wind);
             Debug.LogFormat("The player's wind is {0}", playerManager.seatWind);
-            //// DEBUG
-            //PhotonNetwork.NickName = "Player" + (int)playerManager.seatWind;
+            // DEBUG
+            PhotonNetwork.NickName = "Player" + (int)playerManager.seatWind;
 
             // Initialize Instant Payment dictionary
             this.payment.InitializeInstantPaymentDict(PhotonNetwork.PlayerList.ToList());
@@ -302,6 +317,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             gameManager.prevailingWind = GetPrevailingWind();
             InfoPanel.Instance.SetPrevailingWind(gameManager.prevailingWind);
             Debug.LogFormat("The prevailing wind is {0}", gameManager.prevailingWind);
+
+        } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
+            gameManager.numberOfTilesLeft = GetWallTileList().Count;
+            InfoPanel.Instance.SetNumberOfTilesLeft(gameManager.numberOfTilesLeft);
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = GetDiscardTile();
@@ -328,20 +347,13 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             gameManager.isFreshTile = FreshTileDiscard.IsFreshTile(gameManager.discardTiles, gameManager.AllPlayersOpenTiles(), gameManager.latestDiscardTile);
             gameManager.discardTiles.Add(gameManager.latestDiscardTile);
 
-            // Only instantiate the tile if a remote player threw it
-            if (gameManager.discardPlayer == PhotonNetwork.LocalPlayer) {
-                return;
+            if (PhotonNetwork.IsMasterClient) {
+                SetTileType("Normal");
             }
 
-            RemotePlayer.InstantiateRemoteDiscardTile(gameManager, gameManager.discardPlayer, gameManager.latestDiscardTile, hPos);
-
-            // Check to see if the player can win based on the discard tile
-            if (winManager.CanWin()) {
-                winManager.WinUI();
-                return;
-            } else {
-                // Inform the Master Client that the player can't win
-                EventsManager.EventWinUpdate(false);
+            // Only instantiate the tile if a remote player threw it
+            if (gameManager.discardPlayer != PhotonNetwork.LocalPlayer) {
+                RemotePlayer.InstantiateRemoteDiscardTile(gameManager, gameManager.discardPlayer, gameManager.latestDiscardTile, hPos);
             }
 
         } else if (propertiesThatChanged.ContainsKey(SpecialTilePropKey)) {
@@ -367,48 +379,31 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             } else if (discardTileInfo.Item3 == 1) {
                 gameManager.bonusPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
                 gameManager.latestBonusTile = discardTileInfo.Item2;
-
-                if (gameManager.bonusPlayer == PhotonNetwork.LocalPlayer) {
-                    return;
+                if (PhotonNetwork.IsMasterClient) {
+                    SetTileType("Bonus");
                 }
-
-                if (winManager.CanWin("Bonus")) {
-                    winManager.WinUI();
-                }
-                return;
 
             } else if (discardTileInfo.Item3 == 2) {
                 gameManager.kongPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
                 gameManager.latestKongTile = discardTileInfo.Item2;
 
-                if (gameManager.kongPlayer == PhotonNetwork.LocalPlayer) {
-                    return;
+                if (PhotonNetwork.IsMasterClient) {
+                    SetTileType("Exposed Kong");
                 }
-
-                if (winManager.CanWin("Kong")) {
-                    winManager.WinUI();
-                }
-                return;
 
             } else if (discardTileInfo.Item3 == 3) {
                 gameManager.kongPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
                 gameManager.latestKongTile = discardTileInfo.Item2;
 
-                if (gameManager.kongPlayer == PhotonNetwork.LocalPlayer) {
-                    return;
+                if (PhotonNetwork.IsMasterClient) {
+                    SetTileType("Concealed Kong");
                 }
-
-                if (winManager.CanWin("Kong")) {
-                    if (playerManager.winningCombos.Contains("Thirteen Wonders")) {
-                        winManager.WinUI();
-                    }
-                }
-                return;
             }
 
-        } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
-            gameManager.numberOfTilesLeft = GetWallTileList().Count;
-            InfoPanel.Instance.SetNumberOfTilesLeft(gameManager.numberOfTilesLeft);
+        } else if (propertiesThatChanged.ContainsKey(TileTypePropKey)) {
+            if (PhotonNetwork.IsMasterClient) {
+                EventsManager.EventWinUpdate("Start Win Check");
+            }
 
         } else if (propertiesThatChanged.ContainsKey(PayAllPlayerPropKey)) {
             Player player = GetPayAllPlayer();

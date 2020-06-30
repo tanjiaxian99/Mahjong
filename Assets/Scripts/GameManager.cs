@@ -198,30 +198,42 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
     /// <summary>
     /// Called by the local player to inform the next player that it is his turn
     /// </summary>
-    public void nextPlayersTurn() {
+    public void NextPlayersTurn() {
+        Player nextPlayer = GetNextPlayer(PhotonNetwork.LocalPlayer);
+
+        // Update Room Custom Properties with the next player
+        PropertiesManager.SetNextPlayer(nextPlayer);
+    }
+    
+
+    /// <summary>
+    /// Get the next player in the play order based on the current player
+    /// </summary>
+    public static Player GetNextPlayer(Player currentPlayer) {
+        if (currentPlayer == null) {
+            Debug.LogError("GetNextPlayer: The currentPlayer is null");
+            return null;
+        }
+
         Player[] playOrder = PropertiesManager.GetPlayOrder();
-        int localPlayerPos = 0;
+        int currentPlayerPos = 0;
         Player nextPlayer;
 
         for (int i = 0; i < playOrder.Length; i++) {
-            if (playOrder[i] == PhotonNetwork.LocalPlayer) {
-                localPlayerPos = i;
+            if (playOrder[i] == currentPlayer) {
+                currentPlayerPos = i;
                 break;
             }
         }
 
-        // If there is only one player, call the local player again
-        if (playOrder.Length == 1) {
-            nextPlayer = PhotonNetwork.LocalPlayer;
-        } else if (localPlayerPos == playOrder.Length - 1) {
+        if (currentPlayerPos == playOrder.Length - 1) {
             // Call the first player if the local player is the last player in the play order
             nextPlayer = playOrder[0];
         } else {
-            nextPlayer = playOrder[localPlayerPos + 1];
+            nextPlayer = playOrder[currentPlayerPos + 1];
         }
 
-        // Update Room Custom Properties with the next player
-        PropertiesManager.SetNextPlayer(nextPlayer);
+        return nextPlayer;
     }
 
 

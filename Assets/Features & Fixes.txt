@@ -15,5 +15,7 @@
 - 234678 character, 567567 dot, dragon_three, cat, season_four, seat_wind = North, prevailing_wind = South. Should be 2 fan instead of 3
 - Names cannot have a space, otherwise it will fail regex
 - Robbing the kong not pay all, but guilty party
+- All copies of unity crashing simultaneously
+- Nobody can touch tiles while someone is checking for win
 
 

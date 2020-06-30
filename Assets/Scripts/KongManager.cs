@@ -181,7 +181,7 @@ public class KongManager : MonoBehaviour {
         playerManager.canTouchHandTiles = true;
         playerManager.myTurn = true;
 
-        // Check to see if the player can win based on the discard tile
+        // Check to see if the player can win based on the drawn tile
         if (winManager.CanWin()) {
             winManager.WinUI();
             return;

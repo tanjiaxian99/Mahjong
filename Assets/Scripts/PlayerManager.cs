@@ -258,7 +258,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
                     this.InstantiateLocalHand();
                     this.DiscardTile(tile, hitObject.transform.position.x);
                     missedDiscardManager.ResetMissedDiscard();
-                    gameManager.nextPlayersTurn();
+                    gameManager.NextPlayersTurn();
                 }
             }
         }
