@@ -125,9 +125,9 @@ public class WinManager : MonoBehaviour {
             PropertiesManager.SetPayAllPlayer(gameManager.discardPlayer);
         }
 
-        if (playerManager.winningCombos.Contains("Robbing the Kong")) {
-            PropertiesManager.SetPayAllPlayer(gameManager.kongPlayer);
-        }
+        //if (playerManager.winningCombos.Contains("Robbing the Kong")) {
+        //    PropertiesManager.SetPayAllPlayer(gameManager.kongPlayer);
+        //}
 
         if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
             PropertiesManager.SetPayAllPlayer(gameManager.bonusPlayer);

@@ -66,7 +66,7 @@ public class Settings : MonoBehaviour {
         settingsDict.Add("Pure Terminals Pay All", 1);
 
         settingsDict.Add("Min Point", 1);
-        settingsDict.Add("Shooter Pay", 1);
+        settingsDict.Add("Shooter Pay", 0);
 
         settingsDict.Add("Hidden Cat and Rat", 2);
         settingsDict.Add("Cat and Rat", 1);

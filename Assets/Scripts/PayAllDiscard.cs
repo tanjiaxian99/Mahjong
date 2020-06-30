@@ -35,6 +35,9 @@ public class PayAllDiscard : MonoBehaviour {
             return true;
         }
 
+        // Discarding a high risk tile does not mean the player should pay for all. For instance, discarding a Character tile when there are
+        // 9 character open tiles, only for the player to win without a Full Flush. Checking the winning combos ensures the player won with
+        // the proper high risk scenario.
         if (highRiskScenarios.Contains("Dragon Tile Set")) {
             if (this.IsDragonTileSet(playerManager, discardTile)) {
                 return true;

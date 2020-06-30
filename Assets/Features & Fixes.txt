@@ -1,5 +1,4 @@
 - Player can't click anything for Robbing the Kong
-- 2 people winning with the same tile
 - Shooter Pay scenarios (e.g. PayAllDiscard, Robbing the Kong)
 - If player CanWin, other players should not be able to discard tile. Room property update which freezes all discards
 - Replacement tile on Kong Pay All
@@ -16,6 +15,6 @@
 - Names cannot have a space, otherwise it will fail regex
 - Robbing the kong not pay all, but guilty party
 - All copies of unity crashing simultaneously
-- Nobody can touch tiles while someone is checking for win
+- Discard tile circled
 
 

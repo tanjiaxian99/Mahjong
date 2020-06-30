@@ -5,6 +5,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Security.Cryptography;
+using UnityEngine.UIElements;
 
 public class Payment : MonoBehaviour, IResetVariables {
 
@@ -465,7 +466,9 @@ public class Payment : MonoBehaviour, IResetVariables {
                     playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
                 return winLoseType;
+
             } else if (playerManager.payForAll == "Remote") {
+                winLoseType = "Neutral: Paying for all players";
                 return winLoseType;
             }
 
@@ -481,15 +484,21 @@ public class Payment : MonoBehaviour, IResetVariables {
                     // If the remote player self pick
                     winLoseType = "Loser: Shooter Pay, but Self-pick";
                     playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
+
+                } else {
+                    winLoseType = "Neutral: Shooter Pay";
                 }
                 return winLoseType;
             }
 
             // Non-shooter pay
             Debug.Log("Checkpoint 4");
-            if (discardPlayer == null || discardPlayer == PhotonNetwork.LocalPlayer) {
-                // If the winner self-pick or if the local player discarded the winning tile
-                winLoseType = "Loser: Normal. Winner Self-pick / Local Player discarded winning tile";
+            if (discardPlayer == null) {
+                winLoseType = "Loser: Winner Self-pick";
+                playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
+
+            } else if (discardPlayer == PhotonNetwork.LocalPlayer) {
+                winLoseType = "Loser: Local player discarded the winning tile";
                 playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
 
             } else {
