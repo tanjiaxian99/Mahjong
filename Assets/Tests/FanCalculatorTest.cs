@@ -1630,7 +1630,7 @@ namespace Tests {
         }
 
         [Test]
-        public void NineGates() {
+        public void NineGates_Fail() {
             playerManager = new PlayerManager();
             tilesManager = new TilesManager();
             tilesManager.hand = new List<Tile>() {
@@ -1652,6 +1652,50 @@ namespace Tests {
                     new Tile(Tile.Suit.Character, Tile.Rank.Nine),
                     new Tile(Tile.Suit.Character, Tile.Rank.Nine),
                     new Tile(Tile.Suit.Character, Tile.Rank.Nine)
+                }
+            };
+
+            playerManager.seatWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Character, Tile.Rank.Eight);
+            discardPlayerWind = PlayerManager.Wind.WEST;
+            prevailingWind = PlayerManager.Wind.NORTH;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (0, new List<string>() { });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, tilesManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
+
+        [Test]
+        public void NineGates_Pass() {
+            playerManager = new PlayerManager();
+            tilesManager = new TilesManager();
+            tilesManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.One),
+                new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                new Tile(Tile.Suit.Character, Tile.Rank.Four),
+                new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                new Tile(Tile.Suit.Character, Tile.Rank.Six),
+                new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+                new Tile(Tile.Suit.Character, Tile.Rank.Eight),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                new Tile(Tile.Suit.Character, Tile.Rank.Nine)};
+
+            tilesManager.bonusTiles = new List<Tile>() { new Tile(Tile.Suit.Season, Tile.Rank.One) };
+
+            tilesManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Character, Tile.Rank.One),
+                    new Tile(Tile.Suit.Character, Tile.Rank.One),
+                    new Tile(Tile.Suit.Character, Tile.Rank.One),
                 }
             };
 
@@ -2384,5 +2428,50 @@ namespace Tests {
             Assert.AreEqual(expectedFan, actualFan);
         }
 
+        [Test]
+        public void PongTileUsedAsEye_Fail() {
+            playerManager = new PlayerManager();
+            tilesManager = new TilesManager();
+            tilesManager.hand = new List<Tile>() {
+                new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+                new Tile(Tile.Suit.Character, Tile.Rank.Eight),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+                new Tile(Tile.Suit.Dot, Tile.Rank.Five),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+                new Tile(Tile.Suit.Bamboo, Tile.Rank.Four)};
+
+            tilesManager.bonusTiles = new List<Tile>() {
+                new Tile(Tile.Suit.Animal, Tile.Rank.One),
+            };
+
+            tilesManager.comboTiles = new List<List<Tile>>() {
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Nine) },
+                new List<Tile>() {
+                    new Tile(Tile.Suit.Character, Tile.Rank.One),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Three)
+                }
+            };
+
+            playerManager.seatWind = PlayerManager.Wind.SOUTH;
+            playerManager.numberOfReplacementTiles = 0;
+            playerManager.numberOfKong = 0;
+
+            discardTile = new Tile(Tile.Suit.Bamboo, Tile.Rank.Five);
+            discardPlayerWind = PlayerManager.Wind.SOUTH;
+            prevailingWind = PlayerManager.Wind.EAST;
+            numberOfTilesLeft = 45;
+            turn = 10;
+            allPlayersOpenTiles = new List<Tile>() { };
+
+            (int expectedFan, List<string> expectedWinningCombos) = (0, new List<string>() { });
+            (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, tilesManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
+            Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
+            Assert.AreEqual(expectedFan, actualFan);
+        }
     }
 }

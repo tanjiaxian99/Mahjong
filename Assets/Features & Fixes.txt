@@ -1,14 +1,12 @@
-- Player can't click anything for Robbing the Kong
-- Shooter Pay scenarios (e.g. PayAllDiscard, Robbing the Kong)
 - If player CanWin, other players should not be able to discard tile. Room property update which freezes all discards
 - Replacement tile on Kong Pay All
 - Self-sort after initial sort
 - Speech bubble when player has pong/kong/win
 - Discard tile managed to go underneath hand tiles
 - Pong tiles being used a Eye and part of a Chow combo
-- Animal x3, Player Wind Combo, Dragon_Two and Winning on Replacement Tile for Flower gives 6 Fan, even when limit is 5.
 - Shooter Pay Kong
 - Words in Chinese
+- Circle around discarded tile
 - If the hand contains the drawn tile and the drawn tile is then discarded, the tile in the hand will be the one thrown away.
 - Add dealer's dice
 - 234678 character, 567567 dot, dragon_three, cat, season_four, seat_wind = North, prevailing_wind = South. Should be 2 fan instead of 3

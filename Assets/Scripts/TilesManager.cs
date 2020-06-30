@@ -162,7 +162,7 @@ public class TilesManager : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Returns the combo types of Chow, Pong or Kong
     /// </summary>
-    public string ComboType(List<Tile> tiles) {
+    public static string ComboType(List<Tile> tiles) {
         if (tiles.Count == 4) {
             return "Kong";
         }

@@ -314,10 +314,27 @@ public class FanCalculator : MonoBehaviour {
         int numberOfReplacementTiles = playerManager.numberOfReplacementTiles;
         int numberOfKong = playerManager.numberOfKong;
 
-        
+        List<Tile> combinedHand = new List<Tile>(hand);
+
+        if ((combinedHand.Count + 1) % 3 != 0 && discardTile != null) {
+            combinedHand.Add(discardTile);
+        }
+        combinedHand = combinedHand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
+
+        // Retrieve list of solution(s), excluding that of combo tiles
+        List<List<string>> listOfCombos = winCombos.CheckWin(combinedHand);
+
+        // Add combos from combo tile to listOfCombos
+        List<string> combosInComboTiles = new List<string>();
+        foreach (List<Tile> tiles in comboTiles) {
+            combosInComboTiles.Add(TilesManager.ComboType(tiles));
+        }
+
+        foreach (List<string> combos in listOfCombos) {
+            combos.AddRange(combosInComboTiles);
+        }
 
         // Combining hand and comboTiles
-        List<Tile> combinedHand = new List<Tile>(hand);
         for (int i = 0; i < comboTiles.Count; i++) {
 
             // GetRange is needed to drop the last tile for Kong combos
@@ -325,14 +342,8 @@ public class FanCalculator : MonoBehaviour {
                 combinedHand.Add(comboTile);
             }
         }
-
-        if (combinedHand.Count == 13 && discardTile != null) {
-            combinedHand.Add(discardTile);
-        }
         combinedHand = combinedHand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
 
-        // Retrieve list of solution(s)
-        List<List<string>> listOfCombos = winCombos.CheckWin(combinedHand);
         if (listOfCombos == null) {
             return;
         }
