@@ -65,6 +65,11 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     public static readonly string PlayerPointsPropKey = "pp";
 
     /// <summary>
+    /// A boolean affecting whether a player can touch his/her hand tiles
+    /// </summary>
+    public static readonly string TouchTilesPropKey = "TT";
+
+    /// <summary>
     /// List of tiles in the walls
     /// </summary>
     public static readonly string WallTileListPropKey = "wt";
@@ -167,6 +172,12 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.SetPlayerCustomProperties(ht);
     }
 
+    public static void SetTouchTiles(bool canTouch) {
+        Hashtable ht = new Hashtable();
+        ht.Add(TouchTilesPropKey, canTouch);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
     public static void SetWallTileList(List<Tile> tiles) {
         Hashtable ht = new Hashtable();
         ht.Add(WallTileListPropKey, tiles);
@@ -249,6 +260,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         return (int)player.CustomProperties[PlayerPointsPropKey];
     }
 
+    public static bool GetTouchTiles() {
+        return (bool)PhotonNetwork.CurrentRoom.CustomProperties[TouchTilesPropKey];
+    }
+
     public static List<Tile> GetWallTileList() {
         return (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
     }
@@ -317,6 +332,9 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             gameManager.prevailingWind = GetPrevailingWind();
             InfoPanel.Instance.SetPrevailingWind(gameManager.prevailingWind);
             Debug.LogFormat("The prevailing wind is {0}", gameManager.prevailingWind);
+
+        } else if (propertiesThatChanged.ContainsKey(TouchTilesPropKey)) {
+            playerManager.canTouchHandTiles = GetTouchTiles();
 
         } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
             gameManager.numberOfTilesLeft = GetWallTileList().Count;

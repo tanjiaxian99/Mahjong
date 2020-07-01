@@ -7,6 +7,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using System.Runtime.InteropServices.ComTypes;
 using System;
+using Photon.Pun.UtilityScripts;
 
 public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #region MonoBehaviour References
@@ -264,6 +265,8 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 Player discardPlayer = null;
 
                 if (winUpdate == "Start Win Check") {
+                    PropertiesManager.SetTouchTiles(false);
+
                     if (tileType == "Normal") {
                         discardPlayer = gameManager.discardPlayer;
                     } else if (tileType == "Bonus") {
@@ -292,6 +295,9 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 if (winUpdateCount == 3) {
                     if (tileType == "Normal") {
                         EventCheckPongKong(nonDiscardActorNumbers);
+
+                    } else {
+                        PropertiesManager.SetTouchTiles(true);
                     }
                     winUpdateCount = 0;
                     nonDiscardActorNumbers.Clear();
@@ -356,6 +362,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                     if (allFalse) {
                         Player nextPlayer = PropertiesManager.GetNextPlayer();
                         EventPlayerTurn(nextPlayer);
+                        PropertiesManager.SetTouchTiles(true);
                     }
 
                     PongKongUpdateList.Clear();
