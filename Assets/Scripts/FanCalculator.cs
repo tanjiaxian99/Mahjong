@@ -313,6 +313,7 @@ public class FanCalculator : MonoBehaviour {
         PlayerManager.Wind playerWind = playerManager.seatWind;
         int numberOfReplacementTiles = playerManager.numberOfReplacementTiles;
         int numberOfKong = playerManager.numberOfKong;
+        bool hasDrawnTile = playerManager.hasDrawnTile;
 
         List<Tile> combinedHand = new List<Tile>(hand);
 
@@ -389,7 +390,7 @@ public class FanCalculator : MonoBehaviour {
         for (int i = 0; i < listOfCombos.Count; i++) {
             winningCombos = new List<string>();
 
-            this.FanInFirstRound(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, turn);
+            this.FanInFirstRound(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, hasDrawnTile, turn);
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
             this.FanInHonourTiles(combinedHand, playerWind, prevailingWind);
             this.FanInHand(listOfCombos[i], combinedHand, hand, bonusTiles, comboTiles, playerWind, prevailingWind, discardTile);
@@ -406,7 +407,7 @@ public class FanCalculator : MonoBehaviour {
     /// <summary>
     /// Container for Heavenly, Earthly and Humanly Hands
     /// </summary>
-    private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind? discardPlayerWind, Tile discardTile, int turn) {
+    private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind? discardPlayerWind, Tile discardTile, bool hasDrawnTile, int turn) {
         if (settingsDict["Heavenly Hand"] > 0) {
             winningCombos.Add(HeavenlyHandCheck(playerWind, discardTile, turn));
 
@@ -424,7 +425,7 @@ public class FanCalculator : MonoBehaviour {
         }
 
         if (settingsDict["Humanly Hand"] > 0) {
-            winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, discardTile, turn));
+            winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, discardTile, hasDrawnTile, turn));
         }
 
     }
@@ -891,7 +892,7 @@ public class FanCalculator : MonoBehaviour {
     /// <summary>
     /// Determine if the hand is a Humanly Hand
     /// </summary>
-    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, Tile discardTile, int turn) {
+    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, Tile discardTile, bool hasDrawnTile, int turn) {
         if (turn == 1 && discardTile != null) {
             int numberOfComboTiles = 0;
             int numberOfConcealedKong = 0;
@@ -909,6 +910,10 @@ public class FanCalculator : MonoBehaviour {
             }
 
             if (numberOfConcealedKong * 4 != numberOfComboTiles) {
+                return null;
+            }
+
+            if (hasDrawnTile) {
                 return null;
             }
 

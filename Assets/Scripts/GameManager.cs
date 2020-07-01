@@ -110,6 +110,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
         turn = 0;
 
         camera = Camera.main;
+        tileTrackerRT = tileTracker.GetComponent<RectTransform>();
 
         this.openTilesDict = new Dictionary<Player, List<Tile>>();
         this.discardTiles = new List<Tile>();
@@ -128,7 +129,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
             tileTracker.SetActive(false);
         } else {
             tileTracker.SetActive(true);
-            tileTracker.GetComponent<RectTransform>().position = camera.WorldToScreenPoint(discardTile.transform.position);
+            tileTrackerRT.position = camera.WorldToScreenPoint(discardTile.transform.position);
         }
 
         if (playerManager.myTurn && playerManager.canTouchHandTiles && Input.GetMouseButtonDown(0)) {

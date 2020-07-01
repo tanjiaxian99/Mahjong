@@ -36,6 +36,8 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
 
     public string payForAll;
 
+    public bool hasDrawnTile;
+
     public int fanTotal;
 
     public List<string> winningCombos;
@@ -76,6 +78,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         myTurn = false;
         canTouchHandTiles = false;
         payForAll = "";
+        hasDrawnTile = false;
 
         gameManager = scriptManager.GetComponent<GameManager>();
         playerManager = scriptManager.GetComponent<PlayerManager>();
@@ -88,6 +91,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         payment = scriptManager.GetComponent<Payment>();
         winManager = scriptManager.GetComponent<WinManager>();
     }
+
 
     /// <summary>
     /// Point the camera towards the GameTable and stretch the GameTable to fill up the screen
@@ -189,7 +193,6 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
             }
         }
 
-
         // Check if the discarded tile could be Chowed
         Tuple<int, Tile, float> discardTileInfo = PropertiesManager.GetDiscardTile();
         Tile tile = discardTileInfo.Item2;
@@ -201,6 +204,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         }
 
         hand.Add(this.DrawTile());
+        hasDrawnTile = true;
         gameManager.latestDiscardTile = null;
         gameManager.discardPlayer = null;
 
@@ -535,6 +539,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         numberOfReplacementTiles = 0;
         numberOfKong = 0;
         payForAll = "";
+        hasDrawnTile = false;
         fanTotal = 0;
         winningCombos.Clear();
     }

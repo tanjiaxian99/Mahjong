@@ -243,7 +243,7 @@ public static class InitializeRound {
             } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.SOUTH) {
                 List<Tile> playerTiles = new List<Tile>();
 
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
@@ -263,7 +263,7 @@ public static class InitializeRound {
                 List<Tile> playerTiles = new List<Tile>();
 
                 playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Five));
+                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
