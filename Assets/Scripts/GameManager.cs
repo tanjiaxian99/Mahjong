@@ -81,6 +81,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
 
     public int turn;
 
+    [SerializeField]
+    private GameObject tileTracker;
+
+    private RectTransform tileTrackerRT;
+
+    private Camera camera;
+
     #endregion
 
     #region MonoBehavior Callbacks
@@ -102,6 +109,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
 
         turn = 0;
 
+        camera = Camera.main;
+
         this.openTilesDict = new Dictionary<Player, List<Tile>>();
         this.discardTiles = new List<Tile>();
 
@@ -114,6 +123,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
     }
 
     void Update() {
+        GameObject discardTile = GameObject.FindGameObjectWithTag("Discard");
+        if (discardTile == null) {
+            tileTracker.SetActive(false);
+        } else {
+            tileTracker.SetActive(true);
+            tileTracker.GetComponent<RectTransform>().position = camera.WorldToScreenPoint(discardTile.transform.position);
+        }
+
         if (playerManager.myTurn && playerManager.canTouchHandTiles && Input.GetMouseButtonDown(0)) {
             playerManager.OnLocalPlayerMove();
         }
