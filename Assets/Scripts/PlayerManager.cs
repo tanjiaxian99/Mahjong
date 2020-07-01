@@ -445,9 +445,9 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
             // Instantiate the last Concealed Kong tile one tile above the other 3 Concealed Kong tiles.
             if (tile.kongType == 3) {
                 xPosOpen -= xSepOpen;
-                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 1f + 0.3f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 0.65f + 0.3f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             } else {
-                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 0.65f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             }
 
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);

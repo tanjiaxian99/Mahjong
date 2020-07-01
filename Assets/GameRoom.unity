@@ -7450,6 +7450,7 @@ MonoBehaviour:
   myTurn: 0
   canTouchHandTiles: 0
   payForAll: 
+  hasDrawnTile: 0
   fanTotal: 0
   winningCombos: []
   scriptManager: {fileID: 1419168648}

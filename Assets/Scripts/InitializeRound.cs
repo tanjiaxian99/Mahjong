@@ -173,39 +173,39 @@ public static class InitializeRound {
             Debug.LogErrorFormat("{0} tiles have been created instead of 148", tiles.Count);
         }
 
-        // DEBUG
-        tiles = new List<Tile>() {
-            new Tile(Tile.Suit.Character, Tile.Rank.One),
-            new Tile(Tile.Suit.Character, Tile.Rank.Three),
-            new Tile(Tile.Suit.Character, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Character, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Character, Tile.Rank.One),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
-            new Tile(Tile.Suit.Flower, Tile.Rank.Four),
+        //// DEBUG
+        //tiles = new List<Tile>() {
+        //    new Tile(Tile.Suit.Character, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Character, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Character, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+        //    new Tile(Tile.Suit.Character, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Character, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Flower, Tile.Rank.Four),
 
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-        };
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+        //};
 
         // Add to Room Custom Properties
         PropertiesManager.SetWallTileList(tiles);

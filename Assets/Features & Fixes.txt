@@ -1,8 +1,6 @@
-- If player CanWin, other players should not be able to discard tile. Room property update which freezes all discards
 - Replacement tile on Kong Pay All
 - Self-sort after initial sort
 - Speech bubble when player has pong/kong/win
-- Discard tile managed to go underneath hand tiles
 - Shooter Pay Kong
 - Words in Chinese
 - If the hand contains the drawn tile and the drawn tile is then discarded, the tile in the hand will be the one thrown away.
