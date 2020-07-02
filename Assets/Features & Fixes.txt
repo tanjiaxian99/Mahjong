@@ -3,9 +3,10 @@
 - Speech bubble when player has pong/kong/win
 - Shooter Pay Kong
 - Words in Chinese
-- If the hand contains the drawn tile and the drawn tile is then discarded, the tile in the hand will be the one thrown away.
+- If the hand contains the drawn tile and the drawn tile is then discarded, the tile in the hand will be the one thrown away
+  (can't identify the problem, since xPos of hitobject is given)
 - Add dealer's dice
 - All copies of unity crashing simultaneously
-- join rooms
+- Join rooms
 
 

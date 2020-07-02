@@ -45,6 +45,8 @@ public class UI : MonoBehaviour {
 
     private Dictionary<string, int> settingsDict;
 
+    private string uiType;
+
     #endregion
 
     #region Singleton Initialization
@@ -114,7 +116,7 @@ public class UI : MonoBehaviour {
                 NoMoreTilesUI();
                 break;
         }
-        
+
     }
 
     /// <summary>
@@ -122,8 +124,9 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void InstantPayoutUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Instant Payout: " + (string)objects[0];
+        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_" + (string)objects[0]); 
         AddSpriteTiles((List<Tile>)objects[1]);
+        uiType = "Instant Payout";
     }
 
     /// <summary>
@@ -158,7 +161,7 @@ public class UI : MonoBehaviour {
         skipButtonObject.SetActive(true);
         primaryTextField.text = "Can Win";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
-        
+
         secondaryTextField.text = string.Format("You can win with {0} fan.", (int)objects[1]);
     }
 
@@ -179,7 +182,7 @@ public class UI : MonoBehaviour {
                 combos += combo + " = " + settingsDict["Dragon"] + " fan" + "\n";
             } else {
                 combos += combo + " = " + settingsDict[combo] + " fan" + "\n";
-            }  
+            }
         }
         combos = combos.TrimEnd('\n');
         secondaryTextField.text = string.Format("You won with {0} fan and the following combos:\n{1}\n\n{2}", fanTotal, combos, winLoseType);
@@ -207,7 +210,7 @@ public class UI : MonoBehaviour {
         }
         combos = combos.TrimEnd('\n');
         secondaryTextField.text = string.Format(
-            "{0} has won with {1} fan and the following combos:\n{2}\n\n{3}", 
+            "{0} has won with {1} fan and the following combos:\n{2}\n\n{3}",
             winner.NickName, fanTotal, combos, winLoseType);
     }
 
@@ -234,41 +237,47 @@ public class UI : MonoBehaviour {
     /// Called upon clicking the 'Ok' button
     /// </summary>
     public void OnOk() {
-        switch (primaryTextField.text) {
-            case "Sacred Discard":
-            case "Missed Discard":
-            case "Instant Payout: Hidden Cat and Rat":
-            case "Instant Payout: Cat and Rat":
-            case "Instant Payout: Hidden Chicken and Centipede":
-            case "Instant Payout: Chicken and Centipede":
-            case "Instant Payout: Complete Animal Group Payout":
-            case "Instant Payout: Hidden Bonus Tile Match Seat Wind Pair":
-            case "Instant Payout: Bonus Tile Match Seat Wind Pair":
-            case "Instant Payout: Complete Season Group Payout":
-            case "Instant Payout: Complete Flower Group Payout":
-            case "Instant Payout: Concealed Kong":
-            case "Instant Payout: Exposed Kong":
-            case "Instant Payout: Discard Kong":
-            case "Revert Kong Payout":
+        switch (uiType) {
+            case "Instant Payout":
                 ResetUI();
-                break;
-            case "Can Win":
-                ResetUI();
-                winManager.OnWinOk();
-                break;
-            case "You have won!":
-                ResetUI();
-                EventsManager.EventReadyForNewRound();
-                break;
-            case "Another player has won":
-                ResetUI();
-                EventsManager.EventReadyForNewRound();
-                break;
-            case "There are no more tiles left":
-                ResetUI();
-                EventsManager.EventReadyForNewRound();
                 break;
         }
+
+        //switch (primaryTextField.text) {
+        //    case "Sacred Discard":
+        //    case "Missed Discard":
+        //    case "Instant Payout: Hidden Cat and Rat":
+        //    case "Instant Payout: Cat and Rat":
+        //    case "Instant Payout: Hidden Chicken and Centipede":
+        //    case "Instant Payout: Chicken and Centipede":
+        //    case "Instant Payout: Complete Animal Group Payout":
+        //    case "Instant Payout: Hidden Bonus Tile Match Seat Wind Pair":
+        //    case "Instant Payout: Bonus Tile Match Seat Wind Pair":
+        //    case "Instant Payout: Complete Season Group Payout":
+        //    case "Instant Payout: Complete Flower Group Payout":
+        //    case "Instant Payout: Concealed Kong":
+        //    case "Instant Payout: Exposed Kong":
+        //    case "Instant Payout: Discard Kong":
+        //    case "Revert Kong Payout":
+        //        ResetUI();
+        //        break;
+        //    case "Can Win":
+        //        ResetUI();
+        //        winManager.OnWinOk();
+        //        break;
+        //    case "You have won!":
+        //        ResetUI();
+        //        EventsManager.EventReadyForNewRound();
+        //        break;
+        //    case "Another player has won":
+        //        ResetUI();
+        //        EventsManager.EventReadyForNewRound();
+        //        break;
+        //    case "There are no more tiles left":
+        //        ResetUI();
+        //        EventsManager.EventReadyForNewRound();
+        //        break;
+        //}
     }
 
     /// <summary>

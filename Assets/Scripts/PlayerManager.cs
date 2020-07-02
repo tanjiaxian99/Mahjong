@@ -230,6 +230,8 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Called when the local player wants to select a tile
     /// </summary>
+    // TODO: Create a dictionary with discarded tile and current location. In the event that a player disconnects and reconnects,
+    // he can reconstruct the scene.
     public void OnLocalPlayerMove() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -267,8 +269,6 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
             }
         }
     }
-    // TODO: Create a dictionary with discarded tile and current location. In the event that a player disconnects and reconnects,
-    // he can reconstruct the scene.
 
 
     /// <summary>
