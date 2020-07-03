@@ -21,6 +21,14 @@ MonoBehaviour:
     m_Address: Primary Text Shared Data
     m_ReadOnly: 0
     m_SerializedLabels: []
+    m_mainAssetType: UnityEngine.Localization.Tables.SharedTableData, Unity.Localization,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 8a22c51a6891a034a88db810f248f7b3
+    m_Address: Winning Combos Shared Data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
     m_mainAssetType: 
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
@@ -28,7 +36,8 @@ MonoBehaviour:
     m_Address: Secondary Text Shared Data
     m_ReadOnly: 0
     m_SerializedLabels: []
-    m_mainAssetType: 
+    m_mainAssetType: UnityEngine.Localization.Tables.SharedTableData, Unity.Localization,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   m_ReadOnly: 1

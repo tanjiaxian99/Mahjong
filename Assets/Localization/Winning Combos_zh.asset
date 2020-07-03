@@ -1,0 +1,186 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Winning Combos_zh
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: zh
+  m_SharedData: {fileID: 11400000, guid: 8a22c51a6891a034a88db810f248f7b3, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 1
+    m_Localized: "\u5929\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2
+    m_Localized: "\u5730\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3
+    m_Localized: "\u4EBA\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4
+    m_Localized: "\u6B63\u82B1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5
+    m_Localized: "\u52A8\u7269"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6
+    m_Localized: "\u52A8\u7269\u6760"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7
+    m_Localized: "\u4E00\u53F0\u82B1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8
+    m_Localized: "\u4E00\u53F0\u82B1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9
+    m_Localized: "\u4E03\u62A2\u4E00"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10
+    m_Localized: "\u516B\u4ED9\u8FC7\u6D77"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11
+    m_Localized: "\u95E8\u98CE"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12
+    m_Localized: "\u5708\u98CE"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42
+    m_Localized: "\u7EA2\u4E2D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43
+    m_Localized: "\u767D\u677F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44
+    m_Localized: "\u53D1\u8D22"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14
+    m_Localized: "\u95E8\u6E05"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15
+    m_Localized: "\u5BF9\u5BF9\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16
+    m_Localized: "\u6DF7\u4E00\u8272"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17
+    m_Localized: "\u6E05\u4E00\u8272"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18
+    m_Localized: "\u81ED\u5E73\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19
+    m_Localized: "\u5E73\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 20
+    m_Localized: "\u6DF7\u4E48\u4E5D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21
+    m_Localized: "\u6E05\u4E48\u4E5D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22
+    m_Localized: "\u5B57\u4E00\u8272"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23
+    m_Localized: "\u574E\u574E\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24
+    m_Localized: "\u6E05\u4E00\u8272\u78B0\u78B0\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25
+    m_Localized: "\u6E05\u4E00\u8272\u5E73\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26
+    m_Localized: "\u6E05\u4E00\u8272\u5C0F\u5E73\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27
+    m_Localized: "\u4E5D\u8FDE\u5B9D\u706F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28
+    m_Localized: "\u5C0F\u56DB\u559C"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29
+    m_Localized: "\u5927\u56DB\u559C"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30
+    m_Localized: "\u7EFF\u4E00\u8272"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31
+    m_Localized: "\u5C0F\u4E09\u5143"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32
+    m_Localized: "\u5927\u4E09\u5143"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33
+    m_Localized: "\u5341\u516B\u7F57\u6C49"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34
+    m_Localized: "\u5341\u4E09\u5E7A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36
+    m_Localized: "\u6760\u4E0A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35
+    m_Localized: "\u82B1\u4E0A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37
+    m_Localized: "\u6760\u6760\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38
+    m_Localized: "\u62A2\u6760"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39
+    m_Localized: "\u6D77\u5E95\u635E\u6708"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 1

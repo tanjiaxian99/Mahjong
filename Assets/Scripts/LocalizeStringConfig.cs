@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Localization;
 using UnityEngine.Localization.Components;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
 public class LocalizeStringConfig : MonoBehaviour {
@@ -42,6 +44,7 @@ public class LocalizeStringConfig : MonoBehaviour {
     }
 
     public void SetSecondaryText(string entry) {
+        //secondaryTextString.StringReference.RefreshString();
         secondaryTextString.StringReference.SetReference("Secondary Text", entry);
     }
 }

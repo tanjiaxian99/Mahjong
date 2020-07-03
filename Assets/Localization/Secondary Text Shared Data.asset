@@ -12,12 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
   m_Name: Secondary Text Shared Data
   m_EditorClassIdentifier: 
-  m_NextAvailableId: 2
+  m_NextAvailableId: 4
   m_TableCollectionName: Secondary Text
   m_TableCollectionNameGuidString: b723732592e905f45b24cfd22e34454c
   m_Entries:
   - m_Id: 1
     m_Key: WIN_WITH_X_FAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2
+    m_Key: YOU_HAVE_WON
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3
+    m_Key: FAN
     m_Metadata:
       m_Items: []
   m_Metadata:

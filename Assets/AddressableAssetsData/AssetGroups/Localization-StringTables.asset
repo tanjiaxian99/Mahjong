@@ -22,7 +22,18 @@ MonoBehaviour:
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-zh-TW
-    m_mainAssetType: 
+    m_mainAssetType: UnityEngine.Localization.Tables.StringTable, Unity.Localization,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 1481d012770c6e34f8244b6eceae4dce
+    m_Address: Winning Combos_en-GB
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en-GB
+    - Preload
+    m_mainAssetType: UnityEngine.Localization.Tables.StringTable, Unity.Localization,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   - m_GUID: 33f456f5f3344734ca8b21c1d1866e58
@@ -57,7 +68,28 @@ MonoBehaviour:
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-en-GB
-    m_mainAssetType: 
+    m_mainAssetType: UnityEngine.Localization.Tables.StringTable, Unity.Localization,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 94f1c67c52327174f9f53b200edc5e33
+    m_Address: Winning Combos_zh-TW
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-zh-TW
+    - Preload
+    m_mainAssetType: UnityEngine.Localization.Tables.StringTable, Unity.Localization,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 9fb6a24d9a3a93b47be1dd896e08a0c0
+    m_Address: Winning Combos_zh
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-zh
+    - Preload
+    m_mainAssetType: UnityEngine.Localization.Tables.StringTable, Unity.Localization,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   - m_GUID: c626cf457c4366f4b99dabe0e033a96c
@@ -65,7 +97,8 @@ MonoBehaviour:
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-zh
-    m_mainAssetType: 
+    m_mainAssetType: UnityEngine.Localization.Tables.StringTable, Unity.Localization,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   m_ReadOnly: 1

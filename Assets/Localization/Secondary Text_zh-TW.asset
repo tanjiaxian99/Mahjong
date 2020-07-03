@@ -18,15 +18,29 @@ MonoBehaviour:
   m_Metadata:
     m_Items:
     - id: 0
+    - id: 1
   m_TableData:
   - m_Id: 1
-    m_Localized: "\u4F60\u73FE\u5728\u6709{fanTotal}\u53F0\r"
+    m_Localized: "\u4F60\u73FE\u5728\u6709 {fanTotal} \u53F0\r"
     m_Metadata:
       m_Items:
       - id: 0
+  - m_Id: 2
+    m_Localized: "\r\r\u4F60\u7531 {fanTotal} \u53F0\u4F86\u80E1\u3002\u4F60\u7684\u9023\u52DD\u662F\uFF1A\n{combos}\n\n{winLoseType}"
+    m_Metadata:
+      m_Items:
+      - id: 1
+  - m_Id: 3
+    m_Localized: "\u53F0"
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_Entries: 01000000
+    00000001:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 02000000

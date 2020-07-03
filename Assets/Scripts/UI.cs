@@ -75,7 +75,7 @@ public class UI : MonoBehaviour {
         Settings settings = scriptManager.GetComponent<Settings>();
         settingsDict = settings.settingsDict;
 
-        //DefaultUI();
+        DefaultUI();
     }
 
     #region UI Methods
@@ -171,13 +171,15 @@ public class UI : MonoBehaviour {
         uiType = "Can Win";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
 
-        LocalizeStringConfig.Instance.SetSecondaryText("WIN_WITH_X_FAN");
         LocalizeSecondaryText.Instance.fanTotal = (int)objects[1];
+        LocalizeStringConfig.Instance.SetSecondaryText("WIN_WITH_X_FAN");
+        
     }
 
     private void OnWinOkUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "You have won!";
+        LocalizeStringConfig.Instance.SetPrimaryText("YOU_HAVE_WON");
+        uiType = "You have won!";
 
         Tile winningTile = (Tile)objects[0];
         int fanTotal = (int)objects[1];
@@ -186,21 +188,16 @@ public class UI : MonoBehaviour {
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
-        string combos = "";
-        foreach (string combo in winningCombos) {
-            if (combo.Contains("Dragon")) {
-                combos += combo + " = " + settingsDict["Dragon"] + " fan" + "\n";
-            } else {
-                combos += combo + " = " + settingsDict[combo] + " fan" + "\n";
-            }
-        }
-        combos = combos.TrimEnd('\n');
-        secondaryTextField.text = string.Format("You won with {0} fan and the following combos:\n{1}\n\n{2}", fanTotal, combos, winLoseType);
+        LocalizeSecondaryText.Instance.ConvertWinningCombos(winningCombos);
+        LocalizeSecondaryText.Instance.fanTotal = fanTotal;
+        LocalizeSecondaryText.Instance.winLoseType = winLoseType;
+        LocalizeStringConfig.Instance.SetSecondaryText("YOU_HAVE_WON");
     }
 
     private void RemoteWinUI(params object[] objects) {
         uiPanel.SetActive(true);
         primaryTextField.text = "Another player has won";
+        uiType = "Another player has won";
 
         Player winner = (Player)objects[0];
         Tile winningTile = (Tile)objects[1];
@@ -260,14 +257,15 @@ public class UI : MonoBehaviour {
                 winManager.OnWinOk();
                 break;
 
-            //case "You have won!":
-            //    ResetUI();
-            //    EventsManager.EventReadyForNewRound();
-            //    break;
-            //case "Another player has won":
-            //    ResetUI();
-            //    EventsManager.EventReadyForNewRound();
-            //    break;
+            case "You have won!":
+                ResetUI();
+                EventsManager.EventReadyForNewRound();
+                break;
+
+            case "Another player has won":
+                ResetUI();
+                EventsManager.EventReadyForNewRound();
+                break;
             //case "There are no more tiles left":
             //    ResetUI();
             //    EventsManager.EventReadyForNewRound();

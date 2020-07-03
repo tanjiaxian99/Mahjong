@@ -352,6 +352,7 @@ public class FanCalculator : MonoBehaviour {
         if (listOfCombos.Count == 0) {
             winningCombos = new List<string>();
 
+            this.FanInFirstRound(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, hasDrawnTile, turn);
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
             this.RobbingTheKong(discardTile);
             winningCombos.Add(this.ThirteenWondersCheck(combinedHand));
