@@ -24,6 +24,13 @@ MonoBehaviour:
     m_mainAssetType: 
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
+  - m_GUID: b723732592e905f45b24cfd22e34454c
+    m_Address: Secondary Text Shared Data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 4013b297a5689394e92b7c11cbcd496a, type: 2}
   m_SchemaSet:

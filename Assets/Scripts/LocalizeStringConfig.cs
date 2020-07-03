@@ -41,7 +41,7 @@ public class LocalizeStringConfig : MonoBehaviour {
         primaryTextString.StringReference.SetReference("Primary Text", entry);
     }
 
-    public void SetSecondaryText(string table, string entry) {
-        secondaryTextString.StringReference.SetReference(table, entry);
+    public void SetSecondaryText(string entry) {
+        secondaryTextString.StringReference.SetReference("Secondary Text", entry);
     }
 }

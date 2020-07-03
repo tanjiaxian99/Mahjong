@@ -17,6 +17,14 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 461d7c4a7dd49e54aada305c8e961dce
   m_SerializeEntries:
+  - m_GUID: 11129a82e41d6b145a05514cdbe663b0
+    m_Address: Secondary Text_zh-TW
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-zh-TW
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   - m_GUID: 33f456f5f3344734ca8b21c1d1866e58
     m_Address: Primary Text_en-GB
     m_ReadOnly: 1
@@ -42,6 +50,22 @@ MonoBehaviour:
     - Locale-zh
     m_mainAssetType: UnityEngine.Localization.Tables.StringTable, Unity.Localization,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 7640d54bd0d39ab4fa8acc87e1b66dc1
+    m_Address: Secondary Text_en-GB
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en-GB
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: c626cf457c4366f4b99dabe0e033a96c
+    m_Address: Secondary Text_zh
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-zh
+    m_mainAssetType: 
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   m_ReadOnly: 1

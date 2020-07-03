@@ -75,7 +75,7 @@ public class UI : MonoBehaviour {
         Settings settings = scriptManager.GetComponent<Settings>();
         settingsDict = settings.settingsDict;
 
-        DefaultUI();
+        //DefaultUI();
     }
 
     #region UI Methods
@@ -100,18 +100,23 @@ public class UI : MonoBehaviour {
             case "Sacred Discard":
                 SacredDiscardUI(objects);
                 break;
+
             case "Missed Discard":
                 MissedDiscardUI(objects);
                 break;
+
             case "Can Win":
                 CanWinUI(objects);
                 break;
+
             case "Win Ok":
                 OnWinOkUI(objects);
                 break;
+
             case "Remote Win":
                 RemoteWinUI(objects);
                 break;
+
             case "No More Tiles":
                 NoMoreTilesUI();
                 break;
@@ -124,9 +129,9 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void InstantPayoutUI(params object[] objects) {
         uiPanel.SetActive(true);
-        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_" + (string)objects[0]); 
-        AddSpriteTiles((List<Tile>)objects[1]);
+        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_" + (string)objects[0]);
         uiType = "Instant Payout";
+        AddSpriteTiles((List<Tile>)objects[1]);
     }
 
     /// <summary>
@@ -134,7 +139,8 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void RevertKongPayoutUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Revert Kong Payout";
+        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_REVERT_KONG");
+        uiType = "Revert Kong";
         AddSpriteTiles((List<Tile>)objects[0]);
     }
 
@@ -143,7 +149,8 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void SacredDiscardUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Sacred Discard";
+        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_SACRED_DISCARD");
+        uiType = "Sacred Discard";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
     }
 
@@ -152,17 +159,20 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void MissedDiscardUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Missed Discard";
+        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_MISSED_DISCARD");
+        uiType = "Missed Discard";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
     }
 
     private void CanWinUI(params object[] objects) {
         uiPanel.SetActive(true);
         skipButtonObject.SetActive(true);
-        primaryTextField.text = "Can Win";
+        LocalizeStringConfig.Instance.SetPrimaryText("CAN_WIN");
+        uiType = "Can Win";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
 
-        secondaryTextField.text = string.Format("You can win with {0} fan.", (int)objects[1]);
+        LocalizeStringConfig.Instance.SetSecondaryText("WIN_WITH_X_FAN");
+        LocalizeSecondaryText.Instance.fanTotal = (int)objects[1];
     }
 
     private void OnWinOkUI(params object[] objects) {
@@ -239,45 +249,32 @@ public class UI : MonoBehaviour {
     public void OnOk() {
         switch (uiType) {
             case "Instant Payout":
+            case "Revert Kong":
+            case "Sacred Discard":
+            case "Missed Discard":
                 ResetUI();
                 break;
+
+            case "Can Win":
+                ResetUI();
+                winManager.OnWinOk();
+                break;
+
+            //case "You have won!":
+            //    ResetUI();
+            //    EventsManager.EventReadyForNewRound();
+            //    break;
+            //case "Another player has won":
+            //    ResetUI();
+            //    EventsManager.EventReadyForNewRound();
+            //    break;
+            //case "There are no more tiles left":
+            //    ResetUI();
+            //    EventsManager.EventReadyForNewRound();
+            //    break;
         }
 
-        //switch (primaryTextField.text) {
-        //    case "Sacred Discard":
-        //    case "Missed Discard":
-        //    case "Instant Payout: Hidden Cat and Rat":
-        //    case "Instant Payout: Cat and Rat":
-        //    case "Instant Payout: Hidden Chicken and Centipede":
-        //    case "Instant Payout: Chicken and Centipede":
-        //    case "Instant Payout: Complete Animal Group Payout":
-        //    case "Instant Payout: Hidden Bonus Tile Match Seat Wind Pair":
-        //    case "Instant Payout: Bonus Tile Match Seat Wind Pair":
-        //    case "Instant Payout: Complete Season Group Payout":
-        //    case "Instant Payout: Complete Flower Group Payout":
-        //    case "Instant Payout: Concealed Kong":
-        //    case "Instant Payout: Exposed Kong":
-        //    case "Instant Payout: Discard Kong":
-        //    case "Revert Kong Payout":
-        //        ResetUI();
-        //        break;
-        //    case "Can Win":
-        //        ResetUI();
-        //        winManager.OnWinOk();
-        //        break;
-        //    case "You have won!":
-        //        ResetUI();
-        //        EventsManager.EventReadyForNewRound();
-        //        break;
-        //    case "Another player has won":
-        //        ResetUI();
-        //        EventsManager.EventReadyForNewRound();
-        //        break;
-        //    case "There are no more tiles left":
-        //        ResetUI();
-        //        EventsManager.EventReadyForNewRound();
-        //        break;
-        //}
+        
     }
 
     /// <summary>

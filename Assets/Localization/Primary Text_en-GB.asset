@@ -16,7 +16,8 @@ MonoBehaviour:
     m_Code: en-GB
   m_SharedData: {fileID: 11400000, guid: 84015380348e5f64b847724fe21c84db, type: 2}
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - id: 0
   m_TableData:
   - m_Id: 5
     m_Localized: 'Instant Payout: Cat and Rat'
@@ -82,5 +83,30 @@ MonoBehaviour:
     m_Localized: 'Instant Payout: Discard Kong, Non-shooter'
     m_Metadata:
       m_Items: []
+  - m_Id: 20
+    m_Localized: 'Instant Payout: Revert Kong Payout'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21
+    m_Localized: Sacred Discard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22
+    m_Localized: Missed Discard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23
+    m_Localized: Can Win
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24
+    m_Localized: You can win with {fanTotal} fan
+    m_Metadata:
+      m_Items:
+      - id: 0
   references:
     version: 1
+    00000000:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 18000000

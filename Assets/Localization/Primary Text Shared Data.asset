@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
   m_Name: Primary Text Shared Data
   m_EditorClassIdentifier: 
-  m_NextAvailableId: 20
+  m_NextAvailableId: 25
   m_TableCollectionName: Primary Text
   m_TableCollectionNameGuidString: 84015380348e5f64b847724fe21c84db
   m_Entries:
@@ -78,6 +78,26 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 19
     m_Key: INSTANT_PAYOUT_DISCARD_KONG_NON_SHOOTER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 20
+    m_Key: INSTANT_PAYOUT_REVERT_KONG
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21
+    m_Key: SACRED_DISCARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22
+    m_Key: MISSED_DISCARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23
+    m_Key: CAN_WIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24
+    m_Key: WIN_WITH_X_FAN
     m_Metadata:
       m_Items: []
   m_Metadata:
