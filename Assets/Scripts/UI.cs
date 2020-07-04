@@ -188,9 +188,9 @@ public class UI : MonoBehaviour {
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
-        LocalizeSecondaryText.Instance.ConvertWinningCombos(winningCombos);
+        LocalizeSecondaryText.Instance.SetWinningCombos(winningCombos);
         LocalizeSecondaryText.Instance.fanTotal = fanTotal;
-        LocalizeSecondaryText.Instance.winLoseType = winLoseType;
+        LocalizeSecondaryText.Instance.SetWinLoseType(winLoseType);
         LocalizeStringConfig.Instance.SetSecondaryText("YOU_HAVE_WON");
     }
 

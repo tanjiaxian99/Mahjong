@@ -40,7 +40,7 @@ public class LocalizeSecondaryText : MonoBehaviour {
     }
 
     // https://forum.unity.com/threads/localizating-strings-on-script.847000/
-    public void ConvertWinningCombos(List<string> winningCombos) {
+    public void SetWinningCombos(List<string> winningCombos) {
         combos = "";
 
         foreach (string combo in winningCombos) {
@@ -65,6 +65,11 @@ public class LocalizeSecondaryText : MonoBehaviour {
             }
         }
         combos = combos.TrimEnd('\n');
+    }
+
+    public void SetWinLoseType(string entry) {
+        var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync("Win Lose Type", entry);
+        winLoseType = op.Result;
     }
 
     // TODO: Call whenever there is a change in locale

@@ -17,6 +17,13 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 3d8ae4b17b3d8194eb354c64ff75b5ef
   m_SerializeEntries:
+  - m_GUID: 1732a90b80cf57448913324bd588cb2c
+    m_Address: Win Lose Type Shared Data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   - m_GUID: 84015380348e5f64b847724fe21c84db
     m_Address: Primary Text Shared Data
     m_ReadOnly: 0

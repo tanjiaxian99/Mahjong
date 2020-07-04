@@ -463,10 +463,10 @@ public class Payment : MonoBehaviour, IResetVariables {
 
             if (discardPlayer == null) {
                 // Self-pick
-                winLoseType = "Winner: Self-pick";
+                winLoseType = "WINNER_SELF_PICK";
                 playerManager.Points += minPoint * (int)Math.Pow(2, fan - 1) * 2 * 3;
             } else {
-                winLoseType = "Winner: Non Self-pick";
+                winLoseType = "WINNER_NON_SELF_PICK";
                 playerManager.Points += minPoint * (int)Math.Pow(2, fan - 1) * 4;
             }
 
@@ -478,8 +478,10 @@ public class Payment : MonoBehaviour, IResetVariables {
             if (numberOfTilesLeft < 20 && isFreshTile && discardPlayer != null) {
                 // Only the player that discarded the Fresh Tile pays 
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                    winLoseType = "Loser: Discarded Fresh Tile For Win";
+                    winLoseType = "LOSER_DISCARDED_FRESH_TILE_FOR_WIN";
                     playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
+                } else {
+                    winLoseType = "NEUTRAL_SOMEONE_ELSE_DISCARDED_THE_FRESH_TILE";
                 }
                 return winLoseType;
             }
@@ -488,16 +490,16 @@ public class Payment : MonoBehaviour, IResetVariables {
             Debug.Log("Checkpoint 2");
             if (playerManager.payForAll == "Local") {
                 if (discardPlayer == null) {
-                    winLoseType = "Loser: Paying for all players, Self-pick";
+                    winLoseType = "LOSER_PAYING_FOR_ALL_PLAYERS_SELF_PICK";
                     playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2 * 4;
                 } else {
-                    winLoseType = "Loser: Paying for all players, Non Self-pick";
+                    winLoseType = "LOSER_PAYING_FOR_ALL_PLAYERS_NON_SELF_PICK";
                     playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
                 return winLoseType;
 
             } else if (playerManager.payForAll == "Remote") {
-                winLoseType = "Neutral: Someone else paying for all players";
+                winLoseType = "NEUTRAL_SOMEONE_ELSE_PAYING_FOR_ALL_PLAYERS";
                 return winLoseType;
             }
 
@@ -506,16 +508,16 @@ public class Payment : MonoBehaviour, IResetVariables {
             if (shooterPay) {
                 // If local player is the shooter
                 if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                    winLoseType = "Loser: Shooter Pay";
+                    winLoseType = "LOSER_SHOOTER_PAY";
                     playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
 
                 } else if (discardPlayer == null) {
                     // If the remote player self pick
-                    winLoseType = "Loser: Shooter Pay, but Self-pick";
+                    winLoseType = "LOSER_SHOOTER_PAY_BUT_SELP_PICK";
                     playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
 
                 } else {
-                    winLoseType = "Neutral: Non-shooter";
+                    winLoseType = "NEUTRAL_NON_SHOOTER";
                 }
                 return winLoseType;
             }
@@ -523,16 +525,16 @@ public class Payment : MonoBehaviour, IResetVariables {
             // Non-shooter pay
             Debug.Log("Checkpoint 4");
             if (discardPlayer == null) {
-                winLoseType = "Loser: Winner Self-pick";
+                winLoseType = "LOSER_WINNER_SELF_PICK";
                 playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
 
             } else if (discardPlayer == PhotonNetwork.LocalPlayer) {
-                winLoseType = "Loser: Local player discarded the winning tile";
+                winLoseType = "LOSER_LOCAL_PLAYER_DISCARDED_THE_WINNING_TILE";
                 playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2;
 
             } else {
                 // If the local player is a loser
-                winLoseType = "Loser: Normal.";
+                winLoseType = "LOSER_NORMAL";
                 playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1);
             }
         }

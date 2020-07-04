@@ -384,7 +384,6 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 if (!PhotonNetwork.IsMasterClient) {
                     return;
                 }
-                Debug.LogError("called");
                 startNewRoundCount++;
                 if (startNewRoundCount == 4) {
                     startNewRoundCount = 0;
