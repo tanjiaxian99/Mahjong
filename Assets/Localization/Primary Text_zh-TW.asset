@@ -100,12 +100,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 24
-    m_Localized: "\u4F60\u73FE\u5728\u6709{fanTotal}\u53F0"
+    m_Localized: "\u4F60\u73FE\u5728\u6709 {fanTotal} \u53F0"
     m_Metadata:
       m_Items:
       - id: 0
   - m_Id: 25
     m_Localized: "\u80E1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26
+    m_Localized: "\u522B\u4EBA\u8D62\u4E86"
     m_Metadata:
       m_Items: []
   references:

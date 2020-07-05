@@ -108,6 +108,10 @@ MonoBehaviour:
     m_Localized: You have won!
     m_Metadata:
       m_Items: []
+  - m_Id: 26
+    m_Localized: Another player has won
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:

@@ -10671,6 +10671,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1f606433a5e0cf44b4693c5c2fb2edc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  winnerName: 
   fanTotal: 0
   combos: 
   winLoseType: 

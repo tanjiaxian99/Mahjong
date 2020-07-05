@@ -19,6 +19,7 @@ MonoBehaviour:
     m_Items:
     - id: 0
     - id: 1
+    - id: 2
   m_TableData:
   - m_Id: 1
     m_Localized: "\u4F60\u73FE\u5728\u6709 {fanTotal} \u53F0\r"
@@ -34,6 +35,11 @@ MonoBehaviour:
     m_Localized: "\u53F0"
     m_Metadata:
       m_Items: []
+  - m_Id: 5
+    m_Localized: "{winnerName} \u7531 {fanTotal} \u53F0\u4F86\u80E1\u3002\u4ED6\u7684\u9023\u52DD\u662F\uFF1A\n{combos}\n\n{winLoseType}"
+    m_Metadata:
+      m_Items:
+      - id: 2
   references:
     version: 1
     00000000:
@@ -44,3 +50,7 @@ MonoBehaviour:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_Entries: 02000000
+    00000002:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 05000000

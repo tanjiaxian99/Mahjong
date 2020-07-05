@@ -19,6 +19,7 @@ MonoBehaviour:
     m_Items:
     - id: 0
     - id: 1
+    - id: 2
   m_TableData:
   - m_Id: 1
     m_Localized: You can win with {fanTotal} fan
@@ -39,6 +40,16 @@ MonoBehaviour:
     m_Localized: fan
     m_Metadata:
       m_Items: []
+  - m_Id: 5
+    m_Localized: '{winnerName} has won with {fanTotal} fan and the following combos:
+
+      {combos}
+
+
+      {winLoseType}'
+    m_Metadata:
+      m_Items:
+      - id: 2
   references:
     version: 1
     00000000:
@@ -49,3 +60,7 @@ MonoBehaviour:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_Entries: 02000000
+    00000002:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 05000000

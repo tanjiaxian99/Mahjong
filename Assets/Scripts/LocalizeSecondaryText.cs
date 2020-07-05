@@ -5,7 +5,9 @@ using UnityEngine;
 using UnityEngine.Localization.Components;
 using UnityEngine.Localization.Settings;
 
-public class LocalizeSecondaryText : MonoBehaviour {
+public class LocalizeSecondaryText : MonoBehaviour, IResetVariables {
+
+    public string winnerName;
 
     public int fanTotal;
 
@@ -30,14 +32,12 @@ public class LocalizeSecondaryText : MonoBehaviour {
         } else {
             _instance = this;
         }
-    }
 
-    #endregion
-
-    void Start() {
         var settings = scriptManager.GetComponent<Settings>();
         settingsDict = settings.settingsDict;
     }
+
+    #endregion
 
     // https://forum.unity.com/threads/localizating-strings-on-script.847000/
     public void SetWinningCombos(List<string> winningCombos) {
@@ -51,12 +51,6 @@ public class LocalizeSecondaryText : MonoBehaviour {
             var o = LocalizationSettings.StringDatabase.GetLocalizedStringAsync("Secondary Text", "FAN");
             string translation = op.Result;
             string fanTranslation = o.Result;
-
-            //Debug.LogError(op.Status);
-            //if (op.IsDone)
-            //    translation = op.Result;
-            //else
-            //    op.Completed += (x) => translation = x.Result;
 
             if (combo.Contains("Dragon")) {
                 combos += translation + " = " + settingsDict["Dragon"] + " " + fanTranslation + "\n";
@@ -83,5 +77,12 @@ public class LocalizeSecondaryText : MonoBehaviour {
             op.Completed += (x) => translation = x.Result;
 
         return translation;
+    }
+
+    public void ResetVariables() {
+        winnerName = null;
+        fanTotal = 0;
+        combos = "";
+        winLoseType = null;
     }
 }

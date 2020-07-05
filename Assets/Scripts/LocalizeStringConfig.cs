@@ -44,7 +44,7 @@ public class LocalizeStringConfig : MonoBehaviour {
     }
 
     public void SetSecondaryText(string entry) {
-        //secondaryTextString.StringReference.RefreshString();
+        secondaryTextString.StringReference.RefreshString();
         secondaryTextString.StringReference.SetReference("Secondary Text", entry);
     }
 }

@@ -188,15 +188,15 @@ public class UI : MonoBehaviour {
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
-        LocalizeSecondaryText.Instance.SetWinningCombos(winningCombos);
         LocalizeSecondaryText.Instance.fanTotal = fanTotal;
+        LocalizeSecondaryText.Instance.SetWinningCombos(winningCombos);
         LocalizeSecondaryText.Instance.SetWinLoseType(winLoseType);
         LocalizeStringConfig.Instance.SetSecondaryText("YOU_HAVE_WON");
     }
 
     private void RemoteWinUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Another player has won";
+        LocalizeStringConfig.Instance.SetPrimaryText("ANOTHER_PLAYER_HAS_WON");
         uiType = "Another player has won";
 
         Player winner = (Player)objects[0];
@@ -207,18 +207,11 @@ public class UI : MonoBehaviour {
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
-        string combos = "";
-        foreach (string combo in winningCombos) {
-            if (combo.Contains("Dragon")) {
-                combos += combo + " = " + settingsDict["Dragon"] + " fan" + "\n";
-            } else {
-                combos += combo + " = " + settingsDict[combo] + " fan" + "\n";
-            }
-        }
-        combos = combos.TrimEnd('\n');
-        secondaryTextField.text = string.Format(
-            "{0} has won with {1} fan and the following combos:\n{2}\n\n{3}",
-            winner.NickName, fanTotal, combos, winLoseType);
+        LocalizeSecondaryText.Instance.winnerName = winner.NickName;
+        LocalizeSecondaryText.Instance.fanTotal = fanTotal;
+        LocalizeSecondaryText.Instance.SetWinningCombos(winningCombos);
+        LocalizeSecondaryText.Instance.SetWinLoseType(winLoseType);
+        LocalizeStringConfig.Instance.SetSecondaryText("ANOTHER_PLAYER_HAS_WON");
     }
 
     private void NoMoreTilesUI() {
@@ -279,28 +272,8 @@ public class UI : MonoBehaviour {
     /// Called upon clicking the 'Skip' button
     /// </summary>
     public void OnSkip() {
-        switch (primaryTextField.text) {
-            case "Sacred Discard":
-            case "Missed Discard":
-            case "Instant Payout: Hidden Cat and Rat":
-            case "Instant Payout: Cat and Rat":
-            case "Instant Payout: Hidden Chicken and Centipede":
-            case "Instant Payout: Chicken and Centipede":
-            case "Instant Payout: Complete Animal Group Payout":
-            case "Instant Payout: Hidden Bonus Tile Match Seat Wind Pair":
-            case "Instant Payout: Bonus Tile Match Seat Wind Pair":
-            case "Instant Payout: Complete Season Group Payout":
-            case "Instant Payout: Complete Flower Group Payout":
-            case "Instant Payout: Concealed Kong":
-            case "Instant Payout: Exposed Kong":
-            case "Instant Payout: Discard Kong":
-                ResetUI();
-                break;
-            case "Can Win":
-                winManager.OnWinSkip();
-                ResetUI();
-                break;
-        }
+        winManager.OnWinSkip();
+        ResetUI();
     }
 
     /// <summary>
