@@ -57,7 +57,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 11
-    m_Key: PLAYER_WIND_COMBO
+    m_Key: SEAT_WIND_COMBO
     m_Metadata:
       m_Items: []
   - m_Id: 12

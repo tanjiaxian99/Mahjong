@@ -216,7 +216,8 @@ public class UI : MonoBehaviour {
 
     private void NoMoreTilesUI() {
         uiPanel.SetActive(true);
-        primaryTextField.text = "There are no more tiles left";
+        LocalizeStringConfig.Instance.SetPrimaryText("THERE_ARE_NO_MORE_TILES_LEFT");
+        uiType = "There are no more tiles left";
     }
 
     #endregion
@@ -259,10 +260,11 @@ public class UI : MonoBehaviour {
                 ResetUI();
                 EventsManager.EventReadyForNewRound();
                 break;
-            //case "There are no more tiles left":
-            //    ResetUI();
-            //    EventsManager.EventReadyForNewRound();
-            //    break;
+
+            case "There are no more tiles left":
+                ResetUI();
+                EventsManager.EventReadyForNewRound();
+                break;
         }
 
         

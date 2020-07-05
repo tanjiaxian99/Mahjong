@@ -112,6 +112,10 @@ MonoBehaviour:
     m_Localized: Another player has won
     m_Metadata:
       m_Items: []
+  - m_Id: 27
+    m_Localized: There are no more tiles left
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:

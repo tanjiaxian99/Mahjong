@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
   m_Name: Primary Text Shared Data
   m_EditorClassIdentifier: 
-  m_NextAvailableId: 27
+  m_NextAvailableId: 28
   m_TableCollectionName: Primary Text
   m_TableCollectionNameGuidString: 84015380348e5f64b847724fe21c84db
   m_Entries:
@@ -106,6 +106,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 26
     m_Key: ANOTHER_PLAYER_HAS_WON
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27
+    m_Key: THERE_ARE_NO_MORE_TILES_LEFT
     m_Metadata:
       m_Items: []
   m_Metadata:

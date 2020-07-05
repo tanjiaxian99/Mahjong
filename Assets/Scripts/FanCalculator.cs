@@ -124,8 +124,8 @@ public class FanCalculator : MonoBehaviour {
 
             #region Fan in Honour Tiles
 
-            if (winningCombos.Contains("Player Wind Combo")) {
-                fanTotal += settingsDict["Player Wind Combo"];
+            if (winningCombos.Contains("Seat Wind Combo")) {
+                fanTotal += settingsDict["Seat Wind Combo"];
             }
 
             if (winningCombos.Contains("Prevailing Wind Combo")) {
@@ -363,7 +363,7 @@ public class FanCalculator : MonoBehaviour {
                 winningCombos.Add(this.FourBlessingsCheck(combinedHand));
 
                 if (winningCombos.Contains("Four Great Blessings")) {
-                    winningCombos.Remove("Player Wind Combo");
+                    winningCombos.Remove("Seat Wind Combo");
                     winningCombos.Remove("Prevailing Wind Combo");
                 }
             }
@@ -532,9 +532,9 @@ public class FanCalculator : MonoBehaviour {
         foreach (Tile tile in honourTilesCount.Keys) {
             if (honourTilesCount[tile] == 3) {
 
-                if (settingsDict["Player Wind Combo"] > 0) {
+                if (settingsDict["Seat Wind Combo"] > 0) {
                     if (tile.suit == Tile.Suit.Wind && DictManager.Instance.tileToWindDict[tile] == playerWind) {
-                        winningCombos.Add("Player Wind Combo");
+                        winningCombos.Add("Seat Wind Combo");
                     }
                 }
 
@@ -653,7 +653,7 @@ public class FanCalculator : MonoBehaviour {
 
             if (winningCombos.Contains("All Honour")) {
                 winningCombos.Remove("Triplets");
-                winningCombos.Remove("Player Wind Combo");
+                winningCombos.Remove("Seat Wind Combo");
                 winningCombos.Remove("Prevailing Wind Combo");
                 winningCombos.Remove("Dragon_One");
                 winningCombos.Remove("Dragon_Two");
@@ -763,7 +763,7 @@ public class FanCalculator : MonoBehaviour {
                 if (settingsDict["Four Great Blessings"] == 0) {
                     winningCombos.Remove("Four Great Blessings");
                 } else {
-                    winningCombos.Remove("Player Wind Combo");
+                    winningCombos.Remove("Seat Wind Combo");
                     winningCombos.Remove("Prevailing Wind Combo");
                 }
             }

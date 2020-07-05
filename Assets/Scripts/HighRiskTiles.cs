@@ -157,7 +157,7 @@ public class HighRiskTiles : MonoBehaviour {
         int animalTilesCount = 0;
         
 
-        // Bonus Tile Match Seat Wind: Season & Flower. Player Wind Combo: Wind. Prevailing Wind Combo: Wind
+        // Bonus Tile Match Seat Wind: Season & Flower. Seat Wind Combo: Wind. Prevailing Wind Combo: Wind
         foreach (Tile tile in openTiles) {
 
             if (tile == DictManager.Instance.windTo3TilesDict[playerWind][0] || tile == DictManager.Instance.windTo3TilesDict[playerWind][1]) {
@@ -182,7 +182,7 @@ public class HighRiskTiles : MonoBehaviour {
         }
 
         if (openTiles.Contains(DictManager.Instance.windTo3TilesDict[playerWind][2])) {
-            highRiskDict[DictManager.Instance.windTo3TilesDict[playerWind][2]] += settingsDict["Player Wind Combo"];
+            highRiskDict[DictManager.Instance.windTo3TilesDict[playerWind][2]] += settingsDict["Seat Wind Combo"];
         }
 
         if (openTiles.Contains(DictManager.Instance.windTo3TilesDict[prevailingWind][2])) {

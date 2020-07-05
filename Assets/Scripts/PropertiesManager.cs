@@ -320,7 +320,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
             SetSeatWind(wind);
             playerManager.seatWind = wind;
-            InfoPanel.Instance.SetSeatWind(wind);
+            LocalizeGeneralInfo.Instance.SeatWind = wind.ToString();
             Debug.LogFormat("The player's wind is {0}", playerManager.seatWind);
             // DEBUG
             PhotonNetwork.NickName = "Player" + (int)playerManager.seatWind;
@@ -330,7 +330,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
         } else if (propertiesThatChanged.ContainsKey(PrevailingWindPropKey)) {
             gameManager.prevailingWind = GetPrevailingWind();
-            InfoPanel.Instance.SetPrevailingWind(gameManager.prevailingWind);
+            LocalizeGeneralInfo.Instance.PrevailingWind = gameManager.prevailingWind.ToString();
             Debug.LogFormat("The prevailing wind is {0}", gameManager.prevailingWind);
 
         } else if (propertiesThatChanged.ContainsKey(TouchTilesPropKey)) {
@@ -338,7 +338,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
         } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
             gameManager.numberOfTilesLeft = GetWallTileList().Count;
-            InfoPanel.Instance.SetNumberOfTilesLeft(gameManager.numberOfTilesLeft);
+            LocalizeGeneralInfo.Instance.NumberOfTilesLeft = gameManager.numberOfTilesLeft;
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = GetDiscardTile();

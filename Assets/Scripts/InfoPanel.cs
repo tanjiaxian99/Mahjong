@@ -106,40 +106,6 @@ public class InfoPanel : MonoBehaviour {
     }
 
     /// <summary>
-    /// Update the seat wind of the local player in the info panel
-    /// </summary>
-    public void SetSeatWind(PlayerManager.Wind seatWind) {
-        string input = generalInfoText.text;
-        string pattern = @"(Seat Wind: )(\w*)(\s+Prevailing Wind: )(\w*)(\s+Number Of Tiles Left: )(\d*)";
-        string replacement = string.Format("$1{0}$3$4$5$6", seatWind);
-        string result = Regex.Replace(input, pattern, replacement);
-        generalInfoText.text = result;
-    }
-
-    /// <summary>
-    /// Update the prevailing wind in the info panel
-    /// </summary>
-    public void SetPrevailingWind(PlayerManager.Wind prevailingWind) {
-        string input = generalInfoText.text;
-        string pattern = @"(Seat Wind: )(\w*)(\s+Prevailing Wind: )(\w*)(\s+Number Of Tiles Left: )(\d*)";
-        string replacement = string.Format("$1$2$3{0}$5$6", prevailingWind);
-        string result = Regex.Replace(input, pattern, replacement);
-        generalInfoText.text = result;
-    }
-
-    /// <summary>
-    /// Update the number of tiles left in the info panel
-    /// </summary>
-    /// <param name="tilesLeft"></param>
-    public void SetNumberOfTilesLeft(int tilesLeft) {
-        string input = generalInfoText.text;
-        string pattern = @"(Seat Wind: )(\w*)(\s+Prevailing Wind: )(\w*)(\s+Number Of Tiles Left: )(\d*)";
-        string replacement = "$1$2$3$4${5}" + tilesLeft;
-        string result = Regex.Replace(input, pattern, replacement);
-        generalInfoText.text = result;
-    }
-
-    /// <summary>
     /// Sets the local/remote player's points tally
     /// </summary>
     public void SetPlayerPoints(Player player, int points) {

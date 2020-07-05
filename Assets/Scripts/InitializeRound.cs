@@ -175,7 +175,7 @@ public static class InitializeRound {
 
         // DEBUG
         tiles = new List<Tile>() {
-            new Tile(Tile.Suit.Character, Tile.Rank.One),
+            new Tile(Tile.Suit.Character, Tile.Rank.Four),
             new Tile(Tile.Suit.Character, Tile.Rank.Three),
             new Tile(Tile.Suit.Character, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
@@ -235,10 +235,10 @@ public static class InitializeRound {
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
                 playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Three));
-                
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+
                 EventsManager.EventDistributeTiles(player, playerTiles);
 
             } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.SOUTH) {

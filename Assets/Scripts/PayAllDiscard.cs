@@ -80,7 +80,7 @@ public class PayAllDiscard : MonoBehaviour {
 
     private bool IsPointLimit(PlayerManager playerManager, Tile discardTile, PlayerManager.Wind prevailingWind) {
         if (discardTile.suit == Tile.Suit.Wind && DictManager.Instance.tileToWindDict[discardTile] == playerManager.seatWind) {
-            if (playerManager.winningCombos.Contains("Player Wind Combo")) {
+            if (playerManager.winningCombos.Contains("Seat Wind Combo")) {
                 return true;
             }
         } else if (discardTile.suit == Tile.Suit.Wind && DictManager.Instance.tileToWindDict[discardTile] == prevailingWind) {
