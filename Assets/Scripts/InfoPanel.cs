@@ -61,6 +61,8 @@ public class InfoPanel : MonoBehaviour {
         } else {
             _instance = this;
         }
+
+        infoPanel.SetActive(true);
     }
 
     #endregion
@@ -80,7 +82,6 @@ public class InfoPanel : MonoBehaviour {
             ["Opposite"] = oppositePlayerText,
             ["Local"] = localPlayerText
         };
-        
 
         DefaultConfig();
     }

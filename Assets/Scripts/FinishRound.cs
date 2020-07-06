@@ -131,7 +131,7 @@ public class FinishRound : MonoBehaviour {
         scriptManager.GetComponent<SacredDiscardManager>().ResetVariables();
         scriptManager.GetComponent<MissedDiscardManager>().ResetVariables();
         scriptManager.GetComponent<Payment>().ResetVariables();
-        LocalizeSecondaryText.Instance.ResetVariables();
+        LocalizeWinCombos.Instance.ResetVariables();
     }
 
     /// <summary>

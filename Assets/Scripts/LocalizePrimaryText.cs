@@ -6,23 +6,18 @@ using UnityEngine.Localization.Components;
 using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
-public class LocalizeStringConfig : MonoBehaviour {
+public class LocalizePrimaryText : MonoBehaviour {
 
     [SerializeField]
     private Text primaryText;
 
-    [SerializeField]
-    private Text secondaryText;
-
     private LocalizeStringEvent primaryTextString;
-
-    private LocalizeStringEvent secondaryTextString;
 
     #region Singleton Initialization
 
-    private static LocalizeStringConfig _instance;
+    private static LocalizePrimaryText _instance;
 
-    public static LocalizeStringConfig Instance { get { return _instance; } }
+    public static LocalizePrimaryText Instance { get { return _instance; } }
 
     private void Awake() {
         if (_instance != null && _instance != this) {
@@ -36,15 +31,9 @@ public class LocalizeStringConfig : MonoBehaviour {
 
     void Start() {
         primaryTextString = primaryText.GetComponent<LocalizeStringEvent>();
-        secondaryTextString = secondaryText.GetComponent<LocalizeStringEvent>();
     }
 
     public void SetPrimaryText(string entry) {
         primaryTextString.StringReference.SetReference("Primary Text", entry);
-    }
-
-    public void SetSecondaryText(string entry) {
-        secondaryTextString.StringReference.RefreshString();
-        secondaryTextString.StringReference.SetReference("Secondary Text", entry);
     }
 }

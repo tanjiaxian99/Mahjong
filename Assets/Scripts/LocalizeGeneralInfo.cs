@@ -4,13 +4,15 @@ using UnityEngine;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Components;
 using UnityEngine.UI;
+using UnityEngine.Localization;
 
 public class LocalizeGeneralInfo : MonoBehaviour {
 
     private string seatWind;
 
     public string SeatWind {
-        get { return seatWind; }
+        get {
+            return seatWind; }
         set {
             var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync("Info", value);
             seatWind = op.Result;
@@ -22,12 +24,10 @@ public class LocalizeGeneralInfo : MonoBehaviour {
     public string PrevailingWind {
         get { return prevailingWind; }
         set {
-            var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync("Info", value + "");
+            var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync("Info", value);
             prevailingWind = op.Result;
         }
     }
-
-    private int numberOfTilesLeft;
 
     public int NumberOfTilesLeft { get; set; }
 

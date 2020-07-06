@@ -155,11 +155,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 35
-    m_Localized: Winning on Replacement Tile for Flower
+    m_Localized: Replacement Tile for Flower
     m_Metadata:
       m_Items: []
   - m_Id: 36
-    m_Localized: Winning on Replacement Tile for Kong
+    m_Localized: Replacement Tile for Kong
     m_Metadata:
       m_Items: []
   - m_Id: 37
@@ -180,6 +180,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 44
     m_Localized: Dragon_Three
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45
+    m_Localized: fan
     m_Metadata:
       m_Items: []
   references:

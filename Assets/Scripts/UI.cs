@@ -23,7 +23,10 @@ public class UI : MonoBehaviour {
     private GameObject spritesPanel;
 
     [SerializeField]
-    private GameObject secondaryText;
+    private GameObject comboPanel;
+
+    [SerializeField]
+    private GameObject fanTotalText;
 
     [SerializeField]
     private GameObject okButtonObject;
@@ -39,7 +42,7 @@ public class UI : MonoBehaviour {
 
     private Text primaryTextField;
 
-    private Text secondaryTextField;
+    private Text fanTotalTextField;
 
     private Button okButton;
 
@@ -69,7 +72,7 @@ public class UI : MonoBehaviour {
         winManager = scriptManager.GetComponent<WinManager>();
 
         primaryTextField = primaryText.GetComponent<Text>();
-        secondaryTextField = secondaryText.GetComponent<Text>();
+        fanTotalTextField = fanTotalText.GetComponent<Text>();
         okButton = okButtonObject.GetComponent<Button>();
 
         Settings settings = scriptManager.GetComponent<Settings>();
@@ -129,7 +132,7 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void InstantPayoutUI(params object[] objects) {
         uiPanel.SetActive(true);
-        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_" + (string)objects[0]);
+        LocalizePrimaryText.Instance.SetPrimaryText("INSTANT_PAYOUT_" + (string)objects[0]);
         uiType = "Instant Payout";
         AddSpriteTiles((List<Tile>)objects[1]);
     }
@@ -139,7 +142,7 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void RevertKongPayoutUI(params object[] objects) {
         uiPanel.SetActive(true);
-        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_REVERT_KONG");
+        LocalizePrimaryText.Instance.SetPrimaryText("INSTANT_PAYOUT_REVERT_KONG");
         uiType = "Revert Kong";
         AddSpriteTiles((List<Tile>)objects[0]);
     }
@@ -149,7 +152,7 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void SacredDiscardUI(params object[] objects) {
         uiPanel.SetActive(true);
-        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_SACRED_DISCARD");
+        LocalizePrimaryText.Instance.SetPrimaryText("INSTANT_PAYOUT_SACRED_DISCARD");
         uiType = "Sacred Discard";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
     }
@@ -159,7 +162,7 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void MissedDiscardUI(params object[] objects) {
         uiPanel.SetActive(true);
-        LocalizeStringConfig.Instance.SetPrimaryText("INSTANT_PAYOUT_MISSED_DISCARD");
+        LocalizePrimaryText.Instance.SetPrimaryText("INSTANT_PAYOUT_MISSED_DISCARD");
         uiType = "Missed Discard";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
     }
@@ -167,18 +170,16 @@ public class UI : MonoBehaviour {
     private void CanWinUI(params object[] objects) {
         uiPanel.SetActive(true);
         skipButtonObject.SetActive(true);
-        LocalizeStringConfig.Instance.SetPrimaryText("CAN_WIN");
+        LocalizePrimaryText.Instance.SetPrimaryText("CAN_WIN");
         uiType = "Can Win";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
 
-        LocalizeSecondaryText.Instance.fanTotal = (int)objects[1];
-        LocalizeStringConfig.Instance.SetSecondaryText("WIN_WITH_X_FAN");
-        
+        LocalizeWinCombos.Instance.SetFanTotal((int)objects[1]);        
     }
 
     private void OnWinOkUI(params object[] objects) {
         uiPanel.SetActive(true);
-        LocalizeStringConfig.Instance.SetPrimaryText("YOU_HAVE_WON");
+        LocalizePrimaryText.Instance.SetPrimaryText("YOU_HAVE_WON");
         uiType = "You have won!";
 
         Tile winningTile = (Tile)objects[0];
@@ -188,15 +189,14 @@ public class UI : MonoBehaviour {
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
-        LocalizeSecondaryText.Instance.fanTotal = fanTotal;
-        LocalizeSecondaryText.Instance.SetWinningCombos(winningCombos);
-        LocalizeSecondaryText.Instance.SetWinLoseType(winLoseType);
-        LocalizeStringConfig.Instance.SetSecondaryText("YOU_HAVE_WON");
+        LocalizeWinCombos.Instance.SetWinningCombos(winningCombos);
+        LocalizeWinCombos.Instance.SetFanTotal(fanTotal);
+        LocalizeWinCombos.Instance.SetWinLoseType(winLoseType);
     }
 
     private void RemoteWinUI(params object[] objects) {
         uiPanel.SetActive(true);
-        LocalizeStringConfig.Instance.SetPrimaryText("ANOTHER_PLAYER_HAS_WON");
+        LocalizePrimaryText.Instance.SetPrimaryText("ANOTHER_PLAYER_HAS_WON");
         uiType = "Another player has won";
 
         Player winner = (Player)objects[0];
@@ -207,16 +207,15 @@ public class UI : MonoBehaviour {
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
-        LocalizeSecondaryText.Instance.winnerName = winner.NickName;
-        LocalizeSecondaryText.Instance.fanTotal = fanTotal;
-        LocalizeSecondaryText.Instance.SetWinningCombos(winningCombos);
-        LocalizeSecondaryText.Instance.SetWinLoseType(winLoseType);
-        LocalizeStringConfig.Instance.SetSecondaryText("ANOTHER_PLAYER_HAS_WON");
+        LocalizeWinCombos.Instance.winnerName = winner.NickName;
+        LocalizeWinCombos.Instance.SetFanTotal(fanTotal);
+        LocalizeWinCombos.Instance.SetWinningCombos(winningCombos);
+        LocalizeWinCombos.Instance.SetWinLoseType(winLoseType);
     }
 
     private void NoMoreTilesUI() {
         uiPanel.SetActive(true);
-        LocalizeStringConfig.Instance.SetPrimaryText("THERE_ARE_NO_MORE_TILES_LEFT");
+        LocalizePrimaryText.Instance.SetPrimaryText("THERE_ARE_NO_MORE_TILES_LEFT");
         uiType = "There are no more tiles left";
     }
 
@@ -287,8 +286,10 @@ public class UI : MonoBehaviour {
         primaryText.SetActive(true);
         primaryTextField.text = "";
 
-        secondaryText.SetActive(true);
-        secondaryTextField.text = "";
+        comboPanel.SetActive(true);
+        foreach (Transform child in comboPanel.transform) {
+            child.gameObject.SetActive(false);
+        }
 
         spritesPanel.SetActive(true);
         foreach (Transform imageTransform in spritesPanel.transform) {
@@ -296,6 +297,9 @@ public class UI : MonoBehaviour {
             Image image = imageTransform.GetComponent<Image>();
             image.color = new Color(1f, 1f, 1f);
         }
+
+        fanTotalText.SetActive(true);
+        fanTotalTextField.text = "";
 
         okButtonObject.SetActive(true);
         skipButtonObject.SetActive(false);
@@ -306,7 +310,10 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void ResetUI() {
         uiPanel.SetActive(false);
-        skipButtonObject.SetActive(false);
+        
+        foreach (Transform child in comboPanel.transform) {
+            child.gameObject.SetActive(false);
+        }
 
         foreach (Transform imageTransform in spritesPanel.transform) {
             imageTransform.gameObject.SetActive(false);
@@ -314,6 +321,8 @@ public class UI : MonoBehaviour {
             image.color = new Color(1f, 1f, 1f);
         }
 
-        secondaryTextField.text = "";
+        fanTotalTextField.text = "";
+
+        skipButtonObject.SetActive(false);
     }
 }
