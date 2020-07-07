@@ -120,10 +120,18 @@ public class WinManager : MonoBehaviour {
     /// Called when "Ok" button is clicked for the win
     /// </summary>
     public void OnWinOk() {
+        int numberOfTilesLeft = gameManager.numberOfTilesLeft;
+        bool isFreshTile = gameManager.isFreshTile;
+
         // Check if the discard tile is a high risk discard
         if (payAllDiscard.shouldPayForAll(playerManager, tilesManager, gameManager.prevailingWind, gameManager.latestDiscardTile, "Win")) {
             PropertiesManager.SetPayAllPlayer(gameManager.discardPlayer);
             gameManager.payAllPlayer = gameManager.discardPlayer;
+        }
+
+        if (playerManager.winningCombos.Contains("Winning on Replacement Tile for Kong") && numberOfTilesLeft < 22 && isFreshTile) {
+            PropertiesManager.SetPayAllPlayer(payment.kongDiscardPlayer);
+            gameManager.payAllPlayer = payment.kongDiscardPlayer;
         }
 
         if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
@@ -160,9 +168,7 @@ public class WinManager : MonoBehaviour {
         } else if (playerManager.winningCombos.Contains("Robbing the Eighth")) {
             PropertiesManager.SetSpecialTile(new Tuple<int, Tile, float>(gameManager.bonusPlayer.ActorNumber, gameManager.latestBonusTile, -100));
         }
-
-        int numberOfTilesLeft = gameManager.numberOfTilesLeft;
-        bool isFreshTile = gameManager.isFreshTile;
+        
         Player discardPlayer;
 
         if (playerManager.winningCombos.Contains("Robbing the Kong")) {

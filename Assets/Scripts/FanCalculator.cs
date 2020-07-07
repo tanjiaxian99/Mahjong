@@ -410,7 +410,7 @@ public class FanCalculator : MonoBehaviour {
     /// </summary>
     private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind? discardPlayerWind, Tile discardTile, bool hasDrawnTile, int turn) {
         if (settingsDict["Heavenly Hand"] > 0) {
-            winningCombos.Add(HeavenlyHandCheck(playerWind, discardTile, turn));
+            winningCombos.Add(HeavenlyHandCheck(playerWind, discardTile, hasDrawnTile, turn));
 
             if (winningCombos.Contains("Heavenly Hand")) {
                 return;
@@ -865,8 +865,8 @@ public class FanCalculator : MonoBehaviour {
     /// Determine if the hand is a Heavenly Hand
     /// </summary>
     /// <returns></returns>
-    private string HeavenlyHandCheck(PlayerManager.Wind playerWind, Tile discardTile, int turn) {
-        if (playerWind == PlayerManager.Wind.EAST && turn == 1 && discardTile == null) {
+    private string HeavenlyHandCheck(PlayerManager.Wind playerWind, Tile discardTile, bool hasDrawnTile, int turn) {
+        if (playerWind == PlayerManager.Wind.EAST && turn == 1 && discardTile == null && !hasDrawnTile) {
             return "Heavenly Hand";
         }
         return null;
@@ -996,7 +996,7 @@ public class FanCalculator : MonoBehaviour {
             return null;
         }
 
-        if (comboListNoDuplicate.Contains("Pong")) {
+        if (comboListNoDuplicate.Contains("Pong") || comboListNoDuplicate.Contains("Kong")) {
             return null;
         }
 

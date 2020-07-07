@@ -17,6 +17,7 @@ public class Payment : MonoBehaviour, IResetVariables {
     private Dictionary<Player, List<string>> instantPaymentDict;
     private Player latestKongPlayer;
     private string latestKongType;
+    public Player kongDiscardPlayer;
 
     private List<Tile> seasonGroupTiles;
     private List<Tile> flowerGroupTiles;
@@ -400,6 +401,7 @@ public class Payment : MonoBehaviour, IResetVariables {
 
         } else {
             instantPaymentDict[player].Add("Discard Kong");
+            kongDiscardPlayer = discardPlayer;
 
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.Points += minPoint * (int)Math.Pow(2, settingsDict["Discard and Exposed Kong Payout"]) * 3;
@@ -484,7 +486,7 @@ public class Payment : MonoBehaviour, IResetVariables {
             Debug.Log("Checkpoint 2");
             if (playerManager.payForAll == "Local") {
                 if (discardPlayer == null) {
-                    playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2 * 4;
+                    playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 2 * 3;
                 } else {
                     playerManager.Points -= minPoint * (int)Math.Pow(2, fan - 1) * 4;
                 }
@@ -556,6 +558,7 @@ public class Payment : MonoBehaviour, IResetVariables {
         instantPaymentDict.Clear();
         latestKongPlayer = null;
         latestKongType = null;
+        kongDiscardPlayer = null;
         kongTypeCount.Clear();
     }
 }

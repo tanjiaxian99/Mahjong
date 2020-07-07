@@ -175,6 +175,8 @@ public static class InitializeRound {
 
         // DEBUG
         tiles = new List<Tile>() {
+            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
             new Tile(Tile.Suit.Character, Tile.Rank.Four),
             new Tile(Tile.Suit.Character, Tile.Rank.Three),
             new Tile(Tile.Suit.Character, Tile.Rank.Three),
@@ -227,7 +229,7 @@ public static class InitializeRound {
                     new Tile(Tile.Suit.Character, Tile.Rank.Two),
                     new Tile(Tile.Suit.Character, Tile.Rank.Three),
                     new Tile(Tile.Suit.Character, Tile.Rank.Seven),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Eight),
                     new Tile(Tile.Suit.Dot, Tile.Rank.One),
                     new Tile(Tile.Suit.Dot, Tile.Rank.Two),
                     new Tile(Tile.Suit.Dot, Tile.Rank.Three),

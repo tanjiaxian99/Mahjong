@@ -168,6 +168,7 @@ public class KongManager : MonoBehaviour {
 
         // Always draw a tile regardless of Kong type
         hand.Add(playerManager.DrawTile());
+        playerManager.hasDrawnTile = true;
         gameManager.latestDiscardTile = null;
         gameManager.discardPlayer = null;
 

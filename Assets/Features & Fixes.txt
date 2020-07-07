@@ -1,11 +1,18 @@
-- Replacement tile on Kong Pay All
-- Self-sort after initial sort
+Unidentifiable issues:
+- All copies of unity crashing simultaneously
+- Discarding the drawn tile may sometimes lead to a equivalent hand tile getting discarded instead. Not too sure what is the issue, since
+  xPos of hitobject is given.
+
+Requested features:
+- Ability to self-sort tiles after initial sort
+
+Implementable features:
 - Speech bubble when player has pong/kong/win
 - Winning combos change when locale change => Set locale before entering room
-- If the hand contains the drawn tile and the drawn tile is then discarded, the tile in the hand will be the one thrown away
-  (can't identify the problem, since xPos of hitobject is given)
 - Add dealer's dice
-- All copies of unity crashing simultaneously
+- Settings
 - Join rooms
 
+Future:
+- CheckWin first before Kong is allowed => no need for Revert Kong Payout
 

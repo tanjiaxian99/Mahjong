@@ -412,7 +412,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             } else if (discardTileInfo.Item3 == 3) {
                 gameManager.kongPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
                 gameManager.latestKongTile = discardTileInfo.Item2;
-
+                
                 if (PhotonNetwork.IsMasterClient) {
                     SetTileType("Concealed Kong");
                 }
