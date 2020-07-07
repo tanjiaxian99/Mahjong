@@ -12,60 +12,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
   m_Name: Win Lose Type Shared Data
   m_EditorClassIdentifier: 
-  m_NextAvailableId: 16
+  m_NextAvailableId: 22
   m_TableCollectionName: Win Lose Type
   m_TableCollectionNameGuidString: 1732a90b80cf57448913324bd588cb2c
   m_Entries:
-  - m_Id: 1
-    m_Key: WINNER_SELF_PICK
+  - m_Id: 16
+    m_Key: NORMAL_WIN
     m_Metadata:
       m_Items: []
-  - m_Id: 2
-    m_Key: WINNER_NON_SELF_PICK
+  - m_Id: 17
+    m_Key: SELF_PICK
     m_Metadata:
       m_Items: []
-  - m_Id: 3
-    m_Key: LOSER_DISCARDED_FRESH_TILE_FOR_WIN
+  - m_Id: 18
+    m_Key: DISCARD
     m_Metadata:
       m_Items: []
-  - m_Id: 15
-    m_Key: NEUTRAL_SOMEONE_ELSE_DISCARDED_THE_FRESH_TILE
+  - m_Id: 19
+    m_Key: FRESH_TILE_DISCARD
     m_Metadata:
       m_Items: []
-  - m_Id: 4
-    m_Key: LOSER_PAYING_FOR_ALL_PLAYERS_SELF_PICK
+  - m_Id: 20
+    m_Key: PAY_FOR_ALL
     m_Metadata:
       m_Items: []
-  - m_Id: 5
-    m_Key: LOSER_PAYING_FOR_ALL_PLAYERS_NON_SELF_PICK
-    m_Metadata:
-      m_Items: []
-  - m_Id: 7
-    m_Key: NEUTRAL_SOMEONE_ELSE_PAYING_FOR_ALL_PLAYERS
-    m_Metadata:
-      m_Items: []
-  - m_Id: 8
-    m_Key: LOSER_SHOOTER_PAY
-    m_Metadata:
-      m_Items: []
-  - m_Id: 9
-    m_Key: LOSER_SHOOTER_PAY_BUT_SELP_PICK
-    m_Metadata:
-      m_Items: []
-  - m_Id: 10
-    m_Key: NEUTRAL_NON_SHOOTER
-    m_Metadata:
-      m_Items: []
-  - m_Id: 11
-    m_Key: LOSER_WINNER_SELF_PICK
-    m_Metadata:
-      m_Items: []
-  - m_Id: 12
-    m_Key: LOSER_LOCAL_PLAYER_DISCARDED_THE_WINNING_TILE
-    m_Metadata:
-      m_Items: []
-  - m_Id: 13
-    m_Key: LOSER_NORMAL
+  - m_Id: 21
+    m_Key: SHOOTER
     m_Metadata:
       m_Items: []
   m_Metadata:

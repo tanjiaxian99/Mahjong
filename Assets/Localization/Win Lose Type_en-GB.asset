@@ -18,56 +18,28 @@ MonoBehaviour:
   m_Metadata:
     m_Items: []
   m_TableData:
-  - m_Id: 1
-    m_Localized: 'Winner: Self-pick'
+  - m_Id: 16
+    m_Localized: Win
     m_Metadata:
       m_Items: []
-  - m_Id: 2
-    m_Localized: 'Winner: Non Self-pick'
+  - m_Id: 17
+    m_Localized: Self-Pick
     m_Metadata:
       m_Items: []
-  - m_Id: 3
-    m_Localized: 'Loser: Discard Fresh Tile For Win'
+  - m_Id: 18
+    m_Localized: Discard
     m_Metadata:
       m_Items: []
-  - m_Id: 4
-    m_Localized: 'Loser: Paying for all players, Self-pick'
+  - m_Id: 19
+    m_Localized: Fresh Tile Discard
     m_Metadata:
       m_Items: []
-  - m_Id: 5
-    m_Localized: 'Loser: Paying for all players, Non Self-pick'
+  - m_Id: 20
+    m_Localized: Pay For All
     m_Metadata:
       m_Items: []
-  - m_Id: 7
-    m_Localized: 'Neutral: Someone else paying for all players'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 8
-    m_Localized: 'Loser: Shooter Pay'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 9
-    m_Localized: 'Loser: Shooter Pay, but Self-pick'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 10
-    m_Localized: 'Neutral: Non-shooter'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 11
-    m_Localized: 'Loser: Winner Self-pick'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 12
-    m_Localized: 'Loser: Local player discarded the winning tile'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 13
-    m_Localized: 'Loser: Normal'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 15
-    m_Localized: 'Neutral: Someone else discarded the Fresh Tile'
+  - m_Id: 21
+    m_Localized: Shooter
     m_Metadata:
       m_Items: []
   references:

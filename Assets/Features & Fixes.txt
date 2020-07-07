@@ -1,8 +1,7 @@
 - Replacement tile on Kong Pay All
 - Self-sort after initial sort
 - Speech bubble when player has pong/kong/win
-- Words in Chinese (winning combos change when locale change)
-- UI objects must be active for scripts to run
+- Winning combos change when locale change => Set locale before entering room
 - If the hand contains the drawn tile and the drawn tile is then discarded, the tile in the hand will be the one thrown away
   (can't identify the problem, since xPos of hitobject is given)
 - Add dealer's dice

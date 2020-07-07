@@ -77,6 +77,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
 
     public Tile latestBonusTile;
 
+    public Player payAllPlayer;
+
     public bool isFreshTile;
 
     public int turn;
@@ -287,6 +289,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
         latestKongTile = null;
         bonusPlayer = null;
         latestBonusTile = null;
+        payAllPlayer = null;
         isFreshTile = true;
         turn = 0;
     }

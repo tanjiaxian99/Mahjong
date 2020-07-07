@@ -179,7 +179,7 @@ public static class InitializeRound {
             new Tile(Tile.Suit.Character, Tile.Rank.Three),
             new Tile(Tile.Suit.Character, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Character, Tile.Rank.One),
+            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
@@ -222,79 +222,79 @@ public static class InitializeRound {
         // DEBUG
         foreach (Player player in PhotonNetwork.PlayerList) {
             if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.EAST) {
-                List<Tile> playerTiles = new List<Tile>();
-
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
+                List<Tile> playerTiles = new List<Tile>() {
+                    new Tile(Tile.Suit.Character, Tile.Rank.One),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.One)
+                };
 
                 EventsManager.EventDistributeTiles(player, playerTiles);
 
             } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.SOUTH) {
-                List<Tile> playerTiles = new List<Tile>();
-
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                List<Tile> playerTiles = new List<Tile>() {
+                    new Tile(Tile.Suit.Character, Tile.Rank.One),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+                    new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dragon, Tile.Rank.Three)
+                };
 
                 EventsManager.EventDistributeTiles(player, playerTiles);
 
             } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.WEST) {
-                List<Tile> playerTiles = new List<Tile>();
-
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Three));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Three));
+                List<Tile> playerTiles = new List<Tile>() {
+                    new Tile(Tile.Suit.Character, Tile.Rank.Four),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+                    new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Dragon, Tile.Rank.Three)
+                };
 
                 EventsManager.EventDistributeTiles(player, playerTiles);
 
             } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.NORTH) {
-                List<Tile> playerTiles = new List<Tile>();
-
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Character, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Wind, Tile.Rank.Four));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Seven));
-                playerTiles.Add(new Tile(Tile.Suit.Dot, Tile.Rank.Nine));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.One));
-                playerTiles.Add(new Tile(Tile.Suit.Dragon, Tile.Rank.Two));
-                playerTiles.Add(new Tile(Tile.Suit.Bamboo, Tile.Rank.Five));
+                List<Tile> playerTiles = new List<Tile>() {
+                    new Tile(Tile.Suit.Character, Tile.Rank.One),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Four),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
+                    new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
+                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                    new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Five)
+                };
 
                 EventsManager.EventDistributeTiles(player, playerTiles);
             }

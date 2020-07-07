@@ -34,6 +34,9 @@ public class UI : MonoBehaviour {
     [SerializeField]
     private GameObject skipButtonObject;
 
+    [SerializeField]
+    private GameObject winLosePanel;
+
     #endregion
 
     #region Retrieved Components
@@ -185,13 +188,13 @@ public class UI : MonoBehaviour {
         Tile winningTile = (Tile)objects[0];
         int fanTotal = (int)objects[1];
         List<string> winningCombos = (List<string>)objects[2];
-        string winLoseType = (string)objects[3];
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
         LocalizeWinCombos.Instance.SetWinningCombos(winningCombos);
         LocalizeWinCombos.Instance.SetFanTotal(fanTotal);
-        LocalizeWinCombos.Instance.SetWinLoseType(winLoseType);
+        LocalizeWinLoseType.Instance.SetWinLosePanel();
+        winLosePanel.SetActive(true);
     }
 
     private void RemoteWinUI(params object[] objects) {
@@ -203,14 +206,14 @@ public class UI : MonoBehaviour {
         Tile winningTile = (Tile)objects[1];
         int fanTotal = (int)objects[2];
         List<string> winningCombos = (List<string>)objects[3];
-        string winLoseType = (string)objects[4];
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
         LocalizeWinCombos.Instance.winnerName = winner.NickName;
         LocalizeWinCombos.Instance.SetFanTotal(fanTotal);
         LocalizeWinCombos.Instance.SetWinningCombos(winningCombos);
-        LocalizeWinCombos.Instance.SetWinLoseType(winLoseType);
+        LocalizeWinLoseType.Instance.SetWinLosePanel();
+        winLosePanel.SetActive(true);
     }
 
     private void NoMoreTilesUI() {
@@ -280,7 +283,7 @@ public class UI : MonoBehaviour {
     /// <summary>
     /// The default UI configuration
     /// </summary>
-    private void DefaultUI() {
+    private void DefaultUI() { 
         uiPanel.SetActive(false);
 
         primaryText.SetActive(true);
@@ -303,6 +306,11 @@ public class UI : MonoBehaviour {
 
         okButtonObject.SetActive(true);
         skipButtonObject.SetActive(false);
+
+        winLosePanel.SetActive(false);
+        foreach (Transform child in winLosePanel.transform) {
+            child.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -324,5 +332,10 @@ public class UI : MonoBehaviour {
         fanTotalTextField.text = "";
 
         skipButtonObject.SetActive(false);
+
+        winLosePanel.SetActive(false);
+        foreach (Transform child in winLosePanel.transform) {
+            child.gameObject.SetActive(false);
+        }
     }
 }

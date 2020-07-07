@@ -425,6 +425,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
         } else if (propertiesThatChanged.ContainsKey(PayAllPlayerPropKey)) {
             Player player = GetPayAllPlayer();
+            gameManager.payAllPlayer = player;
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.payForAll = "Local";
             } else {
