@@ -64,6 +64,13 @@ MonoBehaviour:
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
+  - m_GUID: c46892eb17d38744a88c602d9a479684
+    m_Address: Action Shared Data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 4013b297a5689394e92b7c11cbcd496a, type: 2}
   m_SchemaSet:

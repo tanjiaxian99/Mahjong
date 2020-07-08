@@ -118,11 +118,11 @@ public class LocalizeWinLoseType : MonoBehaviour, IResetVariables {
     public void SetWinLosePanel() {
         foreach (string entry in winLoseDict.Keys) {
             Player player = winLoseDict[entry];
-            string remotePos = RemotePlayer.RelativePlayerPosition(player);
-            LocalizeStringEvent stringEvent = stringDict[remotePos];
+            string pos = RemotePlayer.RelativePlayerPosition(player);
+            LocalizeStringEvent stringEvent = stringDict[pos];
             stringEvent.StringReference.SetReference("Win Lose Type", entry);
 
-            Text playerText = textDict[remotePos];
+            Text playerText = textDict[pos];
             playerText.transform.parent.gameObject.SetActive(true);
         }
     }

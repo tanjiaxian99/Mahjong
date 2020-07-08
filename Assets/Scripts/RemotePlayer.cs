@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SocialPlatforms;
 
 public static class RemotePlayer {
 
@@ -223,8 +224,12 @@ public static class RemotePlayer {
             return "Opposite";
         }
 
-        //Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
-        return "Local";
+        if (remotePlayer == PhotonNetwork.LocalPlayer) {
+            return "Local";
+        }
+
+        Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
+        return null;
     }
 
 

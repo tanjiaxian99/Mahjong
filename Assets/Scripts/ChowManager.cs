@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Photon.Realtime;
+using Photon.Pun;
 
 public class ChowManager : MonoBehaviour {
 
@@ -123,6 +124,8 @@ public class ChowManager : MonoBehaviour {
 
         // Update discard tile properties to indicate to all players to remove the latest discard tile
         PropertiesManager.SetDiscardTile(new Tuple<int, Tile, float>(-1, new Tile(0, 0), 0));
+        StartCoroutine(LocalizeActionPanel.Instance.SetAction(PhotonNetwork.LocalPlayer, "CHOW"));
+        EventsManager.EventChowPongKong("CHOW");
 
         // Update both the player's hand and the combo tiles list
         foreach (Tile tile in handTile) {

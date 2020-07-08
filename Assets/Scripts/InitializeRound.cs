@@ -175,11 +175,6 @@ public static class InitializeRound {
 
         // DEBUG
         tiles = new List<Tile>() {
-            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Character, Tile.Rank.Four),
-            new Tile(Tile.Suit.Character, Tile.Rank.Three),
-            new Tile(Tile.Suit.Character, Tile.Rank.Three),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
             new Tile(Tile.Suit.Character, Tile.Rank.Seven),
             new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
@@ -227,7 +222,7 @@ public static class InitializeRound {
                 List<Tile> playerTiles = new List<Tile>() {
                     new Tile(Tile.Suit.Character, Tile.Rank.One),
                     new Tile(Tile.Suit.Character, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Three),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Five),
                     new Tile(Tile.Suit.Character, Tile.Rank.Seven),
                     new Tile(Tile.Suit.Character, Tile.Rank.Eight),
                     new Tile(Tile.Suit.Dot, Tile.Rank.One),
@@ -246,11 +241,11 @@ public static class InitializeRound {
             } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.SOUTH) {
                 List<Tile> playerTiles = new List<Tile>() {
                     new Tile(Tile.Suit.Character, Tile.Rank.One),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Five),
                     new Tile(Tile.Suit.Dot, Tile.Rank.One),
                     new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
                     new Tile(Tile.Suit.Wind, Tile.Rank.One),
                     new Tile(Tile.Suit.Wind, Tile.Rank.Two),
                     new Tile(Tile.Suit.Wind, Tile.Rank.Three),
@@ -264,12 +259,12 @@ public static class InitializeRound {
 
             } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.WEST) {
                 List<Tile> playerTiles = new List<Tile>() {
-                    new Tile(Tile.Suit.Character, Tile.Rank.Four),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Six),
                     new Tile(Tile.Suit.Character, Tile.Rank.Seven),
                     new Tile(Tile.Suit.Dot, Tile.Rank.One),
                     new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
                     new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
                     new Tile(Tile.Suit.Wind, Tile.Rank.One),
                     new Tile(Tile.Suit.Wind, Tile.Rank.Two),
                     new Tile(Tile.Suit.Wind, Tile.Rank.Three),

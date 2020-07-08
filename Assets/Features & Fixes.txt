@@ -7,7 +7,6 @@ Requested features:
 - Ability to self-sort tiles after initial sort
 
 Implementable features:
-- Speech bubble when player has pong/kong/win
 - Winning combos change when locale change => Set locale before entering room
 - Add dealer's dice
 - Settings
