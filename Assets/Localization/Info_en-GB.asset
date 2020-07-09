@@ -18,19 +18,11 @@ MonoBehaviour:
   m_Metadata:
     m_Items:
     - id: 0
+    - id: 1
+    - id: 2
+    - id: 3
+    - id: 4
   m_TableData:
-  - m_Id: 1
-    m_Localized: 'Seat Wind: {SeatWind}
-
-
-      Prevailing Wind: {PrevailingWind}
-
-
-      Number
-      Of Tiles Left: {NumberOfTilesLeft}'
-    m_Metadata:
-      m_Items:
-      - id: 0
   - m_Id: 4
     m_Localized: East
     m_Metadata:
@@ -47,9 +39,43 @@ MonoBehaviour:
     m_Localized: North
     m_Metadata:
       m_Items: []
+  - m_Id: 8
+    m_Localized: 'Seat Wind: {SeatWind}'
+    m_Metadata:
+      m_Items:
+      - id: 1
+  - m_Id: 9
+    m_Localized: 'Prevailing Wind: {PrevailingWind}
+
+'
+    m_Metadata:
+      m_Items:
+      - id: 2
+      - id: 3
+  - m_Id: 10
+    m_Localized: 'Tiles Left: {TilesLeft}'
+    m_Metadata:
+      m_Items:
+      - id: 4
   references:
     version: 1
     00000000:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_Entries: 01000000
+    00000001:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 08000000
+    00000002:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 09000000
+    00000003:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 09000000
+    00000004:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 0a000000

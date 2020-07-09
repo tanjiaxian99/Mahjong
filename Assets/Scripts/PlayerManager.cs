@@ -142,6 +142,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     /// </summary>
     public void InitialLocalInstantiation() {
         InstantiateDice(seatWind);
+        StartCoroutine(InfoPanel.Instance.ShowPrevailingWind());
 
         // Check the local player's hand for bonus tiles. If there are, convert them to normal tiles.
         while (true) {

@@ -7,8 +7,7 @@ Requested features:
 - Ability to self-sort tiles after initial sort
 
 Implementable features:
-- Show Prevailing Wind at start of round
-- Choice to display seatWind
+- Choice to display seatWind and prevailingWind
 - Winning combos change when locale change => Set locale before entering room
 - Settings
 - Join rooms
