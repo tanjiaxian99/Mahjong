@@ -241,11 +241,11 @@ public static class InitializeRound {
             } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.SOUTH) {
                 List<Tile> playerTiles = new List<Tile>() {
                     new Tile(Tile.Suit.Character, Tile.Rank.One),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Five),
+                    new Tile(Tile.Suit.Character, Tile.Rank.Nine),
                     new Tile(Tile.Suit.Dot, Tile.Rank.One),
                     new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
                     new Tile(Tile.Suit.Wind, Tile.Rank.One),
                     new Tile(Tile.Suit.Wind, Tile.Rank.Two),
                     new Tile(Tile.Suit.Wind, Tile.Rank.Three),

@@ -16,6 +16,9 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
 
     public Wind seatWind { get; set; }
 
+    [SerializeField]
+    private GameObject die;
+
     public bool myTurn;
 
     public bool canTouchHandTiles;
@@ -138,6 +141,8 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     /// Called by the local player once Hidden Instant Payouts have been settled. Bonus tiles are converted
     /// </summary>
     public void InitialLocalInstantiation() {
+        InstantiateDice(seatWind);
+
         // Check the local player's hand for bonus tiles. If there are, convert them to normal tiles.
         while (true) {
             bool haveBonusTile = false;
@@ -161,6 +166,56 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
+    }
+
+
+    /// <summary>
+    /// Called by the local player to instantiate the dice at the East player.
+    /// </summary>
+    /// <param name="seatWind"></param>
+    public void InstantiateDice(Wind seatWind) {
+        GameObject remoteDie;
+
+        switch (seatWind) {
+            case Wind.EAST:
+                Instantiate(die, new Vector3(-6.4f, 0.75f, -4.6f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                Instantiate(die, new Vector3(-6.95f, 0.75f, -4.6f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                Instantiate(die, new Vector3(-6.6f, 0.75f, -4.1f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                break;
+
+            case Wind.SOUTH:
+                remoteDie = Instantiate(die, new Vector3(-gameManager.tableWidth / 2 + 0.4f, 0.65f, 3.5f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(-gameManager.tableWidth / 2 + 0.65f, 0.65f, 3.3f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(-gameManager.tableWidth / 2 + 0.4f, 0.65f, 3.2f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                break;
+
+            case Wind.WEST:
+                remoteDie = Instantiate(die, new Vector3(3.2f, 0.65f, 4.6f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(3.5f, 0.65f, 4.6f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(3.3f, 0.65f, 4.3f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                break;
+
+            case Wind.NORTH:
+                remoteDie = Instantiate(die, new Vector3(gameManager.tableWidth / 2 - 0.4f, 0.65f, -3.5f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(gameManager.tableWidth / 2 - 0.65f, 0.65f, -3.3f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(gameManager.tableWidth / 2 - 0.4f, 0.65f, -3.2f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                break;
+        }
     }
 
 

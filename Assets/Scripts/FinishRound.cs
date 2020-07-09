@@ -136,7 +136,7 @@ public class FinishRound : MonoBehaviour {
     }
 
     /// <summary>
-    /// Destroy all tiles on the game table. 
+    /// Destroy all tiles and dice on the game table. 
     /// </summary>
     private void ClearGameTable() {
         GameObject[] allGameObjects = FindObjectsOfType<GameObject>();

@@ -12305,6 +12305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4de396911bdeaa4db43783efc876aaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  die: {fileID: -927199367670048503, guid: feac791250be93e41ac4b3062e739f24, type: 3}
   myTurn: 0
   canTouchHandTiles: 0
   payForAll: 
