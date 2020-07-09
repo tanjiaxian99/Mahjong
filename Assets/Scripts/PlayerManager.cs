@@ -16,6 +16,9 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
 
     public Wind seatWind { get; set; }
 
+    [SerializeField]
+    private GameObject die;
+
     public bool myTurn;
 
     public bool canTouchHandTiles;
@@ -35,6 +38,8 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     }
 
     public string payForAll;
+
+    public bool hasDrawnTile;
 
     public int fanTotal;
 
@@ -76,6 +81,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         myTurn = false;
         canTouchHandTiles = false;
         payForAll = "";
+        hasDrawnTile = false;
 
         gameManager = scriptManager.GetComponent<GameManager>();
         playerManager = scriptManager.GetComponent<PlayerManager>();
@@ -88,6 +94,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         payment = scriptManager.GetComponent<Payment>();
         winManager = scriptManager.GetComponent<WinManager>();
     }
+
 
     /// <summary>
     /// Point the camera towards the GameTable and stretch the GameTable to fill up the screen
@@ -134,6 +141,9 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     /// Called by the local player once Hidden Instant Payouts have been settled. Bonus tiles are converted
     /// </summary>
     public void InitialLocalInstantiation() {
+        InstantiateDice(seatWind);
+        StartCoroutine(InfoPanel.Instance.ShowPrevailingWind());
+
         // Check the local player's hand for bonus tiles. If there are, convert them to normal tiles.
         while (true) {
             bool haveBonusTile = false;
@@ -157,6 +167,56 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         
         this.InstantiateLocalHand();
         this.InstantiateLocalOpenTiles();
+    }
+
+
+    /// <summary>
+    /// Called by the local player to instantiate the dice at the East player.
+    /// </summary>
+    /// <param name="seatWind"></param>
+    public void InstantiateDice(Wind seatWind) {
+        GameObject remoteDie;
+
+        switch (seatWind) {
+            case Wind.EAST:
+                Instantiate(die, new Vector3(-6.4f, 0.75f, -4.6f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                Instantiate(die, new Vector3(-6.95f, 0.75f, -4.6f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                Instantiate(die, new Vector3(-6.6f, 0.75f, -4.1f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                break;
+
+            case Wind.SOUTH:
+                remoteDie = Instantiate(die, new Vector3(-gameManager.tableWidth / 2 + 0.4f, 0.65f, 3.5f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(-gameManager.tableWidth / 2 + 0.65f, 0.65f, 3.3f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(-gameManager.tableWidth / 2 + 0.4f, 0.65f, 3.2f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                break;
+
+            case Wind.WEST:
+                remoteDie = Instantiate(die, new Vector3(3.2f, 0.65f, 4.6f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(3.5f, 0.65f, 4.6f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(3.3f, 0.65f, 4.3f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                break;
+
+            case Wind.NORTH:
+                remoteDie = Instantiate(die, new Vector3(gameManager.tableWidth / 2 - 0.4f, 0.65f, -3.5f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(gameManager.tableWidth / 2 - 0.65f, 0.65f, -3.3f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                remoteDie = Instantiate(die, new Vector3(gameManager.tableWidth / 2 - 0.4f, 0.65f, -3.2f), Quaternion.Euler(GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f, GameManager.RandomNumber(4) * 90f));
+                remoteDie.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                break;
+        }
     }
 
 
@@ -189,7 +249,6 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
             }
         }
 
-
         // Check if the discarded tile could be Chowed
         Tuple<int, Tile, float> discardTileInfo = PropertiesManager.GetDiscardTile();
         Tile tile = discardTileInfo.Item2;
@@ -201,6 +260,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         }
 
         hand.Add(this.DrawTile());
+        hasDrawnTile = true;
         gameManager.latestDiscardTile = null;
         gameManager.discardPlayer = null;
 
@@ -226,6 +286,8 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
     /// <summary>
     /// Called when the local player wants to select a tile
     /// </summary>
+    // TODO: Create a dictionary with discarded tile and current location. In the event that a player disconnects and reconnects,
+    // he can reconstruct the scene.
     public void OnLocalPlayerMove() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -258,13 +320,11 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
                     this.InstantiateLocalHand();
                     this.DiscardTile(tile, hitObject.transform.position.x);
                     missedDiscardManager.ResetMissedDiscard();
-                    gameManager.nextPlayersTurn();
+                    gameManager.NextPlayersTurn();
                 }
             }
         }
     }
-    // TODO: Create a dictionary with discarded tile and current location. In the event that a player disconnects and reconnects,
-    // he can reconstruct the scene.
 
 
     /// <summary>
@@ -441,9 +501,9 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
             // Instantiate the last Concealed Kong tile one tile above the other 3 Concealed Kong tiles.
             if (tile.kongType == 3) {
                 xPosOpen -= xSepOpen;
-                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 1f + 0.3f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 0.65f + 0.3f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             } else {
-                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 1f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
+                newTile = Instantiate(DictManager.Instance.tilesDict[tile], new Vector3(xPosOpen, 0.65f, -3.5f), Quaternion.Euler(270f, 180f, 0f));
             }
 
             newTile.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -535,6 +595,7 @@ public class PlayerManager : MonoBehaviour, IResetVariables {
         numberOfReplacementTiles = 0;
         numberOfKong = 0;
         payForAll = "";
+        hasDrawnTile = false;
         fanTotal = 0;
         winningCombos.Clear();
     }

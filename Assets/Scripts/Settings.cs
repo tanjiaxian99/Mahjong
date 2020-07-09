@@ -26,7 +26,7 @@ public class Settings : MonoBehaviour {
         settingsDict.Add("Robbing the Eighth", 10);
         settingsDict.Add("All Flowers and Seasons", 10);
 
-        settingsDict.Add("Player Wind Combo", 1);
+        settingsDict.Add("Seat Wind Combo", 1);
         settingsDict.Add("Prevailing Wind Combo", 1);
         settingsDict.Add("Dragon", 1);
 

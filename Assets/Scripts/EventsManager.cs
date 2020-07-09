@@ -5,6 +5,10 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using System.Runtime.InteropServices.ComTypes;
+using System;
+using Photon.Pun.UtilityScripts;
+using UnityEngine.Rendering;
 
 public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #region MonoBehaviour References
@@ -68,34 +72,44 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public const byte EvCanPongKong = 11;
 
     /// <summary>
-    /// The Player Win event message byte. Used internally by the local player when a remote player has won.
+    /// The Chow Pong Kong event message byte. Used internally by the local player when a remote player can Chow/Pong/Kong.
     /// </summary>
-    public const byte EvPlayerWin = 12;
+    public const byte EvChowPongKong = 12;
 
     /// <summary>
-    /// The Win Update event message byte. Used internally by MasterClient to track the number of players who are unable to win.
+    /// The Player Win event message byte. Used internally by the local player when a remote player has won.
     /// </summary>
-    public const byte EvWinUpdate = 13;
+    public const byte EvPlayerWin = 13;
+
+    /// <summary>
+    /// The Win Update event message byte. Used internally by MasterClient to inform the next player to check for a win.
+    /// </summary>
+    public const byte EvWinUpdate = 14;
+
+    /// <summary>
+    /// The Check Win event mesage byte. Used internally to check if the local player can win.
+    /// </summary>
+    public const byte EvCheckWin = 15;
 
     /// <summary>
     /// The End Round event message byte. Used internally by the local player when a remote player ends the round.
     /// </summary>
-    public const byte EvEndRound = 14;
+    public const byte EvEndRound = 16;
 
     /// <summary>
     /// The Ready For New Round event message byte. Used internally by the local player to signify that he/she is ready to start a new round.
     /// </summary>
-    public const byte EvReadyForNewRound = 15;
+    public const byte EvReadyForNewRound = 17;
 
     /// <summary>
     /// The Start New Round event message byte. Used internally by the local player to start a new round.
     /// </summary>
-    public const byte EvStartNewRound = 16;
+    public const byte EvStartNewRound = 18;
 
     /// <summary>
     /// The End Game event message byte. Used internally by all players to end the game.
     /// </summary>
-    public const byte EvEndGame = 17;
+    public const byte EvEndGame = 19;
 
     #endregion
 
@@ -112,7 +126,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     /// <summary>
     /// A list used by MasterClient to track whether players can/want to win
     /// </summary>
-    private static List<bool> winUpdateList;
+    private static int winUpdateCount;
 
     /// <summary>
     /// A counter used by MasterClient to track the number of players that is ready to start a new round.
@@ -129,7 +143,7 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
         PongKongUpdateList = new List<bool>();
         nonDiscardActorNumbers = new List<int>();
-        winUpdateList = new List<bool>();
+        winUpdateCount = 0;
         startNewRoundCount = 0;
     }
 
@@ -187,12 +201,20 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         PhotonNetwork.RaiseEvent(EvCanPongKong, canPongKong, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
     }
 
+    public static void EventChowPongKong(string action) {
+        PhotonNetwork.RaiseEvent(EvChowPongKong, action, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
+    }
+
     public static void EventPlayerWin(Dictionary<int, string[]> winInfo) {
         PhotonNetwork.RaiseEvent(EvPlayerWin, winInfo, new RaiseEventOptions() { Receivers = ReceiverGroup.Others }, SendOptions.SendReliable);
     }
 
-    public static void EventWinUpdate(bool canWin) {
-        PhotonNetwork.RaiseEvent(EvWinUpdate, canWin, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+    public static void EventWinUpdate(string winUpdate) {
+        PhotonNetwork.RaiseEvent(EvWinUpdate, winUpdate, new RaiseEventOptions() { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
+    }
+
+    public static void EventCheckWin(Player player) {
+        PhotonNetwork.RaiseEvent(EvCheckWin, null, new RaiseEventOptions() { TargetActors = new int[] { player.ActorNumber } }, SendOptions.SendReliable);
     }
 
     public static void EventEndRound() {
@@ -248,24 +270,82 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 if (!PhotonNetwork.IsMasterClient) {
                     return;
                 }
-                bool winUpdate = (bool)photonEvent.CustomData;
-                winUpdateList.Add(winUpdate);
+                string winUpdate = (string)photonEvent.CustomData;
+                string tileType = PropertiesManager.GetTileType();
+                Player discardPlayer = null;
+
+                if (winUpdate == "Start Win Check") {
+                    PropertiesManager.SetTouchTiles(false);
+
+                    if (tileType == "Normal") {
+                        discardPlayer = gameManager.discardPlayer;
+                    } else if (tileType == "Bonus") {
+                        discardPlayer = gameManager.bonusPlayer;
+                    } else if (tileType == "Exposed Kong") {
+                        discardPlayer = gameManager.kongPlayer;
+                    } else if (tileType == "Concealed Kong") {
+                        discardPlayer = gameManager.kongPlayer;
+                    }
+                    Player nextPlayer = GameManager.GetNextPlayer(discardPlayer);
+                    EventCheckWin(nextPlayer);
+                    return;
+                }
+
+                winUpdateCount++;
                 nonDiscardActorNumbers.Add(photonEvent.Sender);
 
-                // If none of the players can/wants to win from the discard, players can then check for Pong/Kong
-                bool allWinFalse = true;
-                if (winUpdateList.Count == 3) {
-                    foreach (bool update in winUpdateList) {
-                        if (update) {
-                            allWinFalse = false;
-                        }
-                    }
+                if (winUpdateCount < 3) {
+                    Player currentPlayer = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
+                    Player nextPlayer = GameManager.GetNextPlayer(currentPlayer);
+                    EventCheckWin(nextPlayer);
+                    return;
+                }
 
-                    if (allWinFalse) {
+                // If none of the players can/wants to win from the discard, players can then check for Pong/Kong
+                if (winUpdateCount == 3) {
+                    if (tileType == "Normal") {
                         EventCheckPongKong(nonDiscardActorNumbers);
+
+                    } else {
+                        PropertiesManager.SetTouchTiles(true);
                     }
-                    winUpdateList.Clear();
+                    winUpdateCount = 0;
                     nonDiscardActorNumbers.Clear();
+                }
+                break;
+
+            case EvCheckWin:
+                string type = PropertiesManager.GetTileType();
+
+                if (type == "Normal") {
+                    if (winManager.CanWin()) {
+                        winManager.WinUI();
+                        return;
+                    } else {
+                        EventWinUpdate("Can't Win");
+                    }
+                } else if (type == "Bonus") {
+                    if (winManager.CanWin("Bonus")) {
+                        winManager.WinUI();
+                        return;
+                    } else {
+                        EventWinUpdate("Can't Win");
+                    }
+                } else if (type == "Exposed Kong") {
+                    if (winManager.CanWin("Kong")) {
+                        winManager.WinUI();
+                        return;
+                    } else {
+                        EventWinUpdate("Can't Win");
+                    }
+                } else if (type == "Concealed Kong") {
+                    if (winManager.CanWin("Kong")) {
+                        if (playerManager.winningCombos.Contains("Thirteen Wonders")) {
+                            winManager.WinUI();
+                            return;
+                        }
+                    } 
+                    EventWinUpdate("Can't Win");
                 }
                 break;
 
@@ -292,10 +372,17 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                     if (allFalse) {
                         Player nextPlayer = PropertiesManager.GetNextPlayer();
                         EventPlayerTurn(nextPlayer);
+                        PropertiesManager.SetTouchTiles(true);
                     }
 
                     PongKongUpdateList.Clear();
                 }
+                break;
+
+            case EvChowPongKong:
+                Player remotePlayer = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
+                string action = (string)photonEvent.CustomData;
+                StartCoroutine(LocalizeActionPanel.Instance.SetAction(remotePlayer, action));
                 break;
 
             case EvPlayerWin:
@@ -333,6 +420,6 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public static void ResetVariables() {
         PongKongUpdateList.Clear();
         nonDiscardActorNumbers.Clear();
-        winUpdateList.Clear();
+        winUpdateCount = 0;
     }
 }

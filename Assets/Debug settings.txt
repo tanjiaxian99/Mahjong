@@ -1,0 +1,6 @@
+1. Initial Prevailing Wind
+2. this.connect
+3. GenerateTiles
+4. DistributeTiles
+5. DrawTiles
+6. PhotonNetwork.NickName = "Player" + (int)playerManager.seatWind

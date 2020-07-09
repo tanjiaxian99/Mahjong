@@ -65,6 +65,11 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     public static readonly string PlayerPointsPropKey = "pp";
 
     /// <summary>
+    /// A boolean affecting whether a player can touch his/her hand tiles
+    /// </summary>
+    public static readonly string TouchTilesPropKey = "TT";
+
+    /// <summary>
     /// List of tiles in the walls
     /// </summary>
     public static readonly string WallTileListPropKey = "wt";
@@ -78,6 +83,11 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     /// The latest tile which was Konged
     /// </summary>
     public static readonly string SpecialTilePropKey = "kt";
+
+    /// <summary>
+    /// The type of the tile that could be used for winning, ranging from Normal to Kong to Bonus
+    /// </summary>
+    public static readonly string TileTypePropKey = "tt";
 
     /// <summary>
     /// Number of tiles in the player's hand
@@ -162,6 +172,12 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.SetPlayerCustomProperties(ht);
     }
 
+    public static void SetTouchTiles(bool canTouch) {
+        Hashtable ht = new Hashtable();
+        ht.Add(TouchTilesPropKey, canTouch);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
     public static void SetWallTileList(List<Tile> tiles) {
         Hashtable ht = new Hashtable();
         ht.Add(WallTileListPropKey, tiles);
@@ -177,6 +193,12 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     public static void SetSpecialTile(Tuple<int, Tile, float> tuple) {
         Hashtable ht = new Hashtable();
         ht.Add(SpecialTilePropKey, tuple);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
+    public static void SetTileType(string type) {
+        Hashtable ht = new Hashtable();
+        ht.Add(TileTypePropKey, type);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
@@ -238,6 +260,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         return (int)player.CustomProperties[PlayerPointsPropKey];
     }
 
+    public static bool GetTouchTiles() {
+        return (bool)PhotonNetwork.CurrentRoom.CustomProperties[TouchTilesPropKey];
+    }
+
     public static List<Tile> GetWallTileList() {
         return (List<Tile>)PhotonNetwork.CurrentRoom.CustomProperties[WallTileListPropKey];
     }
@@ -248,6 +274,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
     public static Tuple<int, Tile, float> GetSpecialTile() {
         return (Tuple<int, Tile, float>)PhotonNetwork.CurrentRoom.CustomProperties[SpecialTilePropKey];
+    }
+
+    public static string GetTileType() {
+        return (string)PhotonNetwork.CurrentRoom.CustomProperties[TileTypePropKey];
     }
 
     public static int GetHandTilesCount(Player player) {
@@ -290,18 +320,25 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
             SetSeatWind(wind);
             playerManager.seatWind = wind;
-            InfoPanel.Instance.SetSeatWind(wind);
+            LocalizeSeatWind.Instance.SeatWind = wind.ToString();
             Debug.LogFormat("The player's wind is {0}", playerManager.seatWind);
-            //// DEBUG
-            //PhotonNetwork.NickName = "Player" + (int)playerManager.seatWind;
+            // DEBUG
+            PhotonNetwork.NickName = "Player" + (int)playerManager.seatWind;
 
             // Initialize Instant Payment dictionary
             this.payment.InitializeInstantPaymentDict(PhotonNetwork.PlayerList.ToList());
 
         } else if (propertiesThatChanged.ContainsKey(PrevailingWindPropKey)) {
             gameManager.prevailingWind = GetPrevailingWind();
-            InfoPanel.Instance.SetPrevailingWind(gameManager.prevailingWind);
+            LocalizePrevailingWind.Instance.PrevailingWind = gameManager.prevailingWind.ToString();
             Debug.LogFormat("The prevailing wind is {0}", gameManager.prevailingWind);
+
+        } else if (propertiesThatChanged.ContainsKey(TouchTilesPropKey)) {
+            playerManager.canTouchHandTiles = GetTouchTiles();
+
+        } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
+            gameManager.numberOfTilesLeft = GetWallTileList().Count;
+            LocalizeTilesLeft.Instance.TilesLeft = gameManager.numberOfTilesLeft;
 
         } else if (propertiesThatChanged.ContainsKey(DiscardTilePropKey)) {
             Tuple<int, Tile, float> discardTileInfo = GetDiscardTile();
@@ -328,20 +365,13 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             gameManager.isFreshTile = FreshTileDiscard.IsFreshTile(gameManager.discardTiles, gameManager.AllPlayersOpenTiles(), gameManager.latestDiscardTile);
             gameManager.discardTiles.Add(gameManager.latestDiscardTile);
 
-            // Only instantiate the tile if a remote player threw it
-            if (gameManager.discardPlayer == PhotonNetwork.LocalPlayer) {
-                return;
+            if (PhotonNetwork.IsMasterClient) {
+                SetTileType("Normal");
             }
 
-            RemotePlayer.InstantiateRemoteDiscardTile(gameManager, gameManager.discardPlayer, gameManager.latestDiscardTile, hPos);
-
-            // Check to see if the player can win based on the discard tile
-            if (winManager.CanWin()) {
-                winManager.WinUI();
-                return;
-            } else {
-                // Inform the Master Client that the player can't win
-                EventsManager.EventWinUpdate(false);
+            // Only instantiate the tile if a remote player threw it
+            if (gameManager.discardPlayer != PhotonNetwork.LocalPlayer) {
+                RemotePlayer.InstantiateRemoteDiscardTile(gameManager, gameManager.discardPlayer, gameManager.latestDiscardTile, hPos);
             }
 
         } else if (propertiesThatChanged.ContainsKey(SpecialTilePropKey)) {
@@ -367,51 +397,35 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
             } else if (discardTileInfo.Item3 == 1) {
                 gameManager.bonusPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
                 gameManager.latestBonusTile = discardTileInfo.Item2;
-
-                if (gameManager.bonusPlayer == PhotonNetwork.LocalPlayer) {
-                    return;
+                if (PhotonNetwork.IsMasterClient) {
+                    SetTileType("Bonus");
                 }
-
-                if (winManager.CanWin("Bonus")) {
-                    winManager.WinUI();
-                }
-                return;
 
             } else if (discardTileInfo.Item3 == 2) {
                 gameManager.kongPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
                 gameManager.latestKongTile = discardTileInfo.Item2;
 
-                if (gameManager.kongPlayer == PhotonNetwork.LocalPlayer) {
-                    return;
+                if (PhotonNetwork.IsMasterClient) {
+                    SetTileType("Exposed Kong");
                 }
-
-                if (winManager.CanWin("Kong")) {
-                    winManager.WinUI();
-                }
-                return;
 
             } else if (discardTileInfo.Item3 == 3) {
                 gameManager.kongPlayer = PhotonNetwork.CurrentRoom.GetPlayer(discardTileInfo.Item1);
                 gameManager.latestKongTile = discardTileInfo.Item2;
-
-                if (gameManager.kongPlayer == PhotonNetwork.LocalPlayer) {
-                    return;
+                
+                if (PhotonNetwork.IsMasterClient) {
+                    SetTileType("Concealed Kong");
                 }
-
-                if (winManager.CanWin("Kong")) {
-                    if (playerManager.winningCombos.Contains("Thirteen Wonders")) {
-                        winManager.WinUI();
-                    }
-                }
-                return;
             }
 
-        } else if (propertiesThatChanged.ContainsKey(WallTileListPropKey)) {
-            gameManager.numberOfTilesLeft = GetWallTileList().Count;
-            InfoPanel.Instance.SetNumberOfTilesLeft(gameManager.numberOfTilesLeft);
+        } else if (propertiesThatChanged.ContainsKey(TileTypePropKey)) {
+            if (PhotonNetwork.IsMasterClient) {
+                EventsManager.EventWinUpdate("Start Win Check");
+            }
 
         } else if (propertiesThatChanged.ContainsKey(PayAllPlayerPropKey)) {
             Player player = GetPayAllPlayer();
+            gameManager.payAllPlayer = player;
             if (player == PhotonNetwork.LocalPlayer) {
                 playerManager.payForAll = "Local";
             } else {

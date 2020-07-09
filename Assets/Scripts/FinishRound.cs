@@ -131,10 +131,12 @@ public class FinishRound : MonoBehaviour {
         scriptManager.GetComponent<SacredDiscardManager>().ResetVariables();
         scriptManager.GetComponent<MissedDiscardManager>().ResetVariables();
         scriptManager.GetComponent<Payment>().ResetVariables();
+        LocalizeWinCombos.Instance.ResetVariables();
+        LocalizeWinLoseType.Instance.ResetVariables();
     }
 
     /// <summary>
-    /// Destroy all tiles on the game table. 
+    /// Destroy all tiles and dice on the game table. 
     /// </summary>
     private void ClearGameTable() {
         GameObject[] allGameObjects = FindObjectsOfType<GameObject>();

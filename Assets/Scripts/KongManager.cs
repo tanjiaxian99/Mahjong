@@ -168,6 +168,7 @@ public class KongManager : MonoBehaviour {
 
         // Always draw a tile regardless of Kong type
         hand.Add(playerManager.DrawTile());
+        playerManager.hasDrawnTile = true;
         gameManager.latestDiscardTile = null;
         gameManager.discardPlayer = null;
 
@@ -181,7 +182,7 @@ public class KongManager : MonoBehaviour {
         playerManager.canTouchHandTiles = true;
         playerManager.myTurn = true;
 
-        // Check to see if the player can win based on the discard tile
+        // Check to see if the player can win based on the drawn tile
         if (winManager.CanWin()) {
             winManager.WinUI();
             return;

@@ -22,30 +22,31 @@ public class InfoPanel : MonoBehaviour {
     private GameObject generalInfoTextObject;
 
     [SerializeField]
-    private GameObject leftPlayerTextObject;
+    private GameObject leftPlayer;
 
     [SerializeField]
-    private GameObject rightPlayerTextObject;
+    private GameObject rightPlayer;
 
     [SerializeField]
-    private GameObject oppositePlayerTextObject;
+    private GameObject oppositePlayer;
 
     [SerializeField]
-    private GameObject localPlayerTextObject;
+    private GameObject localPlayer;
+
+    [SerializeField]
+    private Text seatWindText;
+
+    [SerializeField]
+    private Text prevailingWindText;
+
+    [SerializeField]
+    private Text tilesLeftText;
 
     #endregion
 
     #region Derived Components 
 
     private Text generalInfoText;
-
-    private Text leftPlayerText;
-
-    private Text rightPlayerText;
-
-    private Text oppositePlayerText;
-
-    private Text localPlayerText;
 
     #endregion
 
@@ -61,6 +62,8 @@ public class InfoPanel : MonoBehaviour {
         } else {
             _instance = this;
         }
+
+        infoPanel.SetActive(true);
     }
 
     #endregion
@@ -68,21 +71,29 @@ public class InfoPanel : MonoBehaviour {
     private Dictionary<string, Text> playerText;
 
     private void Start() {
-        generalInfoText = generalInfoTextObject.GetComponent<Text>();
-        leftPlayerText = leftPlayerTextObject.GetComponent<Text>();
-        rightPlayerText = rightPlayerTextObject.GetComponent<Text>();
-        oppositePlayerText = oppositePlayerTextObject.GetComponent<Text>();
-        localPlayerText = localPlayerTextObject.GetComponent<Text>();
-
         playerText = new Dictionary<string, Text>() {
-            ["Left"] = leftPlayerText,
-            ["Right"] = rightPlayerText,
-            ["Opposite"] = oppositePlayerText,
-            ["Local"] = localPlayerText
+            ["Left"] = leftPlayer.GetComponentInChildren<Text>(),
+            ["Right"] = rightPlayer.GetComponentInChildren<Text>(),
+            ["Opposite"] = oppositePlayer.GetComponentInChildren<Text>(),
+            ["Local"] = localPlayer.GetComponentInChildren<Text>()
         };
-        
 
         DefaultConfig();
+    }
+
+    /// <summary>
+    /// Called at the start of the round to display the Prevailing Wind
+    /// </summary>
+    public IEnumerator ShowPrevailingWind() {
+        infoPanel.SetActive(true);
+        infoPanel.GetComponent<Image>().enabled = false;
+        prevailingWindText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(5f);
+
+        infoPanel.SetActive(false);
+        infoPanel.GetComponent<Image>().enabled = true;
+        prevailingWindText.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -91,6 +102,15 @@ public class InfoPanel : MonoBehaviour {
     public void ShowInfo() {
         if (!infoPanel.activeSelf) {
             infoPanel.SetActive(true);
+
+            foreach (Transform child in generalInfoTextObject.transform) {
+                child.gameObject.SetActive(true);
+            }
+
+            leftPlayer.SetActive(true);
+            rightPlayer.SetActive(true);
+            oppositePlayer.SetActive(true);
+            localPlayer.SetActive(true);
         }
         closeInfoButton.SetActive(true);
     }
@@ -101,42 +121,17 @@ public class InfoPanel : MonoBehaviour {
     public void CloseInfo() {
         if (infoPanel.activeSelf) {
             infoPanel.SetActive(false);
+
+            foreach (Transform child in generalInfoTextObject.transform) {
+                child.gameObject.SetActive(false);
+            }
+
+            leftPlayer.SetActive(false);
+            rightPlayer.SetActive(false);
+            oppositePlayer.SetActive(false);
+            localPlayer.SetActive(false);
         }
         closeInfoButton.SetActive(false);
-    }
-
-    /// <summary>
-    /// Update the seat wind of the local player in the info panel
-    /// </summary>
-    public void SetSeatWind(PlayerManager.Wind seatWind) {
-        string input = generalInfoText.text;
-        string pattern = @"(Seat Wind: )(\w*)(\s+Prevailing Wind: )(\w*)(\s+Number Of Tiles Left: )(\d*)";
-        string replacement = string.Format("$1{0}$3$4$5$6", seatWind);
-        string result = Regex.Replace(input, pattern, replacement);
-        generalInfoText.text = result;
-    }
-
-    /// <summary>
-    /// Update the prevailing wind in the info panel
-    /// </summary>
-    public void SetPrevailingWind(PlayerManager.Wind prevailingWind) {
-        string input = generalInfoText.text;
-        string pattern = @"(Seat Wind: )(\w*)(\s+Prevailing Wind: )(\w*)(\s+Number Of Tiles Left: )(\d*)";
-        string replacement = string.Format("$1$2$3{0}$5$6", prevailingWind);
-        string result = Regex.Replace(input, pattern, replacement);
-        generalInfoText.text = result;
-    }
-
-    /// <summary>
-    /// Update the number of tiles left in the info panel
-    /// </summary>
-    /// <param name="tilesLeft"></param>
-    public void SetNumberOfTilesLeft(int tilesLeft) {
-        string input = generalInfoText.text;
-        string pattern = @"(Seat Wind: )(\w*)(\s+Prevailing Wind: )(\w*)(\s+Number Of Tiles Left: )(\d*)";
-        string replacement = "$1$2$3$4${5}" + tilesLeft;
-        string result = Regex.Replace(input, pattern, replacement);
-        generalInfoText.text = result;
     }
 
     /// <summary>
@@ -156,10 +151,15 @@ public class InfoPanel : MonoBehaviour {
     private void DefaultConfig() {
         showInfoButton.SetActive(true);
         infoPanel.SetActive(false);
+
         generalInfoTextObject.SetActive(true);
-        leftPlayerTextObject.SetActive(true);
-        rightPlayerTextObject.SetActive(true);
-        oppositePlayerTextObject.SetActive(true);
-        localPlayerTextObject.SetActive(true);
+        foreach (Transform child in generalInfoTextObject.transform) {
+            child.gameObject.SetActive(false);
+        }
+
+        leftPlayer.SetActive(false);
+        rightPlayer.SetActive(false);
+        oppositePlayer.SetActive(false);
+        localPlayer.SetActive(false);
     }
 }

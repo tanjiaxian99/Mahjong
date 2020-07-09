@@ -124,8 +124,8 @@ public class FanCalculator : MonoBehaviour {
 
             #region Fan in Honour Tiles
 
-            if (winningCombos.Contains("Player Wind Combo")) {
-                fanTotal += settingsDict["Player Wind Combo"];
+            if (winningCombos.Contains("Seat Wind Combo")) {
+                fanTotal += settingsDict["Seat Wind Combo"];
             }
 
             if (winningCombos.Contains("Prevailing Wind Combo")) {
@@ -278,6 +278,10 @@ public class FanCalculator : MonoBehaviour {
                 fanTotal += settingsDict["Winning on Last Available Tile"];
             }
 
+            if (fanTotal > fanLimit) {
+                fanTotal = fanLimit;
+            }
+
             fanTotalList.Add(fanTotal);
         }
 
@@ -309,11 +313,29 @@ public class FanCalculator : MonoBehaviour {
         PlayerManager.Wind playerWind = playerManager.seatWind;
         int numberOfReplacementTiles = playerManager.numberOfReplacementTiles;
         int numberOfKong = playerManager.numberOfKong;
+        bool hasDrawnTile = playerManager.hasDrawnTile;
 
-        
+        List<Tile> combinedHand = new List<Tile>(hand);
+
+        if ((combinedHand.Count + 1) % 3 != 0 && discardTile != null) {
+            combinedHand.Add(discardTile);
+        }
+        combinedHand = combinedHand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
+
+        // Retrieve list of solution(s), excluding that of combo tiles
+        List<List<string>> listOfCombos = winCombos.CheckWin(combinedHand);
+
+        // Add combos from combo tile to listOfCombos
+        List<string> combosInComboTiles = new List<string>();
+        foreach (List<Tile> tiles in comboTiles) {
+            combosInComboTiles.Add(TilesManager.ComboType(tiles));
+        }
+
+        foreach (List<string> combos in listOfCombos) {
+            combos.AddRange(combosInComboTiles);
+        }
 
         // Combining hand and comboTiles
-        List<Tile> combinedHand = new List<Tile>(hand);
         for (int i = 0; i < comboTiles.Count; i++) {
 
             // GetRange is needed to drop the last tile for Kong combos
@@ -321,14 +343,8 @@ public class FanCalculator : MonoBehaviour {
                 combinedHand.Add(comboTile);
             }
         }
-
-        if (combinedHand.Count == 13 && discardTile != null) {
-            combinedHand.Add(discardTile);
-        }
         combinedHand = combinedHand.OrderBy(x => x.suit).ThenBy(x => x.rank).ToList();
 
-        // Retrieve list of solution(s)
-        List<List<string>> listOfCombos = winCombos.CheckWin(combinedHand);
         if (listOfCombos == null) {
             return;
         }
@@ -336,6 +352,7 @@ public class FanCalculator : MonoBehaviour {
         if (listOfCombos.Count == 0) {
             winningCombos = new List<string>();
 
+            this.FanInFirstRound(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, hasDrawnTile, turn);
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
             this.RobbingTheKong(discardTile);
             winningCombos.Add(this.ThirteenWondersCheck(combinedHand));
@@ -346,7 +363,7 @@ public class FanCalculator : MonoBehaviour {
                 winningCombos.Add(this.FourBlessingsCheck(combinedHand));
 
                 if (winningCombos.Contains("Four Great Blessings")) {
-                    winningCombos.Remove("Player Wind Combo");
+                    winningCombos.Remove("Seat Wind Combo");
                     winningCombos.Remove("Prevailing Wind Combo");
                 }
             }
@@ -374,7 +391,7 @@ public class FanCalculator : MonoBehaviour {
         for (int i = 0; i < listOfCombos.Count; i++) {
             winningCombos = new List<string>();
 
-            this.FanInFirstRound(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, turn);
+            this.FanInFirstRound(allPlayersOpenTiles, playerWind, discardPlayerWind, discardTile, hasDrawnTile, turn);
             this.FanInBonusTiles(bonusTiles, playerWind, allPlayersOpenTiles);
             this.FanInHonourTiles(combinedHand, playerWind, prevailingWind);
             this.FanInHand(listOfCombos[i], combinedHand, hand, bonusTiles, comboTiles, playerWind, prevailingWind, discardTile);
@@ -391,9 +408,9 @@ public class FanCalculator : MonoBehaviour {
     /// <summary>
     /// Container for Heavenly, Earthly and Humanly Hands
     /// </summary>
-    private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind? discardPlayerWind, Tile discardTile, int turn) {
+    private void FanInFirstRound(List<Tile> allPlayersOpenTiles, PlayerManager.Wind playerWind, PlayerManager.Wind? discardPlayerWind, Tile discardTile, bool hasDrawnTile, int turn) {
         if (settingsDict["Heavenly Hand"] > 0) {
-            winningCombos.Add(HeavenlyHandCheck(playerWind, discardTile, turn));
+            winningCombos.Add(HeavenlyHandCheck(playerWind, discardTile, hasDrawnTile, turn));
 
             if (winningCombos.Contains("Heavenly Hand")) {
                 return;
@@ -409,7 +426,7 @@ public class FanCalculator : MonoBehaviour {
         }
 
         if (settingsDict["Humanly Hand"] > 0) {
-            winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, discardTile, turn));
+            winningCombos.Add(HumanlyHandCheck(allPlayersOpenTiles, discardTile, hasDrawnTile, turn));
         }
 
     }
@@ -422,7 +439,7 @@ public class FanCalculator : MonoBehaviour {
         int numberOfSeasonTiles = 0;
         int numberOfFlowerTiles = 0;
         int numberOfAnimalTiles = 0;
-
+        
         foreach (Tile bonusTile in bonusTiles) {
             if (DictManager.Instance.tileToWindDict.ContainsKey(bonusTile)) {
 
@@ -515,9 +532,9 @@ public class FanCalculator : MonoBehaviour {
         foreach (Tile tile in honourTilesCount.Keys) {
             if (honourTilesCount[tile] == 3) {
 
-                if (settingsDict["Player Wind Combo"] > 0) {
+                if (settingsDict["Seat Wind Combo"] > 0) {
                     if (tile.suit == Tile.Suit.Wind && DictManager.Instance.tileToWindDict[tile] == playerWind) {
-                        winningCombos.Add("Player Wind Combo");
+                        winningCombos.Add("Seat Wind Combo");
                     }
                 }
 
@@ -636,7 +653,7 @@ public class FanCalculator : MonoBehaviour {
 
             if (winningCombos.Contains("All Honour")) {
                 winningCombos.Remove("Triplets");
-                winningCombos.Remove("Player Wind Combo");
+                winningCombos.Remove("Seat Wind Combo");
                 winningCombos.Remove("Prevailing Wind Combo");
                 winningCombos.Remove("Dragon_One");
                 winningCombos.Remove("Dragon_Two");
@@ -746,7 +763,7 @@ public class FanCalculator : MonoBehaviour {
                 if (settingsDict["Four Great Blessings"] == 0) {
                     winningCombos.Remove("Four Great Blessings");
                 } else {
-                    winningCombos.Remove("Player Wind Combo");
+                    winningCombos.Remove("Seat Wind Combo");
                     winningCombos.Remove("Prevailing Wind Combo");
                 }
             }
@@ -848,8 +865,8 @@ public class FanCalculator : MonoBehaviour {
     /// Determine if the hand is a Heavenly Hand
     /// </summary>
     /// <returns></returns>
-    private string HeavenlyHandCheck(PlayerManager.Wind playerWind, Tile discardTile, int turn) {
-        if (playerWind == PlayerManager.Wind.EAST && turn == 1 && discardTile == null) {
+    private string HeavenlyHandCheck(PlayerManager.Wind playerWind, Tile discardTile, bool hasDrawnTile, int turn) {
+        if (playerWind == PlayerManager.Wind.EAST && turn == 1 && discardTile == null && !hasDrawnTile) {
             return "Heavenly Hand";
         }
         return null;
@@ -876,7 +893,7 @@ public class FanCalculator : MonoBehaviour {
     /// <summary>
     /// Determine if the hand is a Humanly Hand
     /// </summary>
-    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, Tile discardTile, int turn) {
+    private string HumanlyHandCheck(List<Tile> allPlayersOpenTiles, Tile discardTile, bool hasDrawnTile, int turn) {
         if (turn == 1 && discardTile != null) {
             int numberOfComboTiles = 0;
             int numberOfConcealedKong = 0;
@@ -894,6 +911,10 @@ public class FanCalculator : MonoBehaviour {
             }
 
             if (numberOfConcealedKong * 4 != numberOfComboTiles) {
+                return null;
+            }
+
+            if (hasDrawnTile) {
                 return null;
             }
 
@@ -975,7 +996,7 @@ public class FanCalculator : MonoBehaviour {
             return null;
         }
 
-        if (comboListNoDuplicate.Contains("Pong")) {
+        if (comboListNoDuplicate.Contains("Pong") || comboListNoDuplicate.Contains("Kong")) {
             return null;
         }
 

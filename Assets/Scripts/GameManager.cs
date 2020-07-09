@@ -77,9 +77,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
 
     public Tile latestBonusTile;
 
+    public Player payAllPlayer;
+
     public bool isFreshTile;
 
     public int turn;
+
+    [SerializeField]
+    private GameObject tileTracker;
+
+    private RectTransform tileTrackerRT;
+
+    private Camera camera;
 
     #endregion
 
@@ -102,6 +111,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
 
         turn = 0;
 
+        camera = Camera.main;
+        tileTrackerRT = tileTracker.GetComponent<RectTransform>();
+
         this.openTilesDict = new Dictionary<Player, List<Tile>>();
         this.discardTiles = new List<Tile>();
 
@@ -114,6 +126,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
     }
 
     void Update() {
+        GameObject discardTile = GameObject.FindGameObjectWithTag("Discard");
+        if (discardTile == null) {
+            tileTracker.SetActive(false);
+        } else {
+            tileTracker.SetActive(true);
+            tileTrackerRT.position = camera.WorldToScreenPoint(discardTile.transform.position);
+        }
+
         if (playerManager.myTurn && playerManager.canTouchHandTiles && Input.GetMouseButtonDown(0)) {
             playerManager.OnLocalPlayerMove();
         }
@@ -198,30 +218,42 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
     /// <summary>
     /// Called by the local player to inform the next player that it is his turn
     /// </summary>
-    public void nextPlayersTurn() {
+    public void NextPlayersTurn() {
+        Player nextPlayer = GetNextPlayer(PhotonNetwork.LocalPlayer);
+
+        // Update Room Custom Properties with the next player
+        PropertiesManager.SetNextPlayer(nextPlayer);
+    }
+    
+
+    /// <summary>
+    /// Get the next player in the play order based on the current player
+    /// </summary>
+    public static Player GetNextPlayer(Player currentPlayer) {
+        if (currentPlayer == null) {
+            Debug.LogError("GetNextPlayer: The currentPlayer is null");
+            return null;
+        }
+
         Player[] playOrder = PropertiesManager.GetPlayOrder();
-        int localPlayerPos = 0;
+        int currentPlayerPos = 0;
         Player nextPlayer;
 
         for (int i = 0; i < playOrder.Length; i++) {
-            if (playOrder[i] == PhotonNetwork.LocalPlayer) {
-                localPlayerPos = i;
+            if (playOrder[i] == currentPlayer) {
+                currentPlayerPos = i;
                 break;
             }
         }
 
-        // If there is only one player, call the local player again
-        if (playOrder.Length == 1) {
-            nextPlayer = PhotonNetwork.LocalPlayer;
-        } else if (localPlayerPos == playOrder.Length - 1) {
+        if (currentPlayerPos == playOrder.Length - 1) {
             // Call the first player if the local player is the last player in the play order
             nextPlayer = playOrder[0];
         } else {
-            nextPlayer = playOrder[localPlayerPos + 1];
+            nextPlayer = playOrder[currentPlayerPos + 1];
         }
 
-        // Update Room Custom Properties with the next player
-        PropertiesManager.SetNextPlayer(nextPlayer);
+        return nextPlayer;
     }
 
 
@@ -257,6 +289,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IResetVariables {
         latestKongTile = null;
         bonusPlayer = null;
         latestBonusTile = null;
+        payAllPlayer = null;
         isFreshTile = true;
         turn = 0;
     }

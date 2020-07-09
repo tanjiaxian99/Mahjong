@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SocialPlatforms;
 
 public static class RemotePlayer {
 
@@ -127,37 +128,37 @@ public static class RemotePlayer {
             // Calculate the position and rotation of each tile
             if (tileType.Equals("Hand")) {
                 if (relativePos.Equals("Left")) {
-                    position = new Vector3(-gameManager.tableWidth / 2 + 0.5f, 1f, pos);
+                    position = new Vector3(-gameManager.tableWidth / 2 + 0.5f, 0.8f, pos);
                     rotation = Quaternion.Euler(0f, -90f, 0f);
 
                 } else if (relativePos.Equals("Right")) {
-                    position = new Vector3(gameManager.tableWidth / 2 - 0.5f, 1f, pos);
+                    position = new Vector3(gameManager.tableWidth / 2 - 0.5f, 0.8f, pos);
                     rotation = Quaternion.Euler(0f, 90f, 0f);
 
                 } else if (relativePos.Equals("Opposite")) {
-                    position = new Vector3(pos, 1f, 4.4f);
+                    position = new Vector3(pos, 0.8f, 4.4f);
                     rotation = Quaternion.Euler(0f, 0f, 0f);
                 }
 
             } else if (tileType.Equals("Open Hand")) {
                 if (relativePos.Equals("Left")) {
-                    position = new Vector3(-gameManager.tableWidth / 2 + 0.5f, 1f, pos);
+                    position = new Vector3(-gameManager.tableWidth / 2 + 0.5f, 0.65f, pos);
                     rotation = Quaternion.Euler(-90f, -90f, 0f);
 
                 } else if (relativePos.Equals("Right")) {
-                    position = new Vector3(gameManager.tableWidth / 2 - 0.5f, 1f, pos);
+                    position = new Vector3(gameManager.tableWidth / 2 - 0.5f, 0.65f, pos);
                     rotation = Quaternion.Euler(-90f, 90f, 0f);
 
                 } else if (relativePos.Equals("Opposite")) {
-                    position = new Vector3(pos, 1f, 4.4f);
+                    position = new Vector3(pos, 0.65f, 4.4f);
                     rotation = Quaternion.Euler(-90f, 0f, 0f);
                 }
 
             } else if (tileType.Equals("Open")) {
-                float yPos = 1f;
+                float yPos = 0.65f;
                 if (remoteTiles[i].kongType == 3) {
                     pos -= -negativeConversion * sep;
-                    yPos = 1f + 0.3f;
+                    yPos += 0.3f;
                 }
 
                 if (relativePos.Equals("Left")) {
@@ -223,8 +224,12 @@ public static class RemotePlayer {
             return "Opposite";
         }
 
-        //Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
-        return "Local";
+        if (remotePlayer == PhotonNetwork.LocalPlayer) {
+            return "Local";
+        }
+
+        Debug.LogErrorFormat("Invalid combination of localPlayerPos({0}) and remotePlayerPos({1})", localPlayerPos, remotePlayerPos);
+        return null;
     }
 
 

@@ -23,13 +23,19 @@ public class UI : MonoBehaviour {
     private GameObject spritesPanel;
 
     [SerializeField]
-    private GameObject secondaryText;
+    private GameObject comboPanel;
+
+    [SerializeField]
+    private GameObject fanTotalText;
 
     [SerializeField]
     private GameObject okButtonObject;
 
     [SerializeField]
     private GameObject skipButtonObject;
+
+    [SerializeField]
+    private GameObject winLosePanel;
 
     #endregion
 
@@ -39,11 +45,13 @@ public class UI : MonoBehaviour {
 
     private Text primaryTextField;
 
-    private Text secondaryTextField;
+    private Text fanTotalTextField;
 
     private Button okButton;
 
     private Dictionary<string, int> settingsDict;
+
+    private string uiType;
 
     #endregion
 
@@ -67,7 +75,7 @@ public class UI : MonoBehaviour {
         winManager = scriptManager.GetComponent<WinManager>();
 
         primaryTextField = primaryText.GetComponent<Text>();
-        secondaryTextField = secondaryText.GetComponent<Text>();
+        fanTotalTextField = fanTotalText.GetComponent<Text>();
         okButton = okButtonObject.GetComponent<Button>();
 
         Settings settings = scriptManager.GetComponent<Settings>();
@@ -98,23 +106,28 @@ public class UI : MonoBehaviour {
             case "Sacred Discard":
                 SacredDiscardUI(objects);
                 break;
+
             case "Missed Discard":
                 MissedDiscardUI(objects);
                 break;
+
             case "Can Win":
                 CanWinUI(objects);
                 break;
+
             case "Win Ok":
                 OnWinOkUI(objects);
                 break;
+
             case "Remote Win":
                 RemoteWinUI(objects);
                 break;
+
             case "No More Tiles":
                 NoMoreTilesUI();
                 break;
         }
-        
+
     }
 
     /// <summary>
@@ -122,7 +135,8 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void InstantPayoutUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Instant Payout: " + (string)objects[0];
+        LocalizePrimaryText.Instance.SetPrimaryText("INSTANT_PAYOUT_" + (string)objects[0]);
+        uiType = "Instant Payout";
         AddSpriteTiles((List<Tile>)objects[1]);
     }
 
@@ -131,7 +145,8 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void RevertKongPayoutUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Revert Kong Payout";
+        LocalizePrimaryText.Instance.SetPrimaryText("INSTANT_PAYOUT_REVERT_KONG");
+        uiType = "Revert Kong";
         AddSpriteTiles((List<Tile>)objects[0]);
     }
 
@@ -140,7 +155,8 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void SacredDiscardUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Sacred Discard";
+        LocalizePrimaryText.Instance.SetPrimaryText("INSTANT_PAYOUT_SACRED_DISCARD");
+        uiType = "Sacred Discard";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
     }
 
@@ -149,71 +165,61 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void MissedDiscardUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Missed Discard";
+        LocalizePrimaryText.Instance.SetPrimaryText("INSTANT_PAYOUT_MISSED_DISCARD");
+        uiType = "Missed Discard";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
     }
 
     private void CanWinUI(params object[] objects) {
         uiPanel.SetActive(true);
         skipButtonObject.SetActive(true);
-        primaryTextField.text = "Can Win";
+        LocalizePrimaryText.Instance.SetPrimaryText("CAN_WIN");
+        uiType = "Can Win";
         AddSpriteTiles(new List<Tile>() { (Tile)objects[0] });
-        
-        secondaryTextField.text = string.Format("You can win with {0} fan.", (int)objects[1]);
+
+        LocalizeWinCombos.Instance.SetFanTotal((int)objects[1]);        
     }
 
     private void OnWinOkUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "You have won!";
+        LocalizePrimaryText.Instance.SetPrimaryText("YOU_HAVE_WON");
+        uiType = "You have won!";
 
         Tile winningTile = (Tile)objects[0];
         int fanTotal = (int)objects[1];
         List<string> winningCombos = (List<string>)objects[2];
-        string winLoseType = (string)objects[3];
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
-        string combos = "";
-        foreach (string combo in winningCombos) {
-            if (combo.Contains("Dragon")) {
-                combos += combo + " = " + settingsDict["Dragon"] + " fan" + "\n";
-            } else {
-                combos += combo + " = " + settingsDict[combo] + " fan" + "\n";
-            }  
-        }
-        combos = combos.TrimEnd('\n');
-        secondaryTextField.text = string.Format("You won with {0} fan and the following combos:\n{1}\n\n{2}", fanTotal, combos, winLoseType);
+        LocalizeWinCombos.Instance.SetWinningCombos(winningCombos);
+        LocalizeWinCombos.Instance.SetFanTotal(fanTotal);
+        LocalizeWinLoseType.Instance.SetWinLosePanel();
+        winLosePanel.SetActive(true);
     }
 
     private void RemoteWinUI(params object[] objects) {
         uiPanel.SetActive(true);
-        primaryTextField.text = "Another player has won";
+        LocalizePrimaryText.Instance.SetPrimaryText("ANOTHER_PLAYER_HAS_WON");
+        uiType = "Another player has won";
 
         Player winner = (Player)objects[0];
         Tile winningTile = (Tile)objects[1];
         int fanTotal = (int)objects[2];
         List<string> winningCombos = (List<string>)objects[3];
-        string winLoseType = (string)objects[4];
 
         AddSpriteTiles(new List<Tile>() { winningTile });
 
-        string combos = "";
-        foreach (string combo in winningCombos) {
-            if (combo.Contains("Dragon")) {
-                combos += combo + " = " + settingsDict["Dragon"] + " fan" + "\n";
-            } else {
-                combos += combo + " = " + settingsDict[combo] + " fan" + "\n";
-            }
-        }
-        combos = combos.TrimEnd('\n');
-        secondaryTextField.text = string.Format(
-            "{0} has won with {1} fan and the following combos:\n{2}\n\n{3}", 
-            winner.NickName, fanTotal, combos, winLoseType);
+        LocalizeWinCombos.Instance.winnerName = winner.NickName;
+        LocalizeWinCombos.Instance.SetFanTotal(fanTotal);
+        LocalizeWinCombos.Instance.SetWinningCombos(winningCombos);
+        LocalizeWinLoseType.Instance.SetWinLosePanel();
+        winLosePanel.SetActive(true);
     }
 
     private void NoMoreTilesUI() {
         uiPanel.SetActive(true);
-        primaryTextField.text = "There are no more tiles left";
+        LocalizePrimaryText.Instance.SetPrimaryText("THERE_ARE_NO_MORE_TILES_LEFT");
+        uiType = "There are no more tiles left";
     }
 
     #endregion
@@ -234,82 +240,59 @@ public class UI : MonoBehaviour {
     /// Called upon clicking the 'Ok' button
     /// </summary>
     public void OnOk() {
-        switch (primaryTextField.text) {
+        switch (uiType) {
+            case "Instant Payout":
+            case "Revert Kong":
             case "Sacred Discard":
             case "Missed Discard":
-            case "Instant Payout: Hidden Cat and Rat":
-            case "Instant Payout: Cat and Rat":
-            case "Instant Payout: Hidden Chicken and Centipede":
-            case "Instant Payout: Chicken and Centipede":
-            case "Instant Payout: Complete Animal Group Payout":
-            case "Instant Payout: Hidden Bonus Tile Match Seat Wind Pair":
-            case "Instant Payout: Bonus Tile Match Seat Wind Pair":
-            case "Instant Payout: Complete Season Group Payout":
-            case "Instant Payout: Complete Flower Group Payout":
-            case "Instant Payout: Concealed Kong":
-            case "Instant Payout: Exposed Kong":
-            case "Instant Payout: Discard Kong":
-            case "Revert Kong Payout":
                 ResetUI();
                 break;
+
             case "Can Win":
                 ResetUI();
                 winManager.OnWinOk();
                 break;
+
             case "You have won!":
                 ResetUI();
                 EventsManager.EventReadyForNewRound();
                 break;
+
             case "Another player has won":
                 ResetUI();
                 EventsManager.EventReadyForNewRound();
                 break;
+
             case "There are no more tiles left":
                 ResetUI();
                 EventsManager.EventReadyForNewRound();
                 break;
         }
+
+        
     }
 
     /// <summary>
     /// Called upon clicking the 'Skip' button
     /// </summary>
     public void OnSkip() {
-        switch (primaryTextField.text) {
-            case "Sacred Discard":
-            case "Missed Discard":
-            case "Instant Payout: Hidden Cat and Rat":
-            case "Instant Payout: Cat and Rat":
-            case "Instant Payout: Hidden Chicken and Centipede":
-            case "Instant Payout: Chicken and Centipede":
-            case "Instant Payout: Complete Animal Group Payout":
-            case "Instant Payout: Hidden Bonus Tile Match Seat Wind Pair":
-            case "Instant Payout: Bonus Tile Match Seat Wind Pair":
-            case "Instant Payout: Complete Season Group Payout":
-            case "Instant Payout: Complete Flower Group Payout":
-            case "Instant Payout: Concealed Kong":
-            case "Instant Payout: Exposed Kong":
-            case "Instant Payout: Discard Kong":
-                ResetUI();
-                break;
-            case "Can Win":
-                winManager.OnWinSkip();
-                ResetUI();
-                break;
-        }
+        winManager.OnWinSkip();
+        ResetUI();
     }
 
     /// <summary>
     /// The default UI configuration
     /// </summary>
-    private void DefaultUI() {
+    private void DefaultUI() { 
         uiPanel.SetActive(false);
 
         primaryText.SetActive(true);
         primaryTextField.text = "";
 
-        secondaryText.SetActive(true);
-        secondaryTextField.text = "";
+        comboPanel.SetActive(true);
+        foreach (Transform child in comboPanel.transform) {
+            child.gameObject.SetActive(false);
+        }
 
         spritesPanel.SetActive(true);
         foreach (Transform imageTransform in spritesPanel.transform) {
@@ -318,8 +301,16 @@ public class UI : MonoBehaviour {
             image.color = new Color(1f, 1f, 1f);
         }
 
+        fanTotalText.SetActive(true);
+        fanTotalTextField.text = "";
+
         okButtonObject.SetActive(true);
         skipButtonObject.SetActive(false);
+
+        winLosePanel.SetActive(false);
+        foreach (Transform child in winLosePanel.transform) {
+            child.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -327,7 +318,10 @@ public class UI : MonoBehaviour {
     /// </summary>
     private void ResetUI() {
         uiPanel.SetActive(false);
-        skipButtonObject.SetActive(false);
+        
+        foreach (Transform child in comboPanel.transform) {
+            child.gameObject.SetActive(false);
+        }
 
         foreach (Transform imageTransform in spritesPanel.transform) {
             imageTransform.gameObject.SetActive(false);
@@ -335,6 +329,13 @@ public class UI : MonoBehaviour {
             image.color = new Color(1f, 1f, 1f);
         }
 
-        secondaryTextField.text = "";
+        fanTotalTextField.text = "";
+
+        skipButtonObject.SetActive(false);
+
+        winLosePanel.SetActive(false);
+        foreach (Transform child in winLosePanel.transform) {
+            child.gameObject.SetActive(false);
+        }
     }
 }
