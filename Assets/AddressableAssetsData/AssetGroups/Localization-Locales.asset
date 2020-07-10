@@ -15,38 +15,9 @@ MonoBehaviour:
   m_GroupName: Localization-Locales
   m_Data:
     m_SerializedData: []
-  m_GUID: 0a20d7279c7799e43a239ff638e778da
-  m_SerializeEntries:
-  - m_GUID: 49a7fe9762dc7ac4d9dd8f4b05adc150
-    m_Address: English (United Kingdom) (en-GB)
-    m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale
-    m_mainAssetType: UnityEngine.Localization.Locale, Unity.Localization, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-    m_MainAsset: {fileID: 0}
-    m_TargetAsset: {fileID: 0}
-  - m_GUID: bbf862531a5568f4d8fb0e32e9391254
-    m_Address: Chinese (Simplified) (zh)
-    m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale
-    m_mainAssetType: UnityEngine.Localization.Locale, Unity.Localization, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-    m_MainAsset: {fileID: 0}
-    m_TargetAsset: {fileID: 0}
-  - m_GUID: f32e66254459ed3498322df1bd526588
-    m_Address: Chinese (Traditional) (zh-TW)
-    m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale
-    m_mainAssetType: UnityEngine.Localization.Locale, Unity.Localization, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-    m_MainAsset: {fileID: 0}
-    m_TargetAsset: {fileID: 0}
+  m_GUID: 9815d97698e710d45be3ad646a9d860d
+  m_SerializeEntries: []
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 4013b297a5689394e92b7c11cbcd496a, type: 2}
   m_SchemaSet:
-    m_Schemas:
-    - {fileID: 11400000, guid: 83d92f78a733b8b498df0ce5e5eab4aa, type: 2}
-    - {fileID: 11400000, guid: 48341f873a0c4f24d9c42d947317f492, type: 2}
+    m_Schemas: []

@@ -12483,7 +12483,7 @@ MonoBehaviour:
   gameTable: {fileID: 1286068716}
   tableHeight: 0
   tableWidth: 0
-  numberOfPlayers: 4
+  numberOfPlayers: 1
   numberOfTilesLeft: 0
   prevailingWind: 0
   isFreshTile: 0
