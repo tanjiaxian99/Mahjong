@@ -24,6 +24,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
     [SerializeField]
     private GameObject progressLabel;
 
+    [SerializeField]
+    private GameObject roomsPanel;
+
     /// <summary>
     /// Only true when the player connects to the server for the first time. Prevents calling OnConnectedToMaster()
     /// automatically when leaving a room.
@@ -61,7 +64,6 @@ public class Launcher : MonoBehaviourPunCallbacks {
         if (firstConnection) {
             // If numberOfPlayersToStart == 1 and a second client calls JoinRandomRoom, an exception is raised:
             // Deserialization failed for Operation Response. System.Exception: Read failed. Custom type not found: 255.
-            PhotonNetwork.JoinRandomRoom();
             firstConnection = false;
         }
     }
@@ -116,7 +118,8 @@ public class Launcher : MonoBehaviourPunCallbacks {
         controlPanel.SetActive(false);
 
         if (PhotonNetwork.IsConnected) {
-            PhotonNetwork.JoinRandomRoom();
+            progressLabel.SetActive(false);
+            roomsPanel.SetActive(true);
         } else {
             firstConnection = PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
