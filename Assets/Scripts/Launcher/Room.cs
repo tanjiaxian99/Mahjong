@@ -15,7 +15,11 @@ public class Room : MonoBehaviour {
     [SerializeField]
     private Text privateSetting;
 
+    public RoomInfo RoomInfo { get; private set; }
+
     public void SetRoomInfo(RoomInfo roomInfo) {
+        RoomInfo = roomInfo;
+
         roomName.text = roomInfo.Name;
         numberOfPlayers.text = roomInfo.PlayerCount.ToString() + " / 4";
 

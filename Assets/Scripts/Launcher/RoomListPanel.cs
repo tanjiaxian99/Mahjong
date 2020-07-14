@@ -19,12 +19,30 @@ public class RoomListPanel : MonoBehaviourPunCallbacks {
     [SerializeField]
     private Room roomPrefab;
 
+    private List<Room> roomsList;
+    void Awake() {
+        roomsList = new List<Room>();
+    }
+
     public override void OnRoomListUpdate(List<RoomInfo> roomList) {
         foreach (RoomInfo roomInfo in roomList) {
-            Room room = Instantiate(roomPrefab, content);
-            room.SetRoomInfo(roomInfo);
-        }
 
+            if (roomInfo.RemovedFromList) {
+                int index = roomsList.FindIndex(x => x.RoomInfo.Name == roomInfo.Name);
+                if (index != -1) {
+                    Destroy(roomsList[index].gameObject);
+                    roomsList.RemoveAt(index);
+                }
+
+            } else {
+                Room room = Instantiate(roomPrefab, content);
+                if (roomsList != null) {
+                    room.SetRoomInfo(roomInfo);
+                    roomsList.Add(room);
+                }
+                
+            }            
+        }
     }
 
     public void OnClickCreateRoom() {
