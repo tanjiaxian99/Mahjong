@@ -25,13 +25,13 @@ public class Launcher : MonoBehaviourPunCallbacks {
     private GameObject progressLabel;
 
     [SerializeField]
-    private GameObject roomsPanel;
+    private GameObject roomListPanel;
 
-    /// <summary>
-    /// Only true when the player connects to the server for the first time. Prevents calling OnConnectedToMaster()
-    /// automatically when leaving a room.
-    /// </summary>
-    bool firstConnection;
+    [SerializeField]
+    private GameObject createRoomPanel;
+
+    [SerializeField]
+    private GameObject roomPanel;
 
     #endregion
 
@@ -40,16 +40,16 @@ public class Launcher : MonoBehaviourPunCallbacks {
     void Awake() {
         // All clients in the same room will automatically load the same level as Master Client
         PhotonNetwork.AutomaticallySyncScene = true;
+        DefaultUI();
     }
-
 
     void Start() {
         // Show name inputField and 'Play' button
         progressLabel.SetActive(false);
         controlPanel.SetActive(true);
 
-        // DEBUG
-        this.Connect();
+        //// DEBUG
+        //this.Connect();
     }
 
     #endregion
@@ -58,50 +58,29 @@ public class Launcher : MonoBehaviourPunCallbacks {
 
     public override void OnConnectedToMaster() {
         Debug.Log("Mahjong/Launcher: OnConnectedToMaster() was called by PUN");
-
-        // Automatically connect to a random room when firstConnection is true, which is when the player
-        // connects to the Photon server for the first time.
-        if (firstConnection) {
-            // If numberOfPlayersToStart == 1 and a second client calls JoinRandomRoom, an exception is raised:
-            // Deserialization failed for Operation Response. System.Exception: Read failed. Custom type not found: 255.
-            firstConnection = false;
-        }
     }
-
 
     /// <summary>
     /// Called by PUN when JoinRandomRoom succeeds
     /// </summary>
     public override void OnJoinedRoom() {
         Debug.Log("Mahjong/Launcher: OnJoinedRoom() called by PUN. The client is in a room.");
-        // Let the first player load the room. Every other player will sync with the loaded level 
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 1) {
-            Debug.Log("We load the GameRoom");
-            // Load the Room Level.
-            PhotonNetwork.LoadLevel("GameRoom");
-        }
+
+        createRoomPanel.SetActive(false);
+        roomPanel.SetActive(true);
+
+        //// Let the first player load the room. Every other player will sync with the loaded level 
+        //if (PhotonNetwork.CurrentRoom.PlayerCount == 1) {
+        //    Debug.Log("We load the GameRoom");
+        //    PhotonNetwork.LoadLevel("GameRoom");
+        //}
     }
-
-
-    /// <summary>
-    /// Called by PUN when JoinRandomRoom fails
-    /// </summary>
-    public override void OnJoinRandomFailed(short returnCode, string message) {
-        Debug.Log("Mahjong/Launcher: OnJoinRandomFailed() was called by PUN. No random room available. \nCall PhotonNetwork.CreateRoom");
-        // Create a new room with no name
-        PhotonNetwork.CreateRoom(null, new RoomOptions {
-            MaxPlayers = maxPlayersPerRoom});
-    }
-
 
     public override void OnDisconnected(DisconnectCause cause) {
         Debug.LogWarningFormat("Mahjong/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
         // Turn off 'connecting...' progressLabel
         progressLabel.SetActive(false);
         controlPanel.SetActive(true);
-
-        // Restart the firstConnection
-        firstConnection = false;
     }
 
     #endregion
@@ -117,13 +96,23 @@ public class Launcher : MonoBehaviourPunCallbacks {
         progressLabel.SetActive(true);
         controlPanel.SetActive(false);
 
-        if (PhotonNetwork.IsConnected) {
-            progressLabel.SetActive(false);
-            roomsPanel.SetActive(true);
-        } else {
-            firstConnection = PhotonNetwork.ConnectUsingSettings();
+        if (!PhotonNetwork.IsConnected) {
+            PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
         }
+
+        progressLabel.SetActive(false);
+        roomListPanel.SetActive(true);
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void DefaultUI() {
+        controlPanel.SetActive(true);
+        progressLabel.SetActive(false);
+        roomListPanel.SetActive(false);
     }
 
     #endregion

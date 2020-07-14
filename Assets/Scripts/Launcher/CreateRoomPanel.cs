@@ -6,7 +6,7 @@ using Photon.Realtime;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class CreateRoom : MonoBehaviourPunCallbacks {
+public class CreateRoomPanel : MonoBehaviourPunCallbacks {
 
     [SerializeField]
     private Text roomName;
