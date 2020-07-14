@@ -81,10 +81,10 @@ MonoBehaviour:
     m_ClassName: 
   m_ActivePlayerDataBuilderIndex: 3
   m_DataBuilders:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 5cbf03889665edd4ab59b4f100843506, type: 2}
+  - {fileID: 11400000, guid: 3b99790be420d1a44875902e434aeddd, type: 2}
+  - {fileID: 11400000, guid: b7647c2a03d9cd546afa3b57ead5c3ff, type: 2}
+  - {fileID: 11400000, guid: 4338f5aeb9f849142a1ba6f4d7506b71, type: 2}
   m_ActiveProfileId: fd67151b8b47ba24c8cc58a33be206b5
   m_HostingServicesManager:
     m_HostingServiceInfos: []

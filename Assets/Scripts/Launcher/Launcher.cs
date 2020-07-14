@@ -57,6 +57,11 @@ public class Launcher : MonoBehaviourPunCallbacks {
     #region MonoBehaviourPunCallbacks Callbacks
 
     public override void OnConnectedToMaster() {
+        progressLabel.SetActive(false);
+        roomListPanel.SetActive(true);
+
+        PhotonNetwork.JoinLobby();
+
         Debug.Log("Mahjong/Launcher: OnConnectedToMaster() was called by PUN");
     }
 
@@ -100,9 +105,6 @@ public class Launcher : MonoBehaviourPunCallbacks {
             PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
         }
-
-        progressLabel.SetActive(false);
-        roomListPanel.SetActive(true);
     }
 
     #endregion
@@ -113,6 +115,11 @@ public class Launcher : MonoBehaviourPunCallbacks {
         controlPanel.SetActive(true);
         progressLabel.SetActive(false);
         roomListPanel.SetActive(false);
+
+        // Calls Awake, which then calls DefaultUI. Without this statement, the first roomPanel.SetActive(true) will
+        // lead to Awake, then DefaultUI, then roomPanel.SetActive(false)
+        createRoomPanel.SetActive(true);
+        roomPanel.SetActive(true);
     }
 
     #endregion

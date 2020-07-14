@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class RoomListPanel : MonoBehaviour {
+public class RoomListPanel : MonoBehaviourPunCallbacks {
 
     [SerializeField]
     private GameObject roomListPanel;
@@ -11,17 +13,22 @@ public class RoomListPanel : MonoBehaviour {
     [SerializeField]
     private GameObject createRoomPanel;
 
-    void Awake() {
-        DefaultUI();
+    [SerializeField]
+    private Transform content;
+
+    [SerializeField]
+    private Room roomPrefab;
+
+    public override void OnRoomListUpdate(List<RoomInfo> roomList) {
+        foreach (RoomInfo roomInfo in roomList) {
+            Room room = Instantiate(roomPrefab, content);
+            room.SetRoomInfo(roomInfo);
+        }
+
     }
 
     public void OnClickCreateRoom() {
         roomListPanel.SetActive(false);
         createRoomPanel.SetActive(true);
-    }
-
-    private void DefaultUI() {
-        createRoomPanel.SetActive(false);
-        createRoomPanel.transform.GetChild(3).GetComponent<Text>().enabled = false;
     }
 }

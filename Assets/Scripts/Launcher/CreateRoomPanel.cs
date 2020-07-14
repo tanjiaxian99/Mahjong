@@ -9,6 +9,15 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class CreateRoomPanel : MonoBehaviourPunCallbacks {
 
     [SerializeField]
+    private GameObject roomListPanel;
+
+    [SerializeField]
+    private GameObject createRoomPanel;
+
+    [SerializeField]
+    private GameObject createRoomFail;
+
+    [SerializeField]
     private Text roomName;
 
     [SerializeField]
@@ -18,6 +27,10 @@ public class CreateRoomPanel : MonoBehaviourPunCallbacks {
     /// The password for the current room
     /// </summary>
     public static readonly string RoomPasswordPropKey = "rp";
+
+    void Awake() {
+        DefaultUI();
+    }
 
     /// <summary>
     /// Called when the "Create Room" button is pressed
@@ -36,7 +49,6 @@ public class CreateRoomPanel : MonoBehaviourPunCallbacks {
         options.IsVisible = true;
         options.IsOpen = true;
 
-        Debug.LogError(password.text);
         Hashtable ht = new Hashtable();
         ht.Add(RoomPasswordPropKey, password.text);
         options.CustomRoomProperties = ht;
@@ -48,4 +60,16 @@ public class CreateRoomPanel : MonoBehaviourPunCallbacks {
         Debug.Log("Room successfully created");
     }
 
+    /// <summary>
+    /// Called when the "Back To Lobby" button is pressed
+    /// </summary>
+    public void OnClickBackToLobby() {
+        roomListPanel.SetActive(true);
+        createRoomPanel.SetActive(false);
+    }
+
+    private void DefaultUI() {
+        createRoomPanel.SetActive(false);
+        createRoomFail.SetActive(false);
+    }
 }
