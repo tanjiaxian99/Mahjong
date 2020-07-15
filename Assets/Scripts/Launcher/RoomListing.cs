@@ -7,6 +7,10 @@ using UnityEngine.UI;
 
 public class RoomListing : MonoBehaviour {
 
+    public GameObject RoomListPanel { private get; set; }
+
+    public PasswordPanel PasswordPanel { private get; set; }
+
     [SerializeField]
     private Text roomName;
 
@@ -24,7 +28,7 @@ public class RoomListing : MonoBehaviour {
         roomName.text = roomInfo.Name;
         numberOfPlayers.text = roomInfo.PlayerCount.ToString() + " / 4";
 
-        string password = (string) roomInfo.CustomProperties[CreateRoomPanel.RoomPasswordPropKey];
+        string password = PropertiesManager.GetRoomPassword(RoomInfo);
         if (password == "") {
             privateSetting.text = "Open";
         } else {
@@ -33,6 +37,14 @@ public class RoomListing : MonoBehaviour {
     }
 
     public void OnClickJoinRoom() {
-        PhotonNetwork.JoinRoom(RoomInfo.Name);
+        string password = PropertiesManager.GetRoomPassword(RoomInfo);
+        if (password == "") {
+            PhotonNetwork.JoinRoom(RoomInfo.Name);
+        } else {
+            PasswordPanel.RoomInfo = RoomInfo;
+
+            RoomListPanel.SetActive(false);
+            PasswordPanel.gameObject.SetActive(true);
+        }
     }
 }

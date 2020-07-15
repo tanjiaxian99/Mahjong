@@ -23,11 +23,6 @@ public class CreateRoomPanel : MonoBehaviourPunCallbacks {
     [SerializeField]
     private Text password;
 
-    /// <summary>
-    /// The password for the current room
-    /// </summary>
-    public static readonly string RoomPasswordPropKey = "rp";
-
     void Awake() {
         DefaultUI();
     }
@@ -49,11 +44,10 @@ public class CreateRoomPanel : MonoBehaviourPunCallbacks {
         options.IsVisible = true;
         options.IsOpen = true;
 
-        Hashtable ht = new Hashtable();
-        ht.Add(RoomPasswordPropKey, password.text);
-        options.CustomRoomProperties = ht;
+        options.CustomRoomProperties = PropertiesManager.SetRoomPassword(password.text);
+
         options.CustomRoomPropertiesForLobby = new string[1] {
-            RoomPasswordPropKey
+            PropertiesManager.RoomPasswordPropKey
         };
         
         PhotonNetwork.CreateRoom(roomName.text, options, TypedLobby.Default);

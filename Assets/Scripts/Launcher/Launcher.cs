@@ -28,6 +28,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
     private GameObject roomListPanel;
 
     [SerializeField]
+    private GameObject passwordPanel;
+
+    [SerializeField]
     private GameObject createRoomPanel;
 
     [SerializeField]
@@ -125,10 +128,11 @@ public class Launcher : MonoBehaviourPunCallbacks {
     private void DefaultUI() {
         controlPanel.SetActive(true);
         progressLabel.SetActive(false);
-        roomListPanel.SetActive(false);
 
         // Calls Awake, which then calls DefaultUI. Without this statement, the first roomPanel.SetActive(true) will
         // lead to Awake, then DefaultUI, then roomPanel.SetActive(false)
+        roomListPanel.SetActive(false);
+        passwordPanel.SetActive(true);
         createRoomPanel.SetActive(true);
         roomPanel.SetActive(true);
     }

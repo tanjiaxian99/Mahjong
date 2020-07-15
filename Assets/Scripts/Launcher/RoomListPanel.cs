@@ -11,6 +11,9 @@ public class RoomListPanel : MonoBehaviourPunCallbacks {
     private GameObject roomListPanel;
 
     [SerializeField]
+    private PasswordPanel passwordPanel;
+
+    [SerializeField]
     private GameObject createRoomPanel;
 
     [SerializeField]
@@ -38,6 +41,8 @@ public class RoomListPanel : MonoBehaviourPunCallbacks {
             } else {
                 if (index == -1) {
                     RoomListing roomListing = Instantiate(roomPrefab, content);
+                    roomListing.RoomListPanel = roomListPanel;
+                    roomListing.PasswordPanel = passwordPanel;
 
                     if (roomList != null) {
                         roomListing.SetRoomInfo(roomInfo);
