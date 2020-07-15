@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Realtime;
 
-public class RoomPanel : MonoBehaviour {
+public class RoomPanel : MonoBehaviourPunCallbacks {
 
     [SerializeField]
     private GameObject roomPanel;
@@ -27,16 +27,13 @@ public class RoomPanel : MonoBehaviour {
         } else {
             _instance = this;
         }
+    }
 
+    private void Start() {
         DefaultUI();
     }
 
     #endregion
-
-    public void UpdatePlayerList() {
-        Player[] playerList = PhotonNetwork.PlayerList;
-
-    }
 
     private void DefaultUI() {
         roomPanel.SetActive(false);

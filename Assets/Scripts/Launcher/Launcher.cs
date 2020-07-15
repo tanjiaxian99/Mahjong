@@ -33,6 +33,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
     [SerializeField]
     private GameObject roomPanel;
 
+    [SerializeField]
+    private GameObject playerListPanel;
+
     #endregion
 
     #region MonoBehaviour Callbacks
@@ -69,11 +72,13 @@ public class Launcher : MonoBehaviourPunCallbacks {
     /// Called by PUN when JoinRandomRoom succeeds
     /// </summary>
     public override void OnJoinedRoom() {
-        Debug.Log("Mahjong/Launcher: OnJoinedRoom() called by PUN. The client is in a room.");
-
+        roomListPanel.SetActive(false);
         createRoomPanel.SetActive(false);
         roomPanel.SetActive(true);
 
+        PlayerListPanel.Instance.SetInitialPlayerList();
+
+        Debug.Log("Mahjong/Launcher: OnJoinedRoom() called by PUN. The client is in a room.");
         //// Let the first player load the room. Every other player will sync with the loaded level 
         //if (PhotonNetwork.CurrentRoom.PlayerCount == 1) {
         //    Debug.Log("We load the GameRoom");

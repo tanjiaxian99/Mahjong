@@ -1,10 +1,11 @@
-﻿using Photon.Realtime;
+﻿using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Room : MonoBehaviour {
+public class RoomListing : MonoBehaviour {
 
     [SerializeField]
     private Text roomName;
@@ -29,5 +30,9 @@ public class Room : MonoBehaviour {
         } else {
             privateSetting.text = "Private";
         }
+    }
+
+    public void OnClickJoinRoom() {
+        PhotonNetwork.JoinRoom(RoomInfo.Name);
     }
 }
