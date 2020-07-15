@@ -86,6 +86,12 @@ public class Launcher : MonoBehaviourPunCallbacks {
         //}
     }
 
+
+    public override void OnLeftRoom() {
+        PlayerListPanel.Instance.ClearPlayerList();
+    }
+
+
     public override void OnDisconnected(DisconnectCause cause) {
         Debug.LogWarningFormat("Mahjong/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
         // Turn off 'connecting...' progressLabel

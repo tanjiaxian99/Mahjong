@@ -12,7 +12,7 @@ public class PlayerListPanel : MonoBehaviourPunCallbacks {
     [SerializeField]
     private PlayerListing playerPrefab;
 
-    private List<PlayerListing> playerList;
+    public List<PlayerListing> playerList;
 
     #region Singleton Initialization
 
@@ -52,6 +52,13 @@ public class PlayerListPanel : MonoBehaviourPunCallbacks {
         if (index != -1) {
             Destroy(playerList[index].gameObject);
             playerList.RemoveAt(index);
+        }
+    }
+
+    public void ClearPlayerList() {
+        playerList.Clear();
+        foreach (Transform child in playerListPanel) {
+            Destroy(child.gameObject);
         }
     }
 }

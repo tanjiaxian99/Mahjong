@@ -7,6 +7,9 @@ using Photon.Realtime;
 public class RoomPanel : MonoBehaviourPunCallbacks {
 
     [SerializeField]
+    private GameObject roomListPanel;
+
+    [SerializeField]
     private GameObject roomPanel;
 
     [SerializeField]
@@ -29,11 +32,18 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         }
     }
 
+    #endregion
+
     private void Start() {
         DefaultUI();
     }
 
-    #endregion
+    public void OnClickLeaveRoom() {
+        PhotonNetwork.LeaveRoom();
+
+        roomPanel.SetActive(false);
+        roomListPanel.SetActive(true);
+    }
 
     private void DefaultUI() {
         roomPanel.SetActive(false);
