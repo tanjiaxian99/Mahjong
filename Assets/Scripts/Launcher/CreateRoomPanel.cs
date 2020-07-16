@@ -18,10 +18,10 @@ public class CreateRoomPanel : MonoBehaviourPunCallbacks {
     private GameObject createRoomFail;
 
     [SerializeField]
-    private Text roomName;
+    private InputField roomName;
 
     [SerializeField]
-    private Text password;
+    private InputField password;
 
     void Awake() {
         DefaultUI();
@@ -45,12 +45,13 @@ public class CreateRoomPanel : MonoBehaviourPunCallbacks {
         options.IsOpen = true;
 
         options.CustomRoomProperties = PropertiesManager.SetRoomPassword(password.text);
-
         options.CustomRoomPropertiesForLobby = new string[1] {
             PropertiesManager.RoomPasswordPropKey
         };
         
         PhotonNetwork.CreateRoom(roomName.text, options, TypedLobby.Default);
+        roomName.text = "";
+        password.text = "";
         Debug.Log("Room successfully created");
     }
 

@@ -28,6 +28,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
     private GameObject roomListPanel;
 
     [SerializeField]
+    private GameObject joinRoomFailed;
+
+    [SerializeField]
     private GameObject passwordPanel;
 
     [SerializeField]
@@ -89,6 +92,19 @@ public class Launcher : MonoBehaviourPunCallbacks {
         //}
     }
 
+    public override void OnJoinRoomFailed(short returnCode, string message) {
+        if (message == "Game full") {
+            StartCoroutine(JoinRoomFailed());
+        }
+        roomListPanel.SetActive(true);
+        Debug.LogFormat("Mahjong/RoomListPanel: OnJoinRoomFailed was called by PUN by returnCode {0} and message {1}.", returnCode, message);
+    }
+
+    IEnumerator JoinRoomFailed() {
+        joinRoomFailed.gameObject.SetActive(true);
+        yield return new WaitForSeconds(3f);
+        joinRoomFailed.gameObject.SetActive(false);
+    }
 
     public override void OnLeftRoom() {
         PlayerListPanel.Instance.ClearPlayerList();
@@ -132,6 +148,7 @@ public class Launcher : MonoBehaviourPunCallbacks {
         // Calls Awake, which then calls DefaultUI. Without this statement, the first roomPanel.SetActive(true) will
         // lead to Awake, then DefaultUI, then roomPanel.SetActive(false)
         roomListPanel.SetActive(false);
+        joinRoomFailed.SetActive(false);
         passwordPanel.SetActive(true);
         createRoomPanel.SetActive(true);
         roomPanel.SetActive(true);

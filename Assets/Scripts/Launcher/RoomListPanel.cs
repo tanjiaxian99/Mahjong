@@ -8,7 +8,13 @@ using Photon.Realtime;
 public class RoomListPanel : MonoBehaviourPunCallbacks {
 
     [SerializeField]
+    private GameObject launcher;
+
+    [SerializeField]
     private GameObject roomListPanel;
+
+    [SerializeField]
+    private GameObject joinRoomFailed;
 
     [SerializeField]
     private PasswordPanel passwordPanel;
@@ -41,6 +47,7 @@ public class RoomListPanel : MonoBehaviourPunCallbacks {
             } else {
                 if (index == -1) {
                     RoomListing roomListing = Instantiate(roomPrefab, content);
+                    roomListing.Launcher = launcher;
                     roomListing.RoomListPanel = roomListPanel;
                     roomListing.PasswordPanel = passwordPanel;
 

@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RoomListing : MonoBehaviour {
+public class RoomListing : MonoBehaviourPunCallbacks {
+
+    public GameObject Launcher { get; set; }
 
     public GameObject RoomListPanel { private get; set; }
 
@@ -37,6 +39,11 @@ public class RoomListing : MonoBehaviour {
     }
 
     public void OnClickJoinRoom() {
+        if (RoomInfo.PlayerCount == RoomInfo.MaxPlayers) {
+            Launcher.GetComponent<Launcher>().OnJoinRoomFailed(32765, "Game full");
+            return;
+        }
+
         string password = PropertiesManager.GetRoomPassword(RoomInfo);
         if (password == "") {
             PhotonNetwork.JoinRoom(RoomInfo.Name);
