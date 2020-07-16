@@ -44,7 +44,8 @@ public class CreateRoomPanel : MonoBehaviourPunCallbacks {
         options.IsVisible = true;
         options.IsOpen = true;
 
-        options.CustomRoomProperties = PropertiesManager.SetRoomPassword(password.text);
+        string hashedPassword = Launcher.EncodePassword(password.text);
+        options.CustomRoomProperties = PropertiesManager.SetRoomPassword(hashedPassword);
         options.CustomRoomPropertiesForLobby = new string[1] {
             PropertiesManager.RoomPasswordPropKey
         };

@@ -40,9 +40,10 @@ public class PasswordPanel : MonoBehaviour {
     #endregion
 
     public void OnClickJoinRoom() {
+        string hashedInput = Launcher.EncodePassword(passwordInputField.text);
         string password = PropertiesManager.GetRoomPassword(RoomInfo);
 
-        if (passwordInputField.text == password) {
+        if (hashedInput == password) {
             passwordInputField.text = "";
             passwordPanel.SetActive(false);
             PhotonNetwork.JoinRoom(RoomInfo.Name);
