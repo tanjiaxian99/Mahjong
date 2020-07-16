@@ -34,7 +34,7 @@ public class RoomListPanel : MonoBehaviourPunCallbacks {
         roomList = new List<RoomListing>();
     }
 
-    public override void OnRoomListUpdate(List<RoomInfo> roomInfoList) {
+    public void RoomListUpdate(List<RoomInfo> roomInfoList) {
         foreach (RoomInfo roomInfo in roomInfoList) {
             int index = roomList.FindIndex(x => x.RoomInfo.Name == roomInfo.Name);
 
@@ -60,6 +60,13 @@ public class RoomListPanel : MonoBehaviourPunCallbacks {
                     roomList[index].SetRoomInfo(roomInfo);
                 }                
             }            
+        }
+    }
+
+    public void ClearRoomList() {
+        roomList.Clear();
+        foreach (Transform child in content) {
+            Destroy(child.gameObject);
         }
     }
 

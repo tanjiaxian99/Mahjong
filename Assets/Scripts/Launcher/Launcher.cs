@@ -74,6 +74,10 @@ public class Launcher : MonoBehaviourPunCallbacks {
         Debug.Log("Mahjong/Launcher: OnConnectedToMaster() was called by PUN");
     }
 
+    public override void OnRoomListUpdate(List<RoomInfo> roomInfoList) {
+        roomListPanel.GetComponent<RoomListPanel>().RoomListUpdate(roomInfoList);
+    }
+
     /// <summary>
     /// Called by PUN when JoinRandomRoom succeeds
     /// </summary>
@@ -82,6 +86,7 @@ public class Launcher : MonoBehaviourPunCallbacks {
         createRoomPanel.SetActive(false);
         roomPanel.SetActive(true);
 
+        roomListPanel.GetComponent<RoomListPanel>().ClearRoomList();
         PlayerListPanel.Instance.SetInitialPlayerList();
 
         Debug.Log("Mahjong/Launcher: OnJoinedRoom() called by PUN. The client is in a room.");
