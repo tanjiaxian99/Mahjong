@@ -102,7 +102,7 @@ public class Launcher : MonoBehaviourPunCallbacks {
             StartCoroutine(JoinRoomFailed());
         }
         roomListPanel.SetActive(true);
-        Debug.LogFormat("Mahjong/RoomListPanel: OnJoinRoomFailed was called by PUN by returnCode {0} and message {1}.", returnCode, message);
+        Debug.LogFormat("Mahjong/Launcher: OnJoinRoomFailed was called by PUN by returnCode {0} and message \"{1}\".", returnCode, message);
     }
 
     IEnumerator JoinRoomFailed() {
