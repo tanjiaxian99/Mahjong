@@ -29,6 +29,11 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     #region PropKeys
 
     /// <summary>
+    /// The password for the current room
+    /// </summary>
+    public static readonly string RoomPasswordPropKey = "rp";
+
+    /// <summary>
     /// The current turn
     /// </summary>
     public static readonly string TurnNumberPropKey = "tn";
@@ -125,6 +130,12 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     }
 
     #region Set Properties Methods
+
+    public static Hashtable SetRoomPassword(string password) {
+        Hashtable ht = new Hashtable();
+        ht.Add(RoomPasswordPropKey, password);
+        return ht;
+    }
 
     public static void SetTurnNumber(int turn) {
         Hashtable ht = new Hashtable();
@@ -235,6 +246,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     #endregion
 
     #region Retrieve Properties Methods
+
+    public static string GetRoomPassword(RoomInfo roomInfo) {
+        return (string)roomInfo.CustomProperties[RoomPasswordPropKey];
+    }
 
     public static int GetCurrentTurn() {
         return (int)PhotonNetwork.CurrentRoom.CustomProperties[TurnNumberPropKey];
