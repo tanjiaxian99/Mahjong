@@ -34,6 +34,11 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     public static readonly string RoomPasswordPropKey = "rp";
 
     /// <summary>
+    /// A dictionary containing the ready-state of players
+    /// </summary>
+    public static readonly string PlayerReadyPropKey = "pr";
+
+    /// <summary>
     /// The current turn
     /// </summary>
     public static readonly string TurnNumberPropKey = "tn";
@@ -135,6 +140,23 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         Hashtable ht = new Hashtable();
         ht.Add(RoomPasswordPropKey, password);
         return ht;
+    }
+
+    public static void SetPlayerReadyDict(Player player) {
+        Dictionary<int, bool> readyDict = GetPlayerReadyDict();
+        if (readyDict == null) {
+            readyDict = new Dictionary<int, bool>();
+        }
+
+        if (!readyDict.ContainsKey(player.ActorNumber)) {
+            readyDict.Add(player.ActorNumber, true);
+        }
+
+        readyDict[player.ActorNumber] = !readyDict[player.ActorNumber];
+
+        Hashtable ht = new Hashtable();
+        ht.Add(PlayerReadyPropKey, readyDict);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
     public static void SetTurnNumber(int turn) {
@@ -251,6 +273,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         return (string)roomInfo.CustomProperties[RoomPasswordPropKey];
     }
 
+    public static Dictionary<int, bool> GetPlayerReadyDict() {
+        return (Dictionary<int, bool>)PhotonNetwork.CurrentRoom.CustomProperties[PlayerReadyPropKey];
+    }
+
     public static int GetCurrentTurn() {
         return (int)PhotonNetwork.CurrentRoom.CustomProperties[TurnNumberPropKey];
     }
@@ -321,6 +347,20 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     }
 
     #endregion
+
+    public static void RemovePlayerReady(Player player) {
+        Dictionary<int, bool> readyDict = GetPlayerReadyDict();
+
+        if (readyDict == null) {
+            return;
+        }
+
+        readyDict.Remove(player.ActorNumber);
+
+        Hashtable ht = new Hashtable();
+        ht.Add(PlayerReadyPropKey, readyDict);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
 
     #region Properties Update
 

@@ -22,6 +22,9 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
     [SerializeField]
     private GameObject buttonsPanel;
 
+    [SerializeField]
+    private GameObject startGameButton;
+
     #region Singleton Initialization
 
     private static RoomPanel _instance;
@@ -42,15 +45,29 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         DefaultUI();
     }
 
+    private void Update() {
+        if (PhotonNetwork.IsMasterClient) {
+            startGameButton.SetActive(true);
+        } else {
+            startGameButton.SetActive(false);
+        }
+    }
+
     public void SetRoomName() {
         roomName.GetComponentInChildren<Text>().text = PhotonNetwork.CurrentRoom.Name;
     }
 
     public void OnClickLeaveRoom() {
+        PropertiesManager.RemovePlayerReady(PhotonNetwork.LocalPlayer);
+
         PhotonNetwork.LeaveRoom();
 
         roomPanel.SetActive(false);
         roomListPanel.SetActive(true);
+    }
+
+    public void OnClickStartGame() {
+
     }
 
     private void DefaultUI() {
@@ -67,6 +84,6 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         foreach (Transform child in buttonsPanel.transform) {
             child.gameObject.SetActive(true);
         }
+        startGameButton.SetActive(false);
     }
-
 }

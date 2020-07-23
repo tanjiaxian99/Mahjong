@@ -90,6 +90,8 @@ public class Launcher : MonoBehaviourPunCallbacks {
         roomListPanel.GetComponent<RoomListPanel>().ClearRoomList();
         PlayerListPanel.Instance.SetInitialPlayerList();
 
+        PropertiesManager.SetPlayerReadyDict(PhotonNetwork.LocalPlayer);
+
         Debug.Log("Mahjong/Launcher: OnJoinedRoom() called by PUN. The client is in a room.");
         //// Let the first player load the room. Every other player will sync with the loaded level 
         //if (PhotonNetwork.CurrentRoom.PlayerCount == 1) {
