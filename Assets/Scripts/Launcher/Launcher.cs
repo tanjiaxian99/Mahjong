@@ -85,6 +85,7 @@ public class Launcher : MonoBehaviourPunCallbacks {
         roomListPanel.SetActive(false);
         createRoomPanel.SetActive(false);
         roomPanel.SetActive(true);
+        roomPanel.GetComponent<RoomPanel>().SetRoomName();
 
         roomListPanel.GetComponent<RoomListPanel>().ClearRoomList();
         PlayerListPanel.Instance.SetInitialPlayerList();

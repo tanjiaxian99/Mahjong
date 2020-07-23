@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Realtime;
+using UnityEngine.UI;
 
 public class RoomPanel : MonoBehaviourPunCallbacks {
 
@@ -11,6 +12,9 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
 
     [SerializeField]
     private GameObject roomPanel;
+
+    [SerializeField]
+    private GameObject roomName;
 
     [SerializeField]
     private GameObject playerListPanel;
@@ -38,6 +42,10 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         DefaultUI();
     }
 
+    public void SetRoomName() {
+        roomName.GetComponentInChildren<Text>().text = PhotonNetwork.CurrentRoom.Name;
+    }
+
     public void OnClickLeaveRoom() {
         PhotonNetwork.LeaveRoom();
 
@@ -47,6 +55,8 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
 
     private void DefaultUI() {
         roomPanel.SetActive(false);
+
+        roomName.SetActive(true);
 
         playerListPanel.SetActive(true);
         foreach (Transform child in playerListPanel.transform) {
