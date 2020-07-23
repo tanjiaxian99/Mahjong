@@ -32,6 +32,23 @@ public class PlayerListPanel : MonoBehaviourPunCallbacks {
 
     #endregion
 
+    private void Update() {
+        UpdateHostStar();
+    }
+
+    public void UpdateHostStar() {
+        foreach (Transform child in playerListPanel) {
+            PlayerListing playerListing = child.GetComponent<PlayerListing>();
+            Player masterClient = PhotonNetwork.MasterClient;
+
+            if (playerListing.Player == masterClient) {
+                playerListing.ShowHostStar(true);
+            } else {
+                playerListing.ShowHostStar(false);
+            }
+        }
+    }
+
     public void SetInitialPlayerList() {
         Player[] playerList = PhotonNetwork.PlayerList;
         foreach (Player player in playerList) {
