@@ -59,10 +59,6 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         }
     }
 
-    public void InteractableStartButton(bool interactable) {
-        startGameButton.GetComponent<Button>().interactable = interactable;
-    }
-
     private void DefaultUI() {
         roomPanel.SetActive(false);
 
@@ -88,8 +84,14 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         roomName.GetComponentInChildren<Text>().text = PhotonNetwork.CurrentRoom.Name;
     }
 
-    public void OnClickStartGame() {
+    public void InteractableStartButton(bool interactable) {
+        startGameButton.GetComponent<Button>().interactable = interactable;
+    }
 
+    public void OnClickStartGame() {
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+
+        PhotonNetwork.LoadLevel("GameRoom");
     }
 
     public void OnClickLeaveRoom() {

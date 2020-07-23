@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 923718498304343408}
   - component: {fileID: 1167824957}
   m_Layer: 5
-  m_Name: Private
+  m_Name: Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -371,7 +371,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomName: {fileID: 923718500054989658}
   numberOfPlayers: {fileID: 923718499088684658}
-  privateSetting: {fileID: 923718498304343408}
+  description: {fileID: 923718498304343408}
 --- !u!1 &923718500054989636
 GameObject:
   m_ObjectHideFlags: 0

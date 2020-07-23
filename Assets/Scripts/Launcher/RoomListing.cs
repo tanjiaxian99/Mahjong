@@ -20,7 +20,7 @@ public class RoomListing : MonoBehaviourPunCallbacks {
     private Text numberOfPlayers;
 
     [SerializeField]
-    private Text privateSetting;
+    private Text description;
 
     public RoomInfo RoomInfo { get; private set; }
 
@@ -30,12 +30,18 @@ public class RoomListing : MonoBehaviourPunCallbacks {
         roomName.text = roomInfo.Name;
         numberOfPlayers.text = roomInfo.PlayerCount.ToString() + " / 4";
 
+        if (!roomInfo.IsOpen) {
+            description.text = "Playing";
+            this.gameObject.GetComponent<Button>().interactable = false;
+            return;
+        }
+
         string hashedPassword = PropertiesManager.GetRoomPassword(RoomInfo);
 
         if (hashedPassword == "???B???????o?$'?A?d??L???xR?U") {
-            privateSetting.text = "Open";
+            description.text = "Open";
         } else {
-            privateSetting.text = "Private";
+            description.text = "Private";
         }
     }
 
