@@ -30,8 +30,9 @@ public class RoomListing : MonoBehaviourPunCallbacks {
         roomName.text = roomInfo.Name;
         numberOfPlayers.text = roomInfo.PlayerCount.ToString() + " / 4";
 
-        string password = PropertiesManager.GetRoomPassword(RoomInfo);
-        if (password == "") {
+        string hashedPassword = PropertiesManager.GetRoomPassword(RoomInfo);
+
+        if (hashedPassword == "???B???????o?$'?A?d??L???xR?U") {
             privateSetting.text = "Open";
         } else {
             privateSetting.text = "Private";
@@ -44,8 +45,8 @@ public class RoomListing : MonoBehaviourPunCallbacks {
             return;
         }
 
-        string password = PropertiesManager.GetRoomPassword(RoomInfo);
-        if (password == "") {
+        string hashedPassword = PropertiesManager.GetRoomPassword(RoomInfo);
+        if (hashedPassword == "???B???????o?$'?A?d??L???xR?U") {
             PhotonNetwork.JoinRoom(RoomInfo.Name);
         } else {
             PasswordPanel.RoomInfo = RoomInfo;
