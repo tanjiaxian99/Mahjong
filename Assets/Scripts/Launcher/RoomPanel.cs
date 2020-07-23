@@ -46,6 +46,12 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
     }
 
     private void Update() {
+        DisplayStartButton();
+    }
+
+    #region Private Methods
+
+    private void DisplayStartButton() {
         if (PhotonNetwork.IsMasterClient) {
             startGameButton.SetActive(true);
         } else {
@@ -53,21 +59,8 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         }
     }
 
-    public void SetRoomName() {
-        roomName.GetComponentInChildren<Text>().text = PhotonNetwork.CurrentRoom.Name;
-    }
-
-    public void OnClickLeaveRoom() {
-        PropertiesManager.RemovePlayerReady(PhotonNetwork.LocalPlayer);
-
-        PhotonNetwork.LeaveRoom();
-
-        roomPanel.SetActive(false);
-        roomListPanel.SetActive(true);
-    }
-
-    public void OnClickStartGame() {
-
+    public void InteractableStartButton(bool interactable) {
+        startGameButton.GetComponent<Button>().interactable = interactable;
     }
 
     private void DefaultUI() {
@@ -86,4 +79,27 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         }
         startGameButton.SetActive(false);
     }
+
+    #endregion
+
+    #region Public Methods
+
+    public void SetRoomName() {
+        roomName.GetComponentInChildren<Text>().text = PhotonNetwork.CurrentRoom.Name;
+    }
+
+    public void OnClickStartGame() {
+
+    }
+
+    public void OnClickLeaveRoom() {
+        PropertiesManager.RemovePlayerReady(PhotonNetwork.LocalPlayer);
+
+        PhotonNetwork.LeaveRoom();
+
+        roomPanel.SetActive(false);
+        roomListPanel.SetActive(true);
+    }
+
+    #endregion
 }

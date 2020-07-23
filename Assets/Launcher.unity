@@ -612,7 +612,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 236151672}
   m_OnClick:
     m_PersistentCalls:
@@ -5845,6 +5845,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2651452263b75214e81235ac007a528a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  roomPanelObject: {fileID: 2073910651}
   playerListPanel: {fileID: 1712031209}
 --- !u!1 &2138759509
 GameObject:
