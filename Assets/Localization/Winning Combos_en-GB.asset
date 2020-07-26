@@ -16,7 +16,8 @@ MonoBehaviour:
     m_Code: en-GB
   m_SharedData: {fileID: 11400000, guid: 8a22c51a6891a034a88db810f248f7b3, type: 2}
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - id: 0
   m_TableData:
   - m_Id: 1
     m_Localized: Heavenly Hand
@@ -186,5 +187,14 @@ MonoBehaviour:
     m_Localized: fan
     m_Metadata:
       m_Items: []
+  - m_Id: 46
+    m_Localized: '{value} fan'
+    m_Metadata:
+      m_Items:
+      - id: 0
   references:
     version: 1
+    00000000:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 2e000000

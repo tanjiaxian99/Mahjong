@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
   m_Name: Winning Combos Shared Data
   m_EditorClassIdentifier: 
-  m_NextAvailableId: 46
+  m_NextAvailableId: 47
   m_TableCollectionName: Winning Combos
   m_TableCollectionNameGuidString: 8a22c51a6891a034a88db810f248f7b3
   m_Entries:
@@ -182,6 +182,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 45
     m_Key: FAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46
+    m_Key: X_FAN
     m_Metadata:
       m_Items: []
   m_Metadata:
