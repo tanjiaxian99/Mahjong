@@ -10,8 +10,6 @@ public class UpdateSliderValue : MonoBehaviour {
     [SerializeField]
     private Slider slider;
 
-    public int MaxValue { set { slider.maxValue = value; } }
-
     public int value;
 
     public LocalizedString myString;

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.Localization;
 using UnityEditor;
 using UnityEngine.SocialPlatforms;
+using Photon.Pun;
 
 public class RoomSetting : MonoBehaviour {
 
@@ -43,6 +44,10 @@ public class RoomSetting : MonoBehaviour {
     }
 
     public void UpdateSettings() {
+        if (!PhotonNetwork.IsMasterClient) {
+            return;
+        }
+
         PropertiesManager.SetChangedRoomSetting(settingsName, (int)slider.value);
     }
 
