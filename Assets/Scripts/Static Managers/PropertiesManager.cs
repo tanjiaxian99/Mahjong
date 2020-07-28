@@ -34,9 +34,19 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
     public static readonly string RoomPasswordPropKey = "rp";
 
     /// <summary>
+    /// A dictionary containing the settings for each room
+    /// </summary>
+    public static readonly string RoomSettingsPropKey = "rs";
+
+    /// <summary>
     /// A dictionary containing the ready-state of players
     /// </summary>
     public static readonly string PlayerReadyPropKey = "pr";
+
+    /// <summary>
+    /// A dictionary containing the change in one room setting
+    /// </summary>
+    public static readonly string ChangedRoomSettingPropKey = "cr";
 
     /// <summary>
     /// The current turn
@@ -136,9 +146,10 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
     #region Set Properties Methods
 
-    public static Hashtable SetRoomPassword(string password) {
+    public static Hashtable SetRoomOptions(string password, Dictionary<string, int> settings) {
         Hashtable ht = new Hashtable();
         ht.Add(RoomPasswordPropKey, password);
+        ht.Add(RoomSettingsPropKey, settings);
         return ht;
     }
 
@@ -156,6 +167,16 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
         Hashtable ht = new Hashtable();
         ht.Add(PlayerReadyPropKey, readyDict);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
+    public static void SetChangedRoomSetting(string setting, int value) {
+        Dictionary<string, int> oneRoomSetting = new Dictionary<string, int>() {
+            [setting] = value
+        };
+
+        Hashtable ht = new Hashtable();
+        ht.Add(ChangedRoomSettingPropKey, oneRoomSetting);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
@@ -267,7 +288,7 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
     #endregion
 
-    #region Retrieve Properties Methods
+    #region Get Properties Methods
 
     public static string GetRoomPassword(RoomInfo roomInfo) {
         return (string)roomInfo.CustomProperties[RoomPasswordPropKey];
@@ -275,6 +296,14 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
     public static Dictionary<int, bool> GetPlayerReadyDict() {
         return (Dictionary<int, bool>)PhotonNetwork.CurrentRoom.CustomProperties[PlayerReadyPropKey];
+    }
+
+    public static Dictionary<string ,int> GetRoomSettings() {
+        return (Dictionary<string, int>)PhotonNetwork.CurrentRoom.CustomProperties[RoomSettingsPropKey];
+    }
+
+    public static Dictionary<string, int> GetChangedRoomSetting() {
+        return (Dictionary<string, int>)PhotonNetwork.CurrentRoom.CustomProperties[ChangedRoomSettingPropKey];
     }
 
     public static int GetCurrentTurn() {
@@ -359,6 +388,12 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
         Hashtable ht = new Hashtable();
         ht.Add(PlayerReadyPropKey, readyDict);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
+    public static void UpdateRoomSettings(Dictionary<string, int> roomSettings) {
+        Hashtable ht = new Hashtable();
+        ht.Add(RoomSettingsPropKey, roomSettings);
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
@@ -489,7 +524,6 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         }
     }
 
-
     /// <summary>
     /// Called when a remote player's hand or open tiles changes
     /// </summary>
@@ -510,3 +544,4 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
 
     #endregion
 }
+ 

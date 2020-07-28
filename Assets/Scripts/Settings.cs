@@ -6,6 +6,8 @@ public class Settings : MonoBehaviour {
 
     public Dictionary<string, int> settingsDict;
 
+    public static Dictionary<string, int> settings;
+
     private void Awake() {
         settingsDict = new Dictionary<string, int>();
         this.InitialSettings();

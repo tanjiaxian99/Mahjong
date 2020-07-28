@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 7376812334885688075}
   - component: {fileID: 7376812334885688074}
   - component: {fileID: 7376812334885688077}
+  - component: {fileID: 7045154247596242587}
   m_Layer: 5
-  m_Name: Setting
+  m_Name: RoomSetting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -103,6 +104,22 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!114 &7045154247596242587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376812334885688079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d28eb8be68cc8ce418d961136888050f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomSetting: {fileID: 7376812334885688079}
+  slider: {fileID: 7376812336514063470}
+  stringEvent: {fileID: 7376812336639938657}
+  settingsName: 
 --- !u!1 &7376812335656553793
 GameObject:
   m_ObjectHideFlags: 0
@@ -191,7 +208,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7376812335656553793}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
   m_Name: 
@@ -233,6 +250,13 @@ MonoBehaviour:
   slider: {fileID: 7376812336514063470}
   value: 0
   stringEvent: {fileID: 7376812335656553803}
+  myString:
+    m_TableReference:
+      m_TableCollectionName: GUID:8a22c51a6891a034a88db810f248f7b3
+    m_TableEntryReference:
+      m_KeyId: 46
+      m_Key: 
+  localizedText: {fileID: 7376812335656553807}
 --- !u!114 &7376812335656553805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -639,6 +663,17 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7376812335656553802}
         m_MethodName: OnSliderChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 7045154247596242587}
+        m_MethodName: UpdateSettings
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

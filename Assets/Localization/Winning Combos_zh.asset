@@ -18,11 +18,13 @@ MonoBehaviour:
   m_Metadata:
     m_Items:
     - id: 0
+    - id: 1
   m_TableData:
   - m_Id: 1
     m_Localized: "\u5929\u80E1"
     m_Metadata:
-      m_Items: []
+      m_Items:
+      - id: 0
   - m_Id: 2
     m_Localized: "\u5730\u80E1"
     m_Metadata:
@@ -191,10 +193,14 @@ MonoBehaviour:
     m_Localized: "{value} \u53F0"
     m_Metadata:
       m_Items:
-      - id: 0
+      - id: 1
   references:
     version: 1
     00000000:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 01000000
+    00000001:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_Entries: 2e000000

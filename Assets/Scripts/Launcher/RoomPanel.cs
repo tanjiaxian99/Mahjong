@@ -25,6 +25,9 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
     [SerializeField]
     private GameObject startGameButton;
 
+    [SerializeField]
+    private GameObject roomSettingsPanel;
+
     #region Singleton Initialization
 
     private static RoomPanel _instance;
@@ -73,6 +76,7 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         foreach (Transform child in buttonsPanel.transform) {
             child.gameObject.SetActive(true);
         }
+
         startGameButton.SetActive(false);
     }
 
@@ -92,6 +96,11 @@ public class RoomPanel : MonoBehaviourPunCallbacks {
         PhotonNetwork.CurrentRoom.IsOpen = false;
 
         PhotonNetwork.LoadLevel("GameRoom");
+    }
+
+    public void OnClickRoomSettings() {
+        roomPanel.SetActive(false);
+        roomSettingsPanel.SetActive(true);
     }
 
     public void OnClickLeaveRoom() {
