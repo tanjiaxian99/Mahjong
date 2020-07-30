@@ -250,16 +250,16 @@ public class FanCalculator : MonoBehaviour {
 
             #region Fan in Replacement Tile
 
-            if (winningCombos.Contains("Winning on Replacement Tile for Flower")) {
+            if (winningCombos.Contains("Replacement Tile for Flower")) {
                 foreach (string winCombo in winningCombos) {
-                    if (winCombo == "Winning on Replacement Tile for Flower") {
-                        fanTotal += settingsDict["Winning on Replacement Tile for Flower"];
+                    if (winCombo == "Replacement Tile for Flower") {
+                        fanTotal += settingsDict["Replacement Tile for Flower"];
                     }
                 }
             }
 
-            if (winningCombos.Contains("Winning on Replacement Tile for Kong")) {
-                fanTotal += settingsDict["Winning on Replacement Tile for Kong"];
+            if (winningCombos.Contains("Replacement Tile for Kong")) {
+                fanTotal += settingsDict["Replacement Tile for Kong"];
             }
 
             if (winningCombos.Contains("Kong on Kong")) {
@@ -818,13 +818,13 @@ public class FanCalculator : MonoBehaviour {
     /// Container for Replacement Tile Win checks
     /// </summary>
     private void WinningOnReplacementTile(int numberOfReplacementTiles, int numberOfKong) {
-        if (settingsDict["Winning on Replacement Tile for Flower"] > 0) {
+        if (settingsDict["Replacement Tile for Flower"] > 0) {
             for (int i = 0; i < numberOfReplacementTiles; i++) {
-                winningCombos.Add("Winning on Replacement Tile for Flower");
+                winningCombos.Add("Replacement Tile for Flower");
             }
         }
 
-        if (settingsDict["Winning on Replacement Tile for Kong"] > 0) {
+        if (settingsDict["Replacement Tile for Kong"] > 0) {
             winningCombos.Add(WinningOnReplacementTileForKong(numberOfKong));
         }
 
@@ -1247,7 +1247,7 @@ public class FanCalculator : MonoBehaviour {
     /// </summary>
     private string WinningOnReplacementTileForFlower(int numberOfReplacementTiles) { 
         if (numberOfReplacementTiles > 0) {
-            return "Winning on Replacement Tile for Flower";
+            return "Replacement Tile for Flower";
         }
         return null;
     }
@@ -1258,7 +1258,7 @@ public class FanCalculator : MonoBehaviour {
     /// </summary>
     private string WinningOnReplacementTileForKong(int numberOfKong) {
         if (numberOfKong == 1) {
-            return "Winning on Replacement Tile for Kong";
+            return "Replacement Tile for Kong";
         }
         return null;
     }

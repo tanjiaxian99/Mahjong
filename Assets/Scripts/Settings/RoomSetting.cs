@@ -20,9 +20,6 @@ public class RoomSetting : MonoBehaviour {
     [SerializeField]
     private Slider slider;
 
-    [SerializeField]
-    private LocalizeStringEvent stringEvent;
-
     public string settingsName;
 
     #endregion

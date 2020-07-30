@@ -73,8 +73,8 @@ namespace Tests {
             handsToCheck.Add("Eighteen Arhats", 10);
             handsToCheck.Add("Thirteen Wonders", 10);
 
-            handsToCheck.Add("Winning on Replacement Tile for Flower", 1);
-            handsToCheck.Add("Winning on Replacement Tile for Kong", 1);
+            handsToCheck.Add("Replacement Tile for Flower", 1);
+            handsToCheck.Add("Replacement Tile for Kong", 1);
             handsToCheck.Add("Kong on Kong", 10);
 
             handsToCheck.Add("Robbing the Kong", 1);
@@ -2191,7 +2191,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>();
 
-            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Winning on Replacement Tile for Flower"] + handsToCheck["Winning on Replacement Tile for Flower"], new List<string>() { "Winning on Replacement Tile for Flower", "Winning on Replacement Tile for Flower" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Replacement Tile for Flower"] + handsToCheck["Replacement Tile for Flower"], new List<string>() { "Replacement Tile for Flower", "Replacement Tile for Flower" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, tilesManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -2234,7 +2234,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>();
 
-            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Winning on Replacement Tile for Kong"], new List<string>() { "Winning on Replacement Tile for Kong"});
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Replacement Tile for Kong"], new List<string>() { "Replacement Tile for Kong"});
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, tilesManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -2408,7 +2408,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>();
 
-            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Winning on Replacement Tile for Flower"], new List<string>() { "Winning on Replacement Tile for Flower" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Replacement Tile for Flower"], new List<string>() { "Replacement Tile for Flower" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, tilesManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);
@@ -2547,7 +2547,7 @@ namespace Tests {
             turn = 10;
             allPlayersOpenTiles = new List<Tile>() { };
 
-            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Animal", "Animal", "Animal", "Player Wind Combo", "Dragon_Two", "Winning on Replacement Tile for Flower" });
+            (int expectedFan, List<string> expectedWinningCombos) = (handsToCheck["Fan Limit"], new List<string>() { "Animal", "Animal", "Animal", "Player Wind Combo", "Dragon_Two", "Replacement Tile for Flower" });
             (int actualFan, List<string> actualWinningCombos) = fanCalculator.CalculateFan(playerManager, tilesManager, discardTile, discardPlayerWind, prevailingWind, numberOfTilesLeft, turn, allPlayersOpenTiles);
             Assert.AreEqual(expectedWinningCombos, actualWinningCombos);
             Assert.AreEqual(expectedFan, actualFan);

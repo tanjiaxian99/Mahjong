@@ -196,6 +196,10 @@ MonoBehaviour:
     m_Localized: Fan Limit
     m_Metadata:
       m_Items: []
+  - m_Id: 48
+    m_Localized: Dragon
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:

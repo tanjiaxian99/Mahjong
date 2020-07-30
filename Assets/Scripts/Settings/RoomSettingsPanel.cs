@@ -23,23 +23,36 @@ public class RoomSettingsPanel : MonoBehaviourPunCallbacks {
 
     private List<string> maxValueSettings;
 
+    private void Awake() {
+        InitializeMaxValueSettings();
+    }
+
     public override void OnEnable() {
         base.OnEnable();
-        InitializeMaxValueSettings();
         settings = PropertiesManager.GetRoomSettings();
+        int maxValue = settings["Fan Limit"];
 
-        foreach (Transform child in content) {
-            string settingsName = child.name;
-            child.GetComponent<RoomSetting>().settingsName = settingsName;
-
+        foreach (Transform child in content) {            
             Slider slider = child.GetComponentInChildren<Slider>();
-            slider.value = settings[settingsName];
-
             if (PhotonNetwork.IsMasterClient) {
                 slider.interactable = true;
             } else {
                 slider.interactable = false;
             }
+
+            string settingsName = child.name;
+            child.GetComponent<RoomSetting>().settingsName = settingsName;
+
+            if (child.name != "Fan Limit") {
+                slider.maxValue = maxValue;
+            }
+
+            slider.value = settings[settingsName];
+
+            //if (maxValueSettings.Contains(child.name)) {
+            //    slider.value = maxValue;
+            //}
+            
         }
     }
 
@@ -58,6 +71,7 @@ public class RoomSettingsPanel : MonoBehaviourPunCallbacks {
 
             if (PhotonNetwork.IsMasterClient) {
                 settings[settingsName] = value;
+                PropertiesManager.UpdateRoomSettings(settings);
                 return;
             }
             
@@ -78,11 +92,11 @@ public class RoomSettingsPanel : MonoBehaviourPunCallbacks {
         slider.maxValue = value;
         if (maxValueSettings.Contains(child.name)) {
             slider.value = value;
+            settings[child.name] = value;
         }
     }
 
     public void OnClickBackToRoom() {
-        PropertiesManager.UpdateRoomSettings(settings);
         roomSettingsPanel.SetActive(false);
         roomPanel.SetActive(true);
     }

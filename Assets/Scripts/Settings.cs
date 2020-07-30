@@ -54,8 +54,8 @@ public class Settings : MonoBehaviour {
         settingsDict.Add("Eighteen Arhats", 10);
         settingsDict.Add("Thirteen Wonders", 10);
 
-        settingsDict.Add("Winning on Replacement Tile for Flower", 1);
-        settingsDict.Add("Winning on Replacement Tile for Kong", 1);
+        settingsDict.Add("Replacement Tile for Flower", 1);
+        settingsDict.Add("Replacement Tile for Kong", 1);
         settingsDict.Add("Kong on Kong", 10);
 
         settingsDict.Add("Robbing the Kong", 1);

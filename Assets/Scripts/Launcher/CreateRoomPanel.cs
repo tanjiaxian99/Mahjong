@@ -141,8 +141,8 @@ public class CreateRoomPanel : MonoBehaviourPunCallbacks {
             ["Eighteen Arhats"] = 10,
             ["Thirteen Wonders"] = 10,
 
-            ["Winning on Replacement Tile for Flower"] = 1,
-            ["Winning on Replacement Tile for Kong"] = 1,
+            ["Replacement Tile for Flower"] = 1,
+            ["Replacement Tile for Kong"] = 1,
             ["Kong on Kong"] = 10,
 
             ["Robbing the Kong"] = 1,

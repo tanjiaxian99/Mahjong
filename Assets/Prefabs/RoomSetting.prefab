@@ -131,7 +131,6 @@ GameObject:
   - component: {fileID: 7376812335656553806}
   - component: {fileID: 7376812335656553804}
   - component: {fileID: 7376812335656553807}
-  - component: {fileID: 7376812335656553803}
   - component: {fileID: 7376812335656553802}
   - component: {fileID: 7376812335656553805}
   m_Layer: 5
@@ -201,40 +200,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "5 \u53F0"
---- !u!114 &7376812335656553803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7376812335656553793}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_StringReference:
-    m_TableReference:
-      m_TableCollectionName: GUID:8a22c51a6891a034a88db810f248f7b3
-    m_TableEntryReference:
-      m_KeyId: 46
-      m_Key: 
-  m_FormatArguments:
-  - {fileID: 7376812335656553802}
-  m_UpdateString:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7376812335656553807}
-        m_MethodName: set_text
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &7376812335656553802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -249,7 +214,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slider: {fileID: 7376812336514063470}
   value: 0
-  stringEvent: {fileID: 7376812335656553803}
   myString:
     m_TableReference:
       m_TableCollectionName: GUID:8a22c51a6891a034a88db810f248f7b3
