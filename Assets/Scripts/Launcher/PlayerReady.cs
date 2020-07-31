@@ -43,6 +43,10 @@ public class PlayerReady : MonoBehaviourPunCallbacks {
         }
     }
 
+    public override void OnPlayerLeftRoom(Player otherPlayer) {
+        PropertiesManager.RemovePlayerReady(otherPlayer);
+    }
+
     public void UpdateReadyPlayer(Player player, bool ready) {
         foreach (Transform child in playerListPanel) {
             PlayerListing playerListing = child.GetComponent<PlayerListing>();
