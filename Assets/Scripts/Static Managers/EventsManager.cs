@@ -29,6 +29,11 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #region Ev Bytes
 
     /// <summary>
+    /// The Reset Room Settings event message byte. Used internally for resetting the room's settings.
+    /// </summary>
+    public const byte EvResetRoomSettings = 3;
+
+    /// <summary>
     /// The Screen View Adjustment event message byte. Used internally for pointing the camera towards the GameTable and
     /// stretching the GameTable to fill the screen.
     /// </summary>
@@ -162,6 +167,10 @@ public class EventsManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #endregion
 
     #region Raise Events
+
+    public static void EventResetRoomSettings() {
+        PhotonNetwork.RaiseEvent(EvResetRoomSettings, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
+    }
 
     public static void EventInitialPoints() {
         PhotonNetwork.RaiseEvent(EvInitialPoints, null, new RaiseEventOptions() { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);

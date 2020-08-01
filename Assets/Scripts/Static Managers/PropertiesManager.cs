@@ -170,6 +170,12 @@ public class PropertiesManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
     }
 
+    public static void SetRoomSettings(Dictionary<string, int> roomSettings) {
+        Hashtable ht = new Hashtable();
+        ht.Add(RoomSettingsPropKey, roomSettings);
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+    }
+
     public static void SetChangedRoomSetting(string setting, int value) {
         Dictionary<string, int> oneRoomSetting = new Dictionary<string, int>() {
             [setting] = value
