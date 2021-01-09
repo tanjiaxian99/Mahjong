@@ -30,7 +30,7 @@ public class RoomSetting : MonoBehaviour {
         //TableEntryReference tableEntryReference = stringEvent.StringReference.TableEntryReference;
         //var locale = LocalizationSettings.AvailableLocales.Locales[0];
 
-        //var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync("Winning Combos", tableEntryReference, locale);
+        //var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync("Room Settings", tableEntryReference, locale);
         //if (op.IsDone) {
         //    SettingsName = op.Result;
         //} else {

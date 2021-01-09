@@ -54,7 +54,7 @@ public class LocalizeWinCombos : MonoBehaviour, IResetVariables {
             string entry = winningCombo.ToUpper();
             entry = entry.Replace(' ', '_');
             LocalizeStringEvent comboString = winComboTransform.GetChild(0).GetChild(0).gameObject.GetComponent<LocalizeStringEvent>();
-            comboString.StringReference.SetReference("Winning Combos", entry);
+            comboString.StringReference.SetReference("Room Settings", entry);
 
             int fan = settingsDict[winningCombo];
             Text fanText = winComboTransform.GetChild(1).GetChild(0).gameObject.GetComponent<Text>();

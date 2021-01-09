@@ -173,36 +173,36 @@ public static class InitializeRound {
             Debug.LogErrorFormat("{0} tiles have been created instead of 148", tiles.Count);
         }
 
-        // DEBUG
-        tiles = new List<Tile>() {
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Character, Tile.Rank.One),
-            new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
-            new Tile(Tile.Suit.Flower, Tile.Rank.Four),
+        //// DEBUG
+        //tiles = new List<Tile>() {
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+        //    new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Character, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Dragon, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Flower, Tile.Rank.Four),
 
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
-            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-        };
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Two),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Three),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Four),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Five),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Six),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Eight),
+        //    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+        //};
 
         // Add to Room Custom Properties
         PropertiesManager.SetWallTileList(tiles);
@@ -216,105 +216,105 @@ public static class InitializeRound {
     public static void DistributeTiles() {
         List<Tile> tiles = PropertiesManager.GetWallTileList();
 
-        // DEBUG
-        foreach (Player player in PhotonNetwork.PlayerList) {
-            if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.EAST) {
-                List<Tile> playerTiles = new List<Tile>() {
-                    new Tile(Tile.Suit.Character, Tile.Rank.One),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Five),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Seven),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Eight),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.Three),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.Four),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.One)
-                };
-
-                EventsManager.EventDistributeTiles(player, playerTiles);
-
-            } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.SOUTH) {
-                List<Tile> playerTiles = new List<Tile>() {
-                    new Tile(Tile.Suit.Character, Tile.Rank.One),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Nine),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.Three),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.Four),
-                    new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-                    new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Dragon, Tile.Rank.Three)
-                };
-
-                EventsManager.EventDistributeTiles(player, playerTiles);
-
-            } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.WEST) {
-                List<Tile> playerTiles = new List<Tile>() {
-                    new Tile(Tile.Suit.Character, Tile.Rank.Six),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Seven),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.Three),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.Four),
-                    new Tile(Tile.Suit.Dragon, Tile.Rank.One),
-                    new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Dragon, Tile.Rank.Three)
-                };
-
-                EventsManager.EventDistributeTiles(player, playerTiles);
-
-            } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.NORTH) {
-                List<Tile> playerTiles = new List<Tile>() {
-                    new Tile(Tile.Suit.Character, Tile.Rank.One),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Four),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Seven),
-                    new Tile(Tile.Suit.Character, Tile.Rank.Nine),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.One),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.One),
-                    new Tile(Tile.Suit.Wind, Tile.Rank.Four),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
-                    new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
-                    new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
-                    new Tile(Tile.Suit.Bamboo, Tile.Rank.Five)
-                };
-
-                EventsManager.EventDistributeTiles(player, playerTiles);
-            }
-        }
-
-
+        //// DEBUG
         //foreach (Player player in PhotonNetwork.PlayerList) {
-        //    List<Tile> playerTiles = new List<Tile>();
+        //    if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.EAST) {
+        //        List<Tile> playerTiles = new List<Tile>() {
+        //            new Tile(Tile.Suit.Character, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Two),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Five),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Eight),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.Two),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.Three),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.Four),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.One)
+        //        };
 
-        //    for (int i = 0; i < 14; i++) {
-        //        // Choose a tile randomly from the complete tiles list and add it to the player's tiles
-        //        int randomIndex = GameManager.RandomNumber(tiles.Count());
-        //        playerTiles.Add(tiles[randomIndex]);
-        //        tiles.Remove(tiles[randomIndex]);
+        //        EventsManager.EventDistributeTiles(player, playerTiles);
 
-        //        // Don't give the 14th tile if the player is not the East Wind
-        //        if (i == 12 && (PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] != PlayerManager.Wind.EAST) {
-        //            break;
-        //        }
+        //    } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.SOUTH) {
+        //        List<Tile> playerTiles = new List<Tile>() {
+        //            new Tile(Tile.Suit.Character, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+        //            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Bamboo, Tile.Rank.Nine),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+        //            new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+        //            new Tile(Tile.Suit.Dragon, Tile.Rank.Three)
+        //        };
+
+        //        EventsManager.EventDistributeTiles(player, playerTiles);
+
+        //    } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.WEST) {
+        //        List<Tile> playerTiles = new List<Tile>() {
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Six),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+        //            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Bamboo, Tile.Rank.Seven),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.Two),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.Three),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+        //            new Tile(Tile.Suit.Dragon, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+        //            new Tile(Tile.Suit.Dragon, Tile.Rank.Three)
+        //        };
+
+        //        EventsManager.EventDistributeTiles(player, playerTiles);
+
+        //    } else if ((PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] == PlayerManager.Wind.NORTH) {
+        //        List<Tile> playerTiles = new List<Tile>() {
+        //            new Tile(Tile.Suit.Character, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Two),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Four),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Seven),
+        //            new Tile(Tile.Suit.Character, Tile.Rank.Nine),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Wind, Tile.Rank.Four),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.Seven),
+        //            new Tile(Tile.Suit.Dot, Tile.Rank.Nine),
+        //            new Tile(Tile.Suit.Bamboo, Tile.Rank.One),
+        //            new Tile(Tile.Suit.Dragon, Tile.Rank.Two),
+        //            new Tile(Tile.Suit.Bamboo, Tile.Rank.Five)
+        //        };
+
+        //        EventsManager.EventDistributeTiles(player, playerTiles);
         //    }
-
-        //    EventsManager.EventDistributeTiles(player, playerTiles);
         //}
+
+
+        foreach (Player player in PhotonNetwork.PlayerList) {
+            List<Tile> playerTiles = new List<Tile>();
+
+            for (int i = 0; i < 14; i++) {
+                // Choose a tile randomly from the complete tiles list and add it to the player's tiles
+                int randomIndex = GameManager.RandomNumber(tiles.Count());
+                playerTiles.Add(tiles[randomIndex]);
+                tiles.Remove(tiles[randomIndex]);
+
+                // Don't give the 14th tile if the player is not the East Wind
+                if (i == 12 && (PlayerManager.Wind)DictManager.Instance.windsAllocation[player.ActorNumber] != PlayerManager.Wind.EAST) {
+                    break;
+                }
+            }
+
+            EventsManager.EventDistributeTiles(player, playerTiles);
+        }
 
         PropertiesManager.SetWallTileList(tiles);
         Debug.Log("The tiles from the wall have been distributed");
