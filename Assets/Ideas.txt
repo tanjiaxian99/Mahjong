@@ -1,0 +1,4 @@
+1. Starting points setting
+2. Preset room settings
+3. Retrieve settings from custom properties and cache it.
+4. Shooter pay true false

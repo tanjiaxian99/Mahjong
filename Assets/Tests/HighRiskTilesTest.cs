@@ -58,8 +58,8 @@ namespace Tests {
             handsToCheck.Add("Eighteen Arhats", 10);
             handsToCheck.Add("Thirteen Wonders", 10);
 
-            handsToCheck.Add("Winning on Replacement Tile for Flower", 1);
-            handsToCheck.Add("Winning on Replacement Tile for Kong", 1);
+            handsToCheck.Add("Replacement Tile for Flower", 1);
+            handsToCheck.Add("Replacement Tile for Kong", 1);
             handsToCheck.Add("Kong on Kong", 10);
 
             handsToCheck.Add("Robbing the Kong", 1);

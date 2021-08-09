@@ -129,7 +129,7 @@ public class WinManager : MonoBehaviour {
             gameManager.payAllPlayer = gameManager.discardPlayer;
         }
 
-        if (playerManager.winningCombos.Contains("Winning on Replacement Tile for Kong") && numberOfTilesLeft < 22 && isFreshTile) {
+        if (playerManager.winningCombos.Contains("Replacement Tile for Kong") && numberOfTilesLeft < 22 && isFreshTile) {
             PropertiesManager.SetPayAllPlayer(payment.kongDiscardPlayer);
             gameManager.payAllPlayer = payment.kongDiscardPlayer;
         }

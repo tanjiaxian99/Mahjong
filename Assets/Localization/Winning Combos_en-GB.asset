@@ -16,7 +16,9 @@ MonoBehaviour:
     m_Code: en-GB
   m_SharedData: {fileID: 11400000, guid: 8a22c51a6891a034a88db810f248f7b3, type: 2}
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - id: 0
+    - id: 1
   m_TableData:
   - m_Id: 1
     m_Localized: Heavenly Hand
@@ -186,5 +188,99 @@ MonoBehaviour:
     m_Localized: fan
     m_Metadata:
       m_Items: []
+  - m_Id: 46
+    m_Localized: '{value} fan'
+    m_Metadata:
+      m_Items:
+      - id: 0
+  - m_Id: 47
+    m_Localized: Fan Limit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 48
+    m_Localized: Dragon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49
+    m_Localized: Dragon Tile Set Pay All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50
+    m_Localized: Wind Tile Set Pay All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 51
+    m_Localized: Point Limit Pay All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 52
+    m_Localized: Full Flush Pay All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53
+    m_Localized: Pure Terminals Pay All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 54
+    m_Localized: Min Point Pay All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 55
+    m_Localized: Shooter Pay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56
+    m_Localized: Hidden Cat and Rat Payout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 57
+    m_Localized: Cat and Rat Payout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 58
+    m_Localized: Hidden Chicken and Centipede Payout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 59
+    m_Localized: Chicken and Centipede Payout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 60
+    m_Localized: Complete Animal Group Payout Payout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 61
+    m_Localized: Hidden Bonus Tile Match Seat Wind Pair Payout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 62
+    m_Localized: Bonus Tile Match Seat Wind Pair Payout
+    m_Metadata:
+      m_Items:
+      - id: 1
+  - m_Id: 63
+    m_Localized: Complete Season Group Payout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64
+    m_Localized: Complete Flower Group Payout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 65
+    m_Localized: Concealed Kong Payout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 66
+    m_Localized: Discard and Exposed Kong Payout
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
+    00000000:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 2e000000
+    00000001:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 3e000000

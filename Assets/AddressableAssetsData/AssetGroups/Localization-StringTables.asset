@@ -28,7 +28,7 @@ MonoBehaviour:
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   - m_GUID: 1481d012770c6e34f8244b6eceae4dce
-    m_Address: Winning Combos_en-GB
+    m_Address: Room Settings_en-GB
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-en-GB
@@ -104,7 +104,7 @@ MonoBehaviour:
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   - m_GUID: 94f1c67c52327174f9f53b200edc5e33
-    m_Address: Winning Combos_zh-TW
+    m_Address: Room Settings_zh-TW
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-zh-TW
@@ -114,7 +114,7 @@ MonoBehaviour:
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   - m_GUID: 9fb6a24d9a3a93b47be1dd896e08a0c0
-    m_Address: Winning Combos_zh
+    m_Address: Room Settings_zh
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-zh

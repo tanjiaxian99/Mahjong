@@ -21,7 +21,23 @@ MonoBehaviour:
     - id: 1
     - id: 2
     - id: 3
-  m_TableData: []
+  m_TableData:
+  - m_Id: 3
+    m_Localized: "\u53F0"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5
+    m_Localized: "{winnerName} \u7531 {fanTotal} \u53F0\u4F86\u80E1\u3002\u4ED6\u7684\u8FDE\u80DC\u662F\uFF1A\n{combos}\n\n{winLoseType}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2
+    m_Localized: "\u4F60\u7531 {fanTotal} \u53F0\u6765\u80E1\u3002\u4F60\u7684\u8FDE\u80DC\u662F\uFF1A\r\n{combos}\r\n\r\n{winLoseType}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1
+    m_Localized: "\u4F60\u73B0\u5728\u6709 {fanTotal} \u53F0"
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:
